@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Rajdhani, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 const rajdhani = Rajdhani({
   variable: "--font-heading",
@@ -73,7 +74,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/pwa.png" />
       </head>
       <body
         className={`${rajdhani.variable} ${jetbrainsMono.variable} antialiased`}
@@ -85,6 +88,7 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

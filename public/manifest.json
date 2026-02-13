@@ -1,16 +1,22 @@
 {
-    "name": "KAAN Experience",
-    "short_name": "KAAN",
+    "name": "KAAN - 5th Gen Fighter Concept",
+    "short_name": "KAAN Ops",
     "description": "Interactive experience of Türkiye's 5th generation stealth fighter jet",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#050508",
-    "theme_color": "#00d4ff",
-    "orientation": "any",
+    "theme_color": "#050508",
+    "orientation": "portrait",
     "icons": [
         {
+            "src": "/pwa.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
             "src": "/favicon.ico",
-            "sizes": "any",
+            "sizes": "48x48",
             "type": "image/x-icon"
         }
     ],
