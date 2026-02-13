@@ -27,6 +27,16 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
+    /* Lock body scroll when mobile menu is open */
+    useEffect(() => {
+        if (mobileOpen) {
+            document.body.classList.add("overflow-locked");
+        } else {
+            document.body.classList.remove("overflow-locked");
+        }
+        return () => document.body.classList.remove("overflow-locked");
+    }, [mobileOpen]);
+
     useKeyboardShortcuts({
         onToggleTheme: () => { toggleTheme(); playClick(); },
         onToggleMute: () => { setSoundEnabled((p) => !p); playClick(); },
@@ -48,7 +58,7 @@ export function Navbar() {
                 : "bg-transparent"
                 }`}
         >
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:px-12">
+            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:px-12">
                 <a href="#hero" className="flex items-center gap-3">
                     <div className="h-8 w-1 bg-neon-blue" />
                     <span className="text-xl font-bold tracking-[0.2em] text-white">
@@ -62,6 +72,7 @@ export function Navbar() {
                     </span>
                 </a>
 
+                {/* Desktop nav links */}
                 <div className="hidden items-center gap-6 md:flex">
                     {navLinks.map((link) => (
                         <a
@@ -110,19 +121,19 @@ export function Navbar() {
                     <LanguageToggle locale={locale} toggle={() => { toggleLang(); playClick(); }} />
                 </div>
 
+                {/* Mobile controls */}
                 <div className="flex items-center gap-3 md:hidden">
-                    {/* Mobile toggles */}
                     <button
                         onClick={() => { toggleTheme(); playClick(); }}
-                        className="rounded border border-neon-blue/20 bg-neon-blue/5 p-1.5"
+                        className="rounded border border-neon-blue/20 bg-neon-blue/5 p-2"
                         aria-label="Toggle theme"
                     >
                         {mode === "day" ? (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neon-blue">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-neon-blue">
                                 <circle cx="12" cy="12" r="5" />
                             </svg>
                         ) : (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400">
                                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
                             </svg>
                         )}
@@ -134,43 +145,74 @@ export function Navbar() {
                     />
 
                     <LanguageToggle locale={locale} toggle={toggleLang} />
+
+                    {/* Hamburger */}
                     <button
                         onClick={() => setMobileOpen(!mobileOpen)}
-                        className="flex flex-col gap-1.5"
+                        className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded border border-neon-blue/20 bg-neon-blue/5"
                         aria-label="Toggle menu"
+                        aria-expanded={mobileOpen}
                     >
                         <span
-                            className={`block h-px w-6 bg-neon-blue transition-transform duration-300 ${mobileOpen ? "translate-y-[7px] rotate-45" : ""
+                            className={`block h-px w-5 bg-neon-blue transition-transform duration-300 ${mobileOpen ? "translate-y-[7px] rotate-45" : ""
                                 }`}
                         />
                         <span
-                            className={`block h-px w-6 bg-neon-blue transition-opacity duration-300 ${mobileOpen ? "opacity-0" : ""
+                            className={`block h-px w-5 bg-neon-blue transition-opacity duration-300 ${mobileOpen ? "opacity-0" : ""
                                 }`}
                         />
                         <span
-                            className={`block h-px w-6 bg-neon-blue transition-transform duration-300 ${mobileOpen ? "-translate-y-[7px] -rotate-45" : ""
+                            className={`block h-px w-5 bg-neon-blue transition-transform duration-300 ${mobileOpen ? "-translate-y-[7px] -rotate-45" : ""
                                 }`}
                         />
                     </button>
                 </div>
             </div>
 
+            {/* ── Full-screen Glassmorphism Mobile Drawer ── */}
             <div
-                className={`overflow-hidden transition-all duration-500 md:hidden ${mobileOpen ? "max-h-64" : "max-h-0"
+                className={`fixed inset-0 top-16 z-40 transition-all duration-500 md:hidden ${mobileOpen
+                    ? "visible opacity-100"
+                    : "invisible opacity-0"
                     }`}
             >
-                <div className="glass-panel border-t border-neon-blue/10 px-6 py-4">
-                    {navLinks.map((link) => (
+                {/* Backdrop blur overlay */}
+                <div
+                    className="absolute inset-0 bg-stealth-black/85 backdrop-blur-xl"
+                    onClick={() => setMobileOpen(false)}
+                />
+
+                {/* Nav links */}
+                <div className="relative flex h-full flex-col items-center justify-center gap-2 px-8">
+                    {navLinks.map((link, i) => (
                         <a
                             key={link.href}
                             href={link.href}
                             onClick={handleNavClick}
-                            className="block py-3 text-xs tracking-[0.2em] text-slate-300 transition-colors hover:text-neon-blue"
-                            style={{ fontFamily: "var(--font-mono)" }}
+                            className="group flex w-full max-w-sm items-center justify-between rounded-xl border border-white/5 bg-white/[0.03] px-6 py-4 text-sm tracking-[0.2em] text-slate-200 transition-all duration-300 active:scale-95 active:border-neon-blue/30"
+                            style={{
+                                fontFamily: "var(--font-mono)",
+                                transitionDelay: mobileOpen ? `${i * 60}ms` : "0ms",
+                                transform: mobileOpen ? "translateY(0)" : "translateY(20px)",
+                                opacity: mobileOpen ? 1 : 0,
+                            }}
                         >
-                            {link.label}
+                            <span>{link.label}</span>
+                            <span className="text-neon-blue/40 transition-colors group-active:text-neon-blue">▸</span>
                         </a>
                     ))}
+
+                    {/* Bottom decorative line */}
+                    <div
+                        className="mt-8 h-px w-32 bg-gradient-to-r from-transparent via-neon-blue/30 to-transparent transition-all duration-700"
+                        style={{ opacity: mobileOpen ? 1 : 0 }}
+                    />
+                    <span
+                        className="mt-2 text-[8px] tracking-[0.4em] text-titanium-light/30 transition-all duration-700"
+                        style={{ fontFamily: "var(--font-mono)", opacity: mobileOpen ? 1 : 0 }}
+                    >
+                        KAAN // TF-X // MMU
+                    </span>
                 </div>
             </div>
 

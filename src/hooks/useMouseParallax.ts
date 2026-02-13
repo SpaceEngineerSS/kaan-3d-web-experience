@@ -7,7 +7,7 @@ interface MousePosition {
     y: number;
 }
 
-export function useMouseParallax(sensitivity: number = 1): MousePosition {
+export function useMouseParallax(sensitivity: number = 1, enabled: boolean = true): MousePosition {
     const position = useRef<MousePosition>({ x: 0, y: 0 });
     const target = useRef<MousePosition>({ x: 0, y: 0 });
     const rafId = useRef<number>(0);
@@ -17,6 +17,12 @@ export function useMouseParallax(sensitivity: number = 1): MousePosition {
     }, []);
 
     useEffect(() => {
+        if (!enabled) {
+            position.current = { x: 0, y: 0 };
+            target.current = { x: 0, y: 0 };
+            return;
+        }
+
         const handleMouseMove = (e: MouseEvent) => {
             target.current = {
                 x: ((e.clientX / window.innerWidth) * 2 - 1) * sensitivity,
@@ -37,7 +43,7 @@ export function useMouseParallax(sensitivity: number = 1): MousePosition {
             window.removeEventListener("mousemove", handleMouseMove);
             cancelAnimationFrame(rafId.current);
         };
-    }, [sensitivity, lerp]);
+    }, [sensitivity, lerp, enabled]);
 
     return position.current;
 }

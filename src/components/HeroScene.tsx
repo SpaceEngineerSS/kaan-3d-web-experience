@@ -11,7 +11,16 @@ import { useMouseParallax } from "@/hooks/useMouseParallax";
 
 export function HeroScene() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const mouse = useMouseParallax(1);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    const mouse = useMouseParallax(1, !isMobile);
     const [scrollProgress, setScrollProgress] = useState(0);
 
     const handleScroll = useCallback(() => {
@@ -25,20 +34,22 @@ export function HeroScene() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
+    const cameraZ = isMobile ? 9 : 6;
+
     return (
         <div ref={containerRef} className="fixed inset-0 z-0">
             <ErrorBoundary>
                 <Suspense fallback={<RadarLoader />}>
                     <Canvas
-                        camera={{ position: [0, 1.5, 6], fov: 50, near: 0.1, far: 100 }}
+                        camera={{ position: [0, 1.5, cameraZ], fov: 50, near: 0.1, far: 100 }}
                         gl={{
-                            antialias: true,
+                            antialias: !isMobile,
                             alpha: false,
-                            powerPreference: "high-performance",
+                            powerPreference: isMobile ? "default" : "high-performance",
                             toneMapping: THREE.ACESFilmicToneMapping,
                             toneMappingExposure: 1.2,
                         }}
-                        dpr={[1, 2]}
+                        dpr={isMobile ? [1, 1.5] : [1, 2]}
                     >
                         <color attach="background" args={["#050508"]} />
                         <fog attach="fog" args={["#050508", 5, 25]} />
@@ -48,7 +59,7 @@ export function HeroScene() {
                             position={[10, 10, 10]}
                             intensity={2}
                             color="#ffffff"
-                            castShadow
+                            castShadow={!isMobile}
                             angle={0.4}
                             penumbra={0.5}
                         />

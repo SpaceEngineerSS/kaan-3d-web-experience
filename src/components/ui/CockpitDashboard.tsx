@@ -844,7 +844,7 @@ export function CockpitDashboard() {
                 >
                     {/* WARNING / CAUTION BAR */}
                     <div
-                        className="flex items-center justify-between border-b px-3 py-1"
+                        className="flex items-center justify-between border-b px-2 py-1 sm:px-3"
                         style={{ borderColor: accent + "18", background: "#0a0a0a" }}
                     >
                         <div className="flex items-center gap-4">
@@ -857,7 +857,7 @@ export function CockpitDashboard() {
                                 CAUTION
                             </span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="hidden items-center gap-3 sm:flex">
                             <span className="text-[8px] tracking-[0.2em]" style={{ color: accent + "66", fontFamily: "var(--font-mono)" }}>
                                 HDG {pad3(tel.heading)} // ALT {tel.alt} // M{tel.mach}
                             </span>
@@ -868,13 +868,13 @@ export function CockpitDashboard() {
                         </div>
                     </div>
 
-                    {/* OSB strip top */}
-                    <div className="px-4 pt-1">
+                    {/* OSB strip top — hidden on mobile */}
+                    <div className="hidden px-4 pt-1 sm:block">
                         <OSBStrip count={20} accent={accent} side="top" />
                     </div>
 
                     {/* ── 4-Panel Display Grid ── */}
-                    <div className="flex flex-col md:flex-row gap-[2px] p-2" style={{ minHeight: "320px" }}>
+                    <div className="flex flex-col gap-[2px] p-1 sm:p-2 md:flex-row" style={{ minHeight: "280px" }}>
                         {[
                             { label: "TAK HRT", drawFn: drawMovingMap, idx: 0 },
                             { label: "TAK DURUM", drawFn: drawTacticalSituation, idx: 1 },
@@ -888,11 +888,12 @@ export function CockpitDashboard() {
                                     key={panel.idx}
                                     className={`flex flex-col min-w-0 transition-all duration-500 ${isExpanded ? "flex-[4]" : isHidden ? "flex-0 opacity-0 overflow-hidden w-0 md:w-0" : "flex-1"
                                         }`}
-                                    style={{ height: isExpanded ? "420px" : isHidden ? "0" : "420px" }}
+                                    style={{ height: isExpanded ? "420px" : isHidden ? "0" : undefined }}
+                                    data-panel-height
                                 >
                                     <button
                                         onClick={() => togglePanel(panel.idx)}
-                                        className="px-2 py-0.5 text-center text-[7px] font-bold tracking-[0.2em] uppercase transition-colors hover:opacity-100"
+                                        className="px-2 py-1.5 text-center text-[7px] font-bold tracking-[0.2em] uppercase transition-colors hover:opacity-100 active:scale-95 sm:py-0.5"
                                         style={{ color: accent + (isExpanded ? "cc" : "66"), fontFamily: "var(--font-mono)" }}
                                         aria-label={`${isExpanded ? "Collapse" : "Expand"} ${panel.label} panel`}
                                     >
@@ -916,23 +917,23 @@ export function CockpitDashboard() {
                         })}
                     </div>
 
-                    {/* OSB strip bottom */}
-                    <div className="px-4 pb-1">
+                    {/* OSB strip bottom — hidden on mobile */}
+                    <div className="hidden px-4 pb-1 sm:block">
                         <OSBStrip count={20} accent={accent} side="bottom" />
                     </div>
 
                     {/* Status bar bottom */}
                     <div
-                        className="flex items-center justify-between border-t px-4 py-1"
+                        className="flex items-center justify-between border-t px-2 py-1 sm:px-4"
                         style={{ borderColor: accent + "18", background: "#0a0a0a" }}
                     >
-                        <span className="text-[7px] tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
-                            KAAN MMU // PCD v2.4 // TAI
+                        <span className="text-[6px] tracking-[0.1em] sm:text-[7px] sm:tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
+                            KAAN MMU // PCD v2.4
                         </span>
-                        <span className="text-[7px] tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
+                        <span className="hidden text-[7px] tracking-[0.15em] sm:inline" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
                             {locale === "tr" ? "PANORAMIK KOKPİT EKRANI" : "PANORAMIC COCKPIT DISPLAY"}
                         </span>
-                        <span className="text-[7px] tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
+                        <span className="text-[6px] tracking-[0.1em] sm:text-[7px] sm:tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
                             ASELSAN // HAVELSAN
                         </span>
                     </div>

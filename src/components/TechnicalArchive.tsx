@@ -224,7 +224,7 @@ export function PhotoGallery() {
                                 <div
                                     key={i}
                                     onClick={() => openLightbox(i)}
-                                    className="group relative flex-shrink-0 cursor-pointer overflow-hidden rounded-xl border border-white/5 transition-all duration-500 hover:border-neon-blue/30"
+                                    className="group relative flex-shrink-0 cursor-pointer overflow-hidden rounded-xl border border-white/5 transition-all duration-500 hover:border-neon-blue/30 active:scale-95"
                                 >
                                     <div className="h-52 w-80 bg-cockpit-dark md:h-72 md:w-96">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -199,7 +199,7 @@ export function ComparisonChart() {
                 <div className="glass-panel rounded-2xl p-6">
                     <canvas
                         ref={canvasRef}
-                        className="mx-auto h-[350px] w-full max-w-lg md:h-[420px]"
+                        className="mx-auto h-[280px] w-full max-w-lg sm:h-[350px] md:h-[420px]"
                     />
 
                     {/* Legend */}
