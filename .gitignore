@@ -43,7 +43,4 @@ next-env.d.ts
 # private documents
 /KAAN/
 
-# large media (exceeds GitHub 100MB limit)
-/public/videos/kaan.mp4
-
 /public/models/KAAN/
