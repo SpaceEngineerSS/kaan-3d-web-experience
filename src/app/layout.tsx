@@ -24,9 +24,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kaan-3d-web-experience.vercel.app"),
   title: "KAAN — 5th Generation Fighter Aircraft",
   description:
-    "Türkiye's next-generation stealth fighter jet. An interactive experience showcasing the KAAN's advanced capabilities, avionics, and stealth technology.",
+    "Türkiye's next-generation stealth fighter jet. An interactive 3D experience showcasing the KAAN's advanced capabilities, avionics, stealth technology, weapon systems, and indigenous engine development.",
   authors: [{ name: "Mehmet Gümüş", url: "https://github.com/SpaceEngineerSS" }],
   icons: { icon: "/favicon.ico" },
   keywords: [

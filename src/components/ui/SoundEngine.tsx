@@ -1,19 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 /**
- * SoundEngine – Web Audio API atmospheric audio.
+ * SoundEngine – Web Audio API atmospheric audio with spatial capabilities.
  * Provides:
  * - Low-volume ambient jet engine hum (low-pass filtered brown noise)
+ * - Dynamic pitch based on scroll velocity
  * - Mute toggle state shared via props
  * - playClick() for mechanical click SFX
+ * - playSonicBoom() for dramatic section transitions
  */
 export function useSoundEngine(enabled: boolean) {
     const ctxRef = useRef<AudioContext | null>(null);
     const noiseRef = useRef<AudioBufferSourceNode | null>(null);
     const gainRef = useRef<GainNode | null>(null);
+    const filterRef = useRef<BiquadFilterNode | null>(null);
     const startedRef = useRef(false);
+    const scrollVelRef = useRef(0);
+    const lastScrollRef = useRef(0);
 
     const init = useCallback(() => {
         if (ctxRef.current || !enabled) return;
@@ -36,23 +41,30 @@ export function useSoundEngine(enabled: boolean) {
             source.buffer = buffer;
             source.loop = true;
 
-            /* Low-pass filter – deep rumble */
+            /* Low-pass filter – deep rumble, frequency controlled by scroll */
             const lpf = ctx.createBiquadFilter();
             lpf.type = "lowpass";
             lpf.frequency.value = 180;
             lpf.Q.value = 1.2;
+
+            /* High-pass filter for scroll-based whine */
+            const hpf = ctx.createBiquadFilter();
+            hpf.type = "highpass";
+            hpf.frequency.value = 40;
 
             /* Gain – very low volume */
             const gain = ctx.createGain();
             gain.gain.value = 0.08;
 
             source.connect(lpf);
-            lpf.connect(gain);
+            lpf.connect(hpf);
+            hpf.connect(gain);
             gain.connect(ctx.destination);
             source.start();
 
             noiseRef.current = source;
             gainRef.current = gain;
+            filterRef.current = lpf;
             startedRef.current = true;
         } catch {
             /* Audio not supported */
@@ -77,6 +89,39 @@ export function useSoundEngine(enabled: boolean) {
             document.removeEventListener("keydown", startOnInteraction);
         };
     }, [enabled, init]);
+
+    /* Scroll-based dynamic pitch */
+    useEffect(() => {
+        if (!enabled) return;
+
+        const handleScroll = () => {
+            const currentScroll = window.scrollY;
+            const velocity = Math.abs(currentScroll - lastScrollRef.current);
+            lastScrollRef.current = currentScroll;
+            scrollVelRef.current = velocity;
+
+            if (filterRef.current && ctxRef.current) {
+                const baseFreq = 180;
+                const scrollBoost = Math.min(velocity * 2, 300);
+                filterRef.current.frequency.linearRampToValueAtTime(
+                    baseFreq + scrollBoost,
+                    ctxRef.current.currentTime + 0.1
+                );
+            }
+
+            if (gainRef.current && ctxRef.current) {
+                const baseGain = 0.08;
+                const scrollGain = Math.min(velocity * 0.0005, 0.06);
+                gainRef.current.gain.linearRampToValueAtTime(
+                    enabled ? baseGain + scrollGain : 0,
+                    ctxRef.current.currentTime + 0.1
+                );
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [enabled]);
 
     /* Toggle mute */
     useEffect(() => {
@@ -104,7 +149,37 @@ export function useSoundEngine(enabled: boolean) {
         osc.stop(ctx.currentTime + 0.06);
     }, [enabled]);
 
-    return { playClick };
+    /* Sonic boom SFX */
+    const playSonicBoom = useCallback(() => {
+        if (!ctxRef.current || !enabled) return;
+        const ctx = ctxRef.current;
+
+        const bufferSize = ctx.sampleRate * 0.8;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            const t = i / bufferSize;
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 6) * 0.5;
+        }
+
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+
+        const lpf = ctx.createBiquadFilter();
+        lpf.type = "lowpass";
+        lpf.frequency.value = 200;
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+
+        source.connect(lpf);
+        lpf.connect(gain);
+        gain.connect(ctx.destination);
+        source.start();
+    }, [enabled]);
+
+    return { playClick, playSonicBoom };
 }
 
 /**

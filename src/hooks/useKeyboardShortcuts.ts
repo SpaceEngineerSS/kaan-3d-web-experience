@@ -6,6 +6,11 @@ interface KeyboardShortcutsProps {
     onToggleTheme: () => void;
     onToggleMute: () => void;
     onToggleLanguage: () => void;
+    onToggleXRay?: () => void;
+    onToggleHotspots?: () => void;
+    onCameraPreset?: (preset: string | null) => void;
+    onToggleFullscreen?: () => void;
+    onShowHelp?: () => void;
 }
 
 /**
@@ -15,18 +20,25 @@ interface KeyboardShortcutsProps {
  * - N: Toggle Night/Day mode
  * - M: Toggle Mute/Unmute
  * - L: Toggle Language (TR/EN)
- *
- * All shortcuts are disabled when user is focused on an input, textarea, or
- * contenteditable element to prevent interference with typing.
+ * - X: Toggle X-Ray mode
+ * - H: Toggle Hotspots
+ * - 1-5: Camera presets (Front, Side, Top, Rear, Cockpit)
+ * - 0: Reset camera
+ * - F: Toggle Fullscreen
+ * - ?: Show shortcuts help
  */
 export function useKeyboardShortcuts({
     onToggleTheme,
     onToggleMute,
     onToggleLanguage,
+    onToggleXRay,
+    onToggleHotspots,
+    onCameraPreset,
+    onToggleFullscreen,
+    onShowHelp,
 }: KeyboardShortcutsProps) {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Skip if user is typing in an input
             const target = e.target as HTMLElement;
             if (
                 target.tagName === "INPUT" ||
@@ -36,7 +48,6 @@ export function useKeyboardShortcuts({
                 return;
             }
 
-            // Skip if modifier keys are held
             if (e.ctrlKey || e.metaKey || e.altKey) return;
 
             switch (e.key.toLowerCase()) {
@@ -52,10 +63,50 @@ export function useKeyboardShortcuts({
                     e.preventDefault();
                     onToggleLanguage();
                     break;
+                case "x":
+                    e.preventDefault();
+                    onToggleXRay?.();
+                    break;
+                case "h":
+                    e.preventDefault();
+                    onToggleHotspots?.();
+                    break;
+                case "1":
+                    e.preventDefault();
+                    onCameraPreset?.("front");
+                    break;
+                case "2":
+                    e.preventDefault();
+                    onCameraPreset?.("side");
+                    break;
+                case "3":
+                    e.preventDefault();
+                    onCameraPreset?.("top");
+                    break;
+                case "4":
+                    e.preventDefault();
+                    onCameraPreset?.("rear");
+                    break;
+                case "5":
+                    e.preventDefault();
+                    onCameraPreset?.("cockpit");
+                    break;
+                case "0":
+                    e.preventDefault();
+                    onCameraPreset?.(null);
+                    break;
+                case "f":
+                    e.preventDefault();
+                    onToggleFullscreen?.();
+                    break;
+                case "?":
+                    e.preventDefault();
+                    onShowHelp?.();
+                    break;
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onToggleTheme, onToggleMute, onToggleLanguage]);
+    }, [onToggleTheme, onToggleMute, onToggleLanguage, onToggleXRay, onToggleHotspots, onCameraPreset, onToggleFullscreen, onShowHelp]);
 }

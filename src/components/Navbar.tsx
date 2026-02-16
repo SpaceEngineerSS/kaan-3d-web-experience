@@ -7,7 +7,19 @@ import { SoundToggle, useSoundEngine } from "@/components/ui/SoundEngine";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import translations from "@/lib/translations";
 
-export function Navbar() {
+interface NavbarProps {
+    onToggleXRay?: () => void;
+    onCameraPreset?: (preset: string | null) => void;
+    onToggleFullscreen?: () => void;
+    onShowHelp?: () => void;
+}
+
+export function Navbar({
+    onToggleXRay,
+    onCameraPreset,
+    onToggleFullscreen,
+    onShowHelp,
+}: NavbarProps) {
     const { locale, toggle: toggleLang } = useLanguage();
     const { mode, toggle: toggleTheme } = useTheme();
     const [scrolled, setScrolled] = useState(false);
@@ -41,10 +53,14 @@ export function Navbar() {
         onToggleTheme: () => { toggleTheme(); playClick(); },
         onToggleMute: () => { setSoundEnabled((p) => !p); playClick(); },
         onToggleLanguage: () => { toggleLang(); playClick(); },
+        onToggleXRay: () => { onToggleXRay?.(); playClick(); },
+        onCameraPreset: (preset) => { onCameraPreset?.(preset); playClick(); },
+        onToggleFullscreen: () => { onToggleFullscreen?.(); playClick(); },
+        onShowHelp: () => { onShowHelp?.(); playClick(); },
     });
 
     const handleNavClick = useCallback(
-        (e: React.MouseEvent) => {
+        () => {
             playClick();
             setMobileOpen(false);
         },
@@ -85,6 +101,16 @@ export function Navbar() {
                             {link.label}
                         </a>
                     ))}
+
+                    {/* Shortcuts Help */}
+                    <button
+                        onClick={() => { onShowHelp?.(); playClick(); }}
+                        className="group relative flex items-center justify-center rounded border border-neon-blue/20 bg-neon-blue/5 p-1.5 transition-all hover:border-neon-blue/40 hover:bg-neon-blue/10"
+                        aria-label="Keyboard shortcuts"
+                        title={locale === "tr" ? "Kısayollar (?)" : "Shortcuts (?)"}
+                    >
+                        <span className="text-xs font-bold text-neon-blue/60" style={{ fontFamily: "var(--font-mono)" }}>?</span>
+                    </button>
 
                     {/* Day/Night Toggle */}
                     <button
@@ -169,7 +195,7 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* ── Full-screen Glassmorphism Mobile Drawer ── */}
+            {/* Full-screen Glassmorphism Mobile Drawer */}
             <div
                 className={`fixed inset-0 top-16 z-40 transition-all duration-500 md:hidden ${mobileOpen
                     ? "visible opacity-100"
@@ -198,7 +224,7 @@ export function Navbar() {
                             }}
                         >
                             <span>{link.label}</span>
-                            <span className="text-neon-blue/40 transition-colors group-active:text-neon-blue">▸</span>
+                            <span className="text-neon-blue/40 transition-colors group-active:text-neon-blue">&#9656;</span>
                         </a>
                     ))}
 

@@ -44,7 +44,7 @@ export function Timeline() {
     }, [locale]);
 
     return (
-        <section className="relative z-10 px-6 py-24 md:px-12 lg:px-24">
+        <section id="timeline" className="relative z-10 px-6 py-24 md:px-12 lg:px-24">
             <div className="mx-auto max-w-4xl">
                 {/* Section header */}
                 <div className="mb-16 text-center">

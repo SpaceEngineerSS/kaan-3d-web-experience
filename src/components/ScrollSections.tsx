@@ -80,11 +80,16 @@ export function ScrollSections() {
                             {renderIcon(phase.icon)}
                             <div className="h-px w-12 bg-neon-blue/40" />
                             <span
-                                className="text-[10px] tracking-[0.4em] text-neon-blue animate-hud-blink"
+                                className="typewriter text-[10px] tracking-[0.4em] text-neon-blue animate-hud-blink"
                                 style={{ fontFamily: "var(--font-mono)" }}
                             >
                                 {phase.tag}
                             </span>
+                        </div>
+
+                        {/* Scan line */}
+                        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.03]">
+                            <div className="absolute inset-x-0 h-px bg-neon-blue animate-scan-slow" />
                         </div>
 
                         <div className="hud-animate mb-6 flex items-center gap-4">

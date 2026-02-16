@@ -2,14 +2,22 @@
 
 import { Suspense, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
+import { Environment, Stars } from "@react-three/drei";
+import { EffectComposer, Bloom, Vignette, ChromaticAberration } from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
 import * as THREE from "three";
 import { KaanModel } from "./KaanModel";
+import { AfterburnerEffect } from "./AfterburnerEffect";
 import { RadarLoader } from "./RadarLoader";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { useMouseParallax } from "@/hooks/useMouseParallax";
 
-export function HeroScene() {
+interface HeroSceneProps {
+    xRayMode?: boolean;
+    cameraPreset?: string | null;
+}
+
+export function HeroScene({ xRayMode = false, cameraPreset = null }: HeroSceneProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -54,7 +62,7 @@ export function HeroScene() {
                         <color attach="background" args={["#050508"]} />
                         <fog attach="fog" args={["#050508", 5, 25]} />
 
-                        {/* Key light — dramatic white spot from upper right */}
+                        {/* Key light */}
                         <spotLight
                             position={[10, 10, 10]}
                             intensity={2}
@@ -64,7 +72,7 @@ export function HeroScene() {
                             penumbra={0.5}
                         />
 
-                        {/* Strong blue rim light — back left for silhouette edge */}
+                        {/* Strong blue rim light */}
                         <spotLight
                             position={[-5, 2, -5]}
                             intensity={8}
@@ -74,39 +82,53 @@ export function HeroScene() {
                         />
 
                         {/* Underside blue fill */}
-                        <pointLight
-                            position={[0, -5, 0]}
-                            intensity={1.5}
-                            color="#0088ff"
-                            distance={15}
-                            decay={2}
-                        />
+                        <pointLight position={[0, -5, 0]} intensity={1.5} color="#0088ff" distance={15} decay={2} />
 
-                        {/* Engine glow — warm orange accent */}
-                        <pointLight
-                            position={[3, 0, -3]}
-                            intensity={3}
-                            color="#ffaa00"
-                            distance={12}
-                            decay={2}
-                        />
+                        {/* Engine glow */}
+                        <pointLight position={[3, 0, -3]} intensity={3} color="#ffaa00" distance={12} decay={2} />
 
                         {/* Subtle back-fill for depth */}
-                        <pointLight
-                            position={[0, 1, -10]}
-                            intensity={2}
-                            color="#00d4ff"
-                            distance={18}
-                            decay={2}
-                        />
+                        <pointLight position={[0, 1, -10]} intensity={2} color="#00d4ff" distance={18} decay={2} />
+
+                        {/* Top accent light */}
+                        <spotLight position={[0, 12, 2]} intensity={1.5} color="#ffffff" angle={0.3} penumbra={0.9} />
 
                         <KaanModel
                             scrollProgress={scrollProgress}
                             mouseX={mouse.x}
                             mouseY={mouse.y}
+                            xRayMode={xRayMode}
+                            cameraPreset={cameraPreset}
                         />
 
+                        {!xRayMode && <AfterburnerEffect scrollProgress={scrollProgress} />}
+
+                        <Stars radius={80} depth={60} count={1500} factor={3} saturation={0} fade speed={0.5} />
+
                         <Environment preset="city" blur={0.8} />
+
+                        {!isMobile && (
+                            <EffectComposer>
+                                <Bloom
+                                    intensity={0.5}
+                                    luminanceThreshold={0.6}
+                                    luminanceSmoothing={0.9}
+                                    mipmapBlur
+                                />
+                                <Vignette
+                                    eskil={false}
+                                    offset={0.3}
+                                    darkness={0.7}
+                                    blendFunction={BlendFunction.NORMAL}
+                                />
+                                <ChromaticAberration
+                                    offset={new THREE.Vector2(0.0005, 0.0005)}
+                                    blendFunction={BlendFunction.NORMAL}
+                                    radialModulation={false}
+                                    modulationOffset={0}
+                                />
+                            </EffectComposer>
+                        )}
                     </Canvas>
                 </Suspense>
             </ErrorBoundary>

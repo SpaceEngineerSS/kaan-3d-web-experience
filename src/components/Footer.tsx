@@ -4,7 +4,7 @@ import { GlitchText } from "./GlitchText";
 import { useLanguage } from "@/context/LanguageContext";
 import translations from "@/lib/translations";
 
-const navHrefs = ["#hero", "#overview", "#specs", "#systems"];
+const navHrefs = ["#hero", "#overview", "#specs", "#technology", "#weapons", "#engine", "#production"];
 
 interface FooterLangData {
     description: Record<string, string>;

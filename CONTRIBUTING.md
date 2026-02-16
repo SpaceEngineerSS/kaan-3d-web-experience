@@ -47,11 +47,11 @@ docs/contributing-guide
 
 ```
 src/
-├── app/           # Next.js 15 App Router pages and layouts
-├── components/    # React UI components
-│   ├── ui/        # Sub-components (CockpitDashboard, SoundEngine)
-│   └── *.tsx      # Section-level components
-├── hooks/         # Custom React hooks
+├── app/           # Next.js 16 App Router pages and layouts
+├── components/    # React UI components (30+ components)
+│   ├── ui/        # Sub-components (CockpitDashboard, SoundEngine, HUDOverlay, ComparisonChart)
+│   └── *.tsx      # Section-level components (HeroScene, WeaponConfig, AvionicsArchitecture, etc.)
+├── hooks/         # Custom React hooks (useMouseParallax, useKeyboardShortcuts, useKonamiCode)
 ├── context/       # React Context providers (Language, Theme)
 └── lib/           # Utilities, translations, helpers
 ```
@@ -59,9 +59,12 @@ src/
 ### Key Technologies
 | Package | Version | Purpose |
 |---------|---------|---------|
-| Next.js | 15+ | App Router, SSR |
-| React Three Fiber | 9+ | 3D rendering |
-| GSAP | 3.12+ | Scroll animations |
+| Next.js | 16+ | App Router, SSR, Turbopack |
+| React | 19+ | Hooks, Context, Dynamic Imports |
+| React Three Fiber | 9+ | 3D rendering (STL model) |
+| @react-three/postprocessing | 3+ | Bloom, Vignette, Chromatic Aberration |
+| @react-three/drei | 10+ | Environment, Stars, Html overlays |
+| GSAP | 3.14+ | Scroll animations |
 | Tailwind CSS | v4 | Styling |
 | Lucide React | — | Icons |
 
