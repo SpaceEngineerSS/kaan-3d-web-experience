@@ -108,12 +108,6 @@ export function VideoBriefing() {
                                     >
                                         {v.caption}
                                     </p>
-                                    <p
-                                        className="mt-1 text-[9px] tracking-[0.2em] text-red-400/60"
-                                        style={{ fontFamily: "var(--font-mono)" }}
-                                    >
-                                        {v.classification}
-                                    </p>
                                 </div>
                                 <span
                                     className="text-[10px] tracking-[0.2em] text-slate-400"
