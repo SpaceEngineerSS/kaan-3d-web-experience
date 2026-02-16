@@ -231,6 +231,18 @@ body::after {
   textarea {
     touch-action: manipulation;
   }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html {
+    scrollbar-width: none;
+  }
+}
+
+canvas {
+  touch-action: none;
 }
 
 /* Safe-area for notched phones (iPhone X+) */

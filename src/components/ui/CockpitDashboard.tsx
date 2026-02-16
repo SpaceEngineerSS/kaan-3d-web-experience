@@ -215,7 +215,7 @@ function drawMovingMap(ctx: CanvasRenderingContext2D, w: number, h: number, col:
 function drawTacticalSituation(ctx: CanvasRenderingContext2D, w: number, h: number, col: string, _warnCol: string, tel: Tel) {
     ctx.clearRect(0, 0, w, h);
     const cx = w / 2, cy = h / 2;
-    const maxR = Math.min(cx, cy) - 16;
+    const maxR = Math.max(0, Math.min(cx, cy) - 16);
 
     /* range rings */
     for (let i = 1; i <= 3; i++) {
