@@ -233,5 +233,6 @@ Kaynak kodu **MIT Lisansi** altinda sunulmaktadir. Gorsel varliklar, 3D modeller
 
 <p align="center">
   <strong>Mehmet Gumus</strong> tarafindan gelistirildi<br>
-  <a href="https://github.com/SpaceEngineerSS">github.com/SpaceEngineerSS</a>
+  <a href="https://github.com/SpaceEngineerSS">github.com/SpaceEngineerSS</a><br><br>
+  <strong>3D Model:</strong> Kaan Azman
 </p>

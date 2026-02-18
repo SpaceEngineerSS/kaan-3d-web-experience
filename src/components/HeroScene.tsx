@@ -6,7 +6,7 @@
 
 import { Suspense, useRef, useEffect, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment, Stars } from "@react-three/drei";
+import { Environment, Stars, useGLTF } from "@react-three/drei";
 import {
     EffectComposer,
     Bloom,
@@ -16,7 +16,6 @@ import {
 import { BlendFunction } from "postprocessing";
 import * as THREE from "three";
 import { KaanModel } from "./KaanModel";
-import { AfterburnerEffect } from "./AfterburnerEffect";
 import { RadarLoader } from "./RadarLoader";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { useMouseParallax } from "@/hooks/useMouseParallax";
@@ -32,34 +31,14 @@ export function HeroScene({
     cameraPreset = null,
 }: HeroSceneProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
     const { isMobile, dpr, shadowsEnabled, postProcessing, particleDensity } =
         useDeviceProfile();
 
-    const [isVisible, setIsVisible] = useState(true);
     const [scrollProgress, setScrollProgress] = useState(0);
     const mouse = useMouseParallax(1, !isMobile);
 
-    useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
-
-        const io = new IntersectionObserver(
-            ([entry]) => setIsVisible(entry.isIntersecting),
-            { threshold: 0.05 }
-        );
-        io.observe(el);
-
-        const onVisibility = () =>
-            setIsVisible(!document.hidden && el.getBoundingClientRect().bottom > 0);
-
-        document.addEventListener("visibilitychange", onVisibility);
-
-        return () => {
-            io.disconnect();
-            document.removeEventListener("visibilitychange", onVisibility);
-        };
-    }, []);
-
+    // Scroll progress — clamped to [0, 1]
     const handleScroll = useCallback(() => {
         const scrollHeight =
             document.documentElement.scrollHeight - window.innerHeight;
@@ -74,6 +53,28 @@ export function HeroScene({
         return () => window.removeEventListener("scroll", handleScroll);
     }, [handleScroll]);
 
+    // WebGL context loss recovery
+    useEffect(() => {
+        const canvas = containerRef.current?.querySelector("canvas");
+        if (!canvas) return;
+
+        const handleContextLost = (e: Event) => {
+            e.preventDefault();
+            console.warn("[KAAN] WebGL context lost — will attempt restore");
+        };
+        const handleContextRestored = () => {
+            console.info("[KAAN] WebGL context restored");
+        };
+
+        canvas.addEventListener("webglcontextlost", handleContextLost);
+        canvas.addEventListener("webglcontextrestored", handleContextRestored);
+
+        return () => {
+            canvas.removeEventListener("webglcontextlost", handleContextLost);
+            canvas.removeEventListener("webglcontextrestored", handleContextRestored);
+        };
+    }, []);
+
     const cameraZ = isMobile ? 9 : 6;
     const starCount = isMobile ? 500 : 1500;
 
@@ -82,7 +83,7 @@ export function HeroScene({
             <ErrorBoundary>
                 <Suspense fallback={<RadarLoader />}>
                     <Canvas
-                        frameloop={isVisible ? "always" : "never"}
+                        frameloop="always"
                         camera={{
                             position: [0, 1.5, cameraZ],
                             fov: 50,
@@ -99,7 +100,8 @@ export function HeroScene({
                         dpr={dpr}
                     >
                         <color attach="background" args={["#050508"]} />
-                        <fog attach="fog" args={["#050508", 5, 25]} />
+                        {/* Fog disabled to prevent model blackout issue */}
+                        {/* <fog attach="fog" args={["#050508", 10, 100]} /> */}
 
                         <spotLight
                             position={[10, 10, 10]}
@@ -160,7 +162,7 @@ export function HeroScene({
                             cameraPreset={cameraPreset}
                         />
 
-                        {!xRayMode && <AfterburnerEffect scrollProgress={scrollProgress} />}
+
 
                         <Stars
                             radius={80}
@@ -174,7 +176,8 @@ export function HeroScene({
 
                         <Environment preset="city" blur={0.8} />
 
-                        {postProcessing === "full" && (
+                        {/* Post-processing disabled to prevent bloom artifacting */}
+                        {false && postProcessing === "full" && (
                             <EffectComposer>
                                 <Bloom
                                     intensity={0.5}
@@ -202,3 +205,6 @@ export function HeroScene({
         </div>
     );
 }
+
+// Eagerly preload GLB model
+useGLTF.preload("/models/KAAN.glb");
