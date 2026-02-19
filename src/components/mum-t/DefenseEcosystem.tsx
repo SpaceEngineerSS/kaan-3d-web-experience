@@ -19,7 +19,7 @@ const COMPANY_META = [
     { id: "aselsan", name: "ASELSAN", color: "#a78bfa", angle: 60 },
     { id: "roketsan", name: "ROKETSAN", color: "#ef4444", angle: 120 },
     { id: "tei", name: "TEI", color: "#f97316", angle: 180 },
-    { id: "tubitak", name: "TÜBİTAK BİLGEM", color: "#10b981", angle: 240 },
+    { id: "tubitak", name: "TÜBİTAK SAGE", color: "#10b981", angle: 240 },
     { id: "havelsan", name: "HAVELSAN", color: "#fbbf24", angle: 300 },
 ];
 

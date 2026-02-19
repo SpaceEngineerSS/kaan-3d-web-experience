@@ -874,7 +874,10 @@ export function CockpitDashboard() {
                     </div>
 
                     {/* ── 4-Panel Display Grid ── */}
-                    <div className="flex flex-col gap-[2px] p-1 sm:p-2 md:flex-row" style={{ minHeight: "280px" }}>
+                    <div
+                        className="flex flex-col gap-[2px] p-1 sm:p-2 md:flex-row"
+                        style={{ height: expandedPanel !== null ? "420px" : "280px" }}
+                    >
                         {[
                             { label: "TAK HRT", drawFn: drawMovingMap, idx: 0 },
                             { label: "TAK DURUM", drawFn: drawTacticalSituation, idx: 1 },
@@ -886,21 +889,20 @@ export function CockpitDashboard() {
                             return (
                                 <div
                                     key={panel.idx}
-                                    className={`flex flex-col min-w-0 transition-all duration-500 ${isExpanded ? "flex-[4]" : isHidden ? "flex-0 opacity-0 overflow-hidden w-0 md:w-0" : "flex-1"
+                                    className={`flex flex-col min-w-0 h-full ${isExpanded ? "flex-[4]" : isHidden ? "hidden" : "flex-1"
                                         }`}
-                                    style={{ height: isExpanded ? "420px" : isHidden ? "0" : undefined }}
                                     data-panel-height
                                 >
                                     <button
                                         onClick={() => togglePanel(panel.idx)}
-                                        className="px-2 py-1.5 text-center text-[7px] font-bold tracking-[0.2em] uppercase transition-colors hover:opacity-100 active:scale-95 sm:py-0.5"
+                                        className="shrink-0 px-2 py-1.5 text-center text-[7px] font-bold tracking-[0.2em] uppercase transition-colors hover:opacity-100 active:scale-95 sm:py-0.5"
                                         style={{ color: accent + (isExpanded ? "cc" : "66"), fontFamily: "var(--font-mono)" }}
                                         aria-label={`${isExpanded ? "Collapse" : "Expand"} ${panel.label} panel`}
                                     >
                                         {panel.label} {isExpanded ? "▼" : "◆"}
                                     </button>
                                     <div
-                                        className="flex-1 rounded border overflow-hidden"
+                                        className="min-h-0 flex-1 rounded border overflow-hidden"
                                         style={{ borderColor: accent + (isExpanded ? "44" : "18") }}
                                     >
                                         <MFDCanvas
