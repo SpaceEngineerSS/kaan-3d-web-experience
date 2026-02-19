@@ -86,6 +86,17 @@ export function Footer() {
                         >
                             github.com/SpaceEngineerSS
                         </p>
+                        <div className="mt-4 flex items-center gap-2">
+                            <span
+                                className="text-xs tracking-[0.2em] text-neon-blue/50 uppercase"
+                                style={{ fontFamily: "var(--font-mono)" }}
+                            >
+                                3D Model:
+                            </span>
+                            <span className="text-sm text-slate-300">
+                                Kaan Azman
+                            </span>
+                        </div>
                     </div>
                 </div>
 
