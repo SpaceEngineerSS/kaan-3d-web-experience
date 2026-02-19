@@ -254,7 +254,7 @@ function SceneContent({ isMobile }: { isMobile: boolean }) {
             <pointLight position={[5, 2, -3]} color="#0ea5e9" intensity={isMobile ? 0.4 : 0.6} distance={22} />
             {!isMobile && <pointLight position={[0, 5, 8]} color="#ffffff" intensity={0.3} distance={20} />}
 
-            <group scale={isMobile ? 0.5 : 1}>
+            <group scale={isMobile ? 0.35 : 1}>
                 {/* Float animation disabled on mobile for perf */}
                 {isMobile ? innerContent : (
                     <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
@@ -303,7 +303,7 @@ export function MumTScene() {
                     logarithmicDepthBuffer: !isMobile,
                     powerPreference: isMobile ? "low-power" : "high-performance",
                 }}
-                style={{ background: "#020617" }}
+                style={{ background: "#020617", touchAction: "pan-y" }}
             >
                 <Suspense fallback={null}>
                     <SceneContent isMobile={isMobile} />

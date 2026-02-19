@@ -92,7 +92,7 @@ function SuperSimsekModel() {
     });
 
     return (
-        <group ref={groupRef} scale={isMobile ? 2 : 1}>
+        <group ref={groupRef} scale={isMobile ? 0.7 : 1}>
             <primitive object={model} />
         </group>
     );
@@ -186,6 +186,7 @@ export function SuperSimsekShowcase() {
                                 camera={{ position: [0, 1, 6], fov: 45 }}
                                 dpr={1}
                                 gl={{ antialias: false, alpha: true, powerPreference: isMobile ? "low-power" : "high-performance" }}
+                                style={{ touchAction: "pan-y" }}
                             >
                                 <Suspense fallback={null}>
                                     <ambientLight intensity={0.6} />
@@ -201,6 +202,7 @@ export function SuperSimsekShowcase() {
                                         autoRotate={false}
                                         enableZoom={false}
                                         enablePan={false}
+                                        enableRotate={!isMobile}
                                         maxPolarAngle={Math.PI * 0.65}
                                         minPolarAngle={Math.PI * 0.35}
                                     />
