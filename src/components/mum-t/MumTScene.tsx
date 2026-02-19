@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Float, useGLTF } from "@react-three/drei";
+import { Float, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { MumTKaan } from "./MumTKaan";
 import { useFormationState } from "./useFormation";
@@ -22,7 +22,7 @@ function lerpEuler(out: THREE.Euler, target: [number, number, number], speed: nu
     out.z = THREE.MathUtils.lerp(out.z, target[2], speed);
 }
 
-function useAnkaModel() {
+function useAnkaModel(isMobile: boolean) {
     const { scene } = useGLTF(ANKA_MODEL_PATH);
 
     return useMemo(() => {
@@ -30,10 +30,31 @@ function useAnkaModel() {
 
         clone.traverse((child) => {
             if (child instanceof THREE.Mesh) {
+                const convertMat = (m: THREE.Material): THREE.Material => {
+                    if (m instanceof THREE.MeshStandardMaterial) {
+                        if (isMobile) {
+                            const lam = new THREE.MeshLambertMaterial({
+                                map: m.map,
+                                color: m.color,
+                                transparent: m.transparent,
+                                opacity: m.opacity,
+                                side: m.side,
+                                alphaTest: m.alphaTest,
+                            });
+                            lam.name = m.name;
+                            return lam;
+                        }
+                        const mat = m.clone();
+                        mat.envMap = null;
+                        mat.envMapIntensity = 0;
+                        return mat;
+                    }
+                    return m.clone();
+                };
                 if (Array.isArray(child.material)) {
-                    child.material = child.material.map((m) => m.clone());
+                    child.material = child.material.map(convertMat);
                 } else if (child.material) {
-                    child.material = child.material.clone();
+                    child.material = convertMat(child.material);
                 }
             }
         });
@@ -56,7 +77,7 @@ function useAnkaModel() {
         });
 
         return wrapper;
-    }, [scene]);
+    }, [scene, isMobile]);
 }
 
 function DynamicDataLink({
@@ -71,20 +92,35 @@ function DynamicDataLink({
     const tubeRef = useRef<THREE.Mesh>(null);
     const matRef = useRef<THREE.MeshBasicMaterial>(null);
     const currentOpacity = useRef(targetOpacity);
+    const frameCounter = useRef(0);
+    // Reuse vectors to avoid GC pressure
+    const startPos = useMemo(() => new THREE.Vector3(), []);
+    const endPos = useMemo(() => new THREE.Vector3(), []);
+    const mid = useMemo(() => new THREE.Vector3(), []);
 
     useFrame((state) => {
         if (!startRef.current || !endRef.current || !tubeRef.current) return;
 
-        const startPos = new THREE.Vector3();
-        const endPos = new THREE.Vector3();
+        // Throttle geometry rebuild to every 3rd frame
+        frameCounter.current++;
+        if (frameCounter.current % 3 !== 0) {
+            // Still update opacity for smooth fading
+            if (matRef.current) {
+                currentOpacity.current = THREE.MathUtils.lerp(currentOpacity.current, targetOpacity, 0.04);
+                const pulse = 0.15 * Math.sin(state.clock.elapsedTime * 3);
+                matRef.current.opacity = currentOpacity.current + pulse;
+            }
+            return;
+        }
+
         startRef.current.getWorldPosition(startPos);
         endRef.current.getWorldPosition(endPos);
 
-        const mid = new THREE.Vector3().lerpVectors(startPos, endPos, 0.5);
+        mid.lerpVectors(startPos, endPos, 0.5);
         mid.y += 1.8;
 
-        const curve = new THREE.QuadraticBezierCurve3(startPos, mid, endPos);
-        const newGeo = new THREE.TubeGeometry(curve, 48, 0.012, 6, false);
+        const curve = new THREE.QuadraticBezierCurve3(startPos.clone(), mid.clone(), endPos.clone());
+        const newGeo = new THREE.TubeGeometry(curve, 24, 0.012, 4, false);
 
         if (tubeRef.current.geometry) tubeRef.current.geometry.dispose();
         tubeRef.current.geometry = newGeo;
@@ -114,8 +150,8 @@ function DynamicDataLink({
     );
 }
 
-function AnkaAlpha({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
-    const model = useAnkaModel();
+function AnkaAlpha({ groupRef, isMobile }: { groupRef: React.RefObject<THREE.Group | null>; isMobile: boolean }) {
+    const model = useAnkaModel(isMobile);
     const formation = useFormationState();
 
     useFrame((state) => {
@@ -145,42 +181,9 @@ function AnkaAlpha({ groupRef }: { groupRef: React.RefObject<THREE.Group | null>
     );
 }
 
-function AnkaBravo({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
-    const { scene } = useGLTF(ANKA_MODEL_PATH);
+function AnkaBravo({ groupRef, isMobile }: { groupRef: React.RefObject<THREE.Group | null>; isMobile: boolean }) {
+    const model = useAnkaModel(isMobile);
     const formation = useFormationState();
-
-    const model = useMemo(() => {
-        const clone = scene.clone(true);
-
-        clone.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                if (Array.isArray(child.material)) {
-                    child.material = child.material.map((m) => m.clone());
-                } else if (child.material) {
-                    child.material = child.material.clone();
-                }
-            }
-        });
-
-        const box = new THREE.Box3().setFromObject(clone);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-        const sf = 3.5 / maxDim;
-
-        clone.position.set(-center.x, -center.y, -center.z);
-
-        const wrapper = new THREE.Group();
-        wrapper.add(clone);
-        wrapper.scale.setScalar(sf);
-        wrapper.rotation.y = Math.PI;
-
-        wrapper.traverse((obj) => {
-            obj.frustumCulled = false;
-        });
-
-        return wrapper;
-    }, [scene]);
 
     useFrame((state) => {
         if (!groupRef.current) return;
@@ -215,36 +218,49 @@ function SceneContent({ isMobile }: { isMobile: boolean }) {
     const bravoRef = useRef<THREE.Group>(null);
     const formation = useFormationState();
 
+    const innerContent = (
+        <>
+            <group ref={kaanRef}>
+                <MumTKaan />
+            </group>
+            <AnkaAlpha groupRef={alphaRef} isMobile={isMobile} />
+            <AnkaBravo groupRef={bravoRef} isMobile={isMobile} />
+            {/* Data links disabled on mobile — too heavy for mid-range GPUs */}
+            {!isMobile && (
+                <>
+                    <DynamicDataLink startRef={kaanRef} endRef={alphaRef} targetOpacity={formation.linkAlpha.opacity} />
+                    <DynamicDataLink startRef={kaanRef} endRef={bravoRef} targetOpacity={formation.linkBravo.opacity} />
+                </>
+            )}
+        </>
+    );
+
     return (
         <>
             <fog attach="fog" args={["#020617", 30, 80]} />
-            <Environment preset="night" />
+            {/* Environment removed — MeshLambertMaterial doesn't need IBL, eliminates feedback loop */}
 
-            <ambientLight intensity={0.5} />
+            <ambientLight intensity={isMobile ? 0.8 : 0.5} />
             <directionalLight
                 position={[8, 12, 5]}
-                intensity={1.2}
+                intensity={isMobile ? 1.5 : 1.2}
                 color="#c8d6e5"
-                castShadow
-                shadow-mapSize-width={1024}
-                shadow-mapSize-height={1024}
+                castShadow={!isMobile}
+                shadow-mapSize-width={isMobile ? 256 : 1024}
+                shadow-mapSize-height={isMobile ? 256 : 1024}
             />
-            <pointLight position={[-5, 3, 2]} color="#00e5ff" intensity={0.8} distance={25} />
-            <pointLight position={[5, 2, -3]} color="#0ea5e9" intensity={0.6} distance={22} />
-            <pointLight position={[0, 5, 8]} color="#ffffff" intensity={0.3} distance={20} />
+            {/* Reduce point lights on mobile: keep 1 instead of 3 */}
+            {!isMobile && <pointLight position={[-5, 3, 2]} color="#00e5ff" intensity={0.8} distance={25} />}
+            <pointLight position={[5, 2, -3]} color="#0ea5e9" intensity={isMobile ? 0.4 : 0.6} distance={22} />
+            {!isMobile && <pointLight position={[0, 5, 8]} color="#ffffff" intensity={0.3} distance={20} />}
 
             <group scale={isMobile ? 0.5 : 1}>
-                <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
-                    <group ref={kaanRef}>
-                        <MumTKaan />
-                    </group>
-
-                    <AnkaAlpha groupRef={alphaRef} />
-                    <AnkaBravo groupRef={bravoRef} />
-
-                    <DynamicDataLink startRef={kaanRef} endRef={alphaRef} targetOpacity={formation.linkAlpha.opacity} />
-                    <DynamicDataLink startRef={kaanRef} endRef={bravoRef} targetOpacity={formation.linkBravo.opacity} />
-                </Float>
+                {/* Float animation disabled on mobile for perf */}
+                {isMobile ? innerContent : (
+                    <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
+                        {innerContent}
+                    </Float>
+                )}
             </group>
         </>
     );
@@ -275,16 +291,17 @@ export function MumTScene() {
     return (
         <div ref={containerRef} className="h-full w-full">
             <Canvas
-                shadows
-                dpr={[1, 2]}
+                shadows={!isMobile}
+                dpr={isMobile ? 1 : [1, 2]}
                 camera={{ position: [0, 3, 14], fov: 45 }}
                 frameloop={isVisible ? "always" : "never"}
                 gl={{
-                    antialias: true,
+                    antialias: !isMobile,
                     alpha: false,
-                    toneMapping: THREE.ACESFilmicToneMapping,
+                    toneMapping: isMobile ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping,
                     toneMappingExposure: 1.1,
-                    logarithmicDepthBuffer: true,
+                    logarithmicDepthBuffer: !isMobile,
+                    powerPreference: isMobile ? "low-power" : "high-performance",
                 }}
                 style={{ background: "#020617" }}
             >

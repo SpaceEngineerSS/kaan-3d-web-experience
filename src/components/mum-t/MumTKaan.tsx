@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -12,16 +12,48 @@ export function MumTKaan() {
     const groupRef = useRef<THREE.Group>(null);
     const { scene } = useGLTF(MODEL_PATH);
     const formation = useFormationState();
+    const frameCount = useRef(0);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
 
     const wrappedScene = useMemo(() => {
         const clone = scene.clone(true);
 
         clone.traverse((child) => {
             if (child instanceof THREE.Mesh) {
+                const convertMat = (m: THREE.Material): THREE.Material => {
+                    if (m instanceof THREE.MeshStandardMaterial) {
+                        if (isMobile) {
+                            // Mobile: lightweight Lambert — no IBL, ~60% cheaper
+                            const lam = new THREE.MeshLambertMaterial({
+                                map: m.map,
+                                color: m.color,
+                                transparent: m.transparent,
+                                opacity: m.opacity,
+                                side: m.side,
+                                alphaTest: m.alphaTest,
+                            });
+                            lam.name = m.name;
+                            return lam;
+                        }
+                        // Desktop: keep PBR but disable IBL to prevent feedback loop
+                        const mat = m.clone();
+                        mat.envMap = null;
+                        mat.envMapIntensity = 0;
+                        return mat;
+                    }
+                    return m.clone();
+                };
                 if (Array.isArray(child.material)) {
-                    child.material = child.material.map((m) => m.clone());
+                    child.material = child.material.map(convertMat);
                 } else if (child.material) {
-                    child.material = child.material.clone();
+                    child.material = convertMat(child.material);
                 }
             }
         });
@@ -39,15 +71,23 @@ export function MumTKaan() {
         wrapper.scale.setScalar(sf);
         wrapper.rotation.y = Math.PI;
 
-        wrapper.traverse((obj) => {
-            obj.frustumCulled = false;
-        });
+        // Re-enable frustum culling on mobile for GPU savings
+        if (!isMobile) {
+            wrapper.traverse((obj) => {
+                obj.frustumCulled = false;
+            });
+        }
 
         return wrapper;
-    }, [scene]);
+    }, [scene, isMobile]);
 
     useFrame((state) => {
         if (!groupRef.current) return;
+
+        // Throttle to every 2nd frame on mobile
+        frameCount.current++;
+        if (isMobile && frameCount.current % 2 !== 0) return;
+
         const t = state.clock.elapsedTime;
 
         if (formation.mode === "FREE") {

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { FormationStateCtx, FormationDispatchCtx, useFormationReducer } from "@/components/mum-t/useFormation";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { LazySection } from "@/components/mum-t/LazySection";
 
 const MumTScene = dynamic(
     () =>
@@ -190,15 +191,36 @@ export function MumTContent() {
                         <ThreatLandscape />
                         <AvionicsShowcase />
                         <GenerationCompare />
+
                         <MissionTimeline />
-                        <ScenarioSimulator />
-                        <PlatformCompare />
-                        <DataLinkDiagram />
+
+                        <LazySection minHeight="500px">
+                            <ScenarioSimulator />
+                        </LazySection>
+
+                        <LazySection minHeight="400px">
+                            <PlatformCompare />
+                        </LazySection>
+
+                        <LazySection minHeight="400px">
+                            <DataLinkDiagram />
+                        </LazySection>
+
                         <MumTStats />
                         <CapabilityCards />
-                        <SuperSimsekShowcase />
-                        <DefenseEcosystem />
-                        <VideoGallery />
+
+                        <LazySection minHeight="600px">
+                            <SuperSimsekShowcase />
+                        </LazySection>
+
+                        <LazySection minHeight="400px">
+                            <DefenseEcosystem />
+                        </LazySection>
+
+                        <LazySection minHeight="300px">
+                            <VideoGallery />
+                        </LazySection>
+
                         <MumTFooter />
                     </main>
                 </FormationDispatchCtx.Provider>

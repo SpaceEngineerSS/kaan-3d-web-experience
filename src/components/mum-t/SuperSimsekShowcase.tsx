@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, OrbitControls, Environment } from "@react-three/drei";
+import { useGLTF, OrbitControls } from "@react-three/drei";
 import { motion } from "framer-motion";
 import * as THREE from "three";
 import { useLanguage } from "@/context/LanguageContext";
@@ -36,10 +36,31 @@ function SuperSimsekModel() {
 
         clone.traverse((child) => {
             if (child instanceof THREE.Mesh) {
+                const convertMat = (m: THREE.Material): THREE.Material => {
+                    if (m instanceof THREE.MeshStandardMaterial) {
+                        if (isMobile) {
+                            const lam = new THREE.MeshLambertMaterial({
+                                map: m.map,
+                                color: m.color,
+                                transparent: m.transparent,
+                                opacity: m.opacity,
+                                side: m.side,
+                                alphaTest: m.alphaTest,
+                            });
+                            lam.name = m.name;
+                            return lam;
+                        }
+                        const mat = m.clone();
+                        mat.envMap = null;
+                        mat.envMapIntensity = 0;
+                        return mat;
+                    }
+                    return m.clone();
+                };
                 if (Array.isArray(child.material)) {
-                    child.material = child.material.map((m) => m.clone());
+                    child.material = child.material.map(convertMat);
                 } else if (child.material) {
-                    child.material = child.material.clone();
+                    child.material = convertMat(child.material);
                 }
             }
         });
@@ -118,6 +139,15 @@ const fadeUp = {
 export function SuperSimsekShowcase() {
     const { locale } = useLanguage();
     const mt = useMumtT(locale);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
     const SPECS = mt.simsekSpecs;
     const MISSIONS: MissionProfile[] = MISSION_META.map((m, i) => ({
         ...m,
@@ -154,7 +184,8 @@ export function SuperSimsekShowcase() {
                         <div className="absolute inset-0">
                             <Canvas
                                 camera={{ position: [0, 1, 6], fov: 45 }}
-                                gl={{ antialias: true, alpha: true }}
+                                dpr={1}
+                                gl={{ antialias: false, alpha: true, powerPreference: isMobile ? "low-power" : "high-performance" }}
                             >
                                 <Suspense fallback={null}>
                                     <ambientLight intensity={0.6} />
@@ -164,8 +195,7 @@ export function SuperSimsekShowcase() {
                                         color="#c8d6e5"
                                     />
                                     <pointLight position={[-3, 2, 4]} color="#00e5ff" intensity={0.5} distance={15} />
-                                    <pointLight position={[3, -1, -2]} color="#0ea5e9" intensity={0.3} distance={12} />
-                                    <Environment preset="night" />
+                                    {/* Environment removed — Lambert materials don't need IBL */}
                                     <SuperSimsekModel />
                                     <OrbitControls
                                         autoRotate={false}
