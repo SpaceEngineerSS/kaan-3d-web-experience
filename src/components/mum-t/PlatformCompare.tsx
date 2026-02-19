@@ -19,7 +19,7 @@ const SPECS: SpecRow[] = [
     { label: "MAKSİMUM HIZ", kaan: "Mach 1.8+", anka: "Mach 0.7" },
     { label: "SERVİS TAVANI", kaan: "55,000 ft", anka: "40,000 ft" },
     { label: "DAYANIKLILIK", kaan: "—", anka: "10 saat" },
-    { label: "MOTOR", kaan: "2× TEI TF-10000", anka: "1× AI-322" },
+    { label: "MOTOR", kaan: "2× TEI TF-35000", anka: "1× AI-322" },
     { label: "FAYDALIYÜK", kaan: "Dahili + Harici", anka: "1,200 kg" },
 ];
 
