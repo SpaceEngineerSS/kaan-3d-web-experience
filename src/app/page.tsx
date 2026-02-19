@@ -36,6 +36,7 @@ const RCSVisualization = dynamic(() => import("@/components/RCSVisualization").t
 const GForceSimulator = dynamic(() => import("@/components/GForceSimulator").then((m) => ({ default: m.GForceSimulator })), { ssr: false });
 const FlightEnvelope = dynamic(() => import("@/components/FlightEnvelope").then((m) => ({ default: m.FlightEnvelope })), { ssr: false });
 const AvionicsArchitecture = dynamic(() => import("@/components/AvionicsArchitecture").then((m) => ({ default: m.AvionicsArchitecture })), { ssr: false });
+const ScrollToTop = dynamic(() => import("@/components/ScrollToTop").then((m) => ({ default: m.ScrollToTop })), { ssr: false });
 
 export default function Home() {
     const [xRayMode, setXRayMode] = useState(false);
@@ -116,6 +117,7 @@ export default function Home() {
                     {/* Overlays */}
                     <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
                     <MobileBottomNav />
+                    <ScrollToTop />
                 </main>
             </ThemeProvider>
         </LanguageProvider>

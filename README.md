@@ -38,6 +38,7 @@ Turkiye'nin 5. nesil milli muharip ucagi KAAN'in modern web teknolojileri ile na
 | **TypeScript 5** | Tip guvenli gelistirme |
 | **Web Audio API** | Dinamik motor sesi, sonik patlama, SFX |
 | **Canvas API** | Kokpit MFD, RCS grafigi, ucus zarfi, gorev haritasi |
+| **Framer Motion** | MUM-T animasyonlar, layout gecisleri, gesture |
 | **Lucide React** | Ikon kutuphanesi |
 
 ---
@@ -64,11 +65,11 @@ Turkiye'nin 5. nesil milli muharip ucagi KAAN'in modern web teknolojileri ile na
 - **Aviyonik Mimari** -- 9 dugumlu IMA platform diyagrami, tiklanabilir sistemler
 - **Teknoloji Detaylari** -- 4 genisletilebilir kart (Stealth, Aviyonik, Itki, Yapi)
 - **RCS Analizi** -- Polar radar kesit alani gorsellestirmesi (goreli seviyeler)
-- **Silah Sistemleri** -- 7 gorev profili, Stealth/Karma/Beast mod etiketleri
+- **Silah Sistemleri** -- 7 gorev profili, Stealth/Karma/Beast mod etiketleri + GAZAP (termobarik FAE) ve HAYALET (bunker delici) muhimmatlari
 - **Gorev Briefing** -- Taktik harita, 3 animasyonlu gorev rotasi (CAP, Taarruz, SEAD)
 - **Karsilastirma Grafigi** -- KAAN vs F-22 vs F-35 radar/spider chart
 - **Boyut Karsilastirma** -- KAAN vs F-16/F-35/Su-57/Eurofighter gorsel barlar
-- **Loyal Wingman** -- KAAN + KIZILELMA + ANKA-3 ekosistem diyagrami
+- **Loyal Wingman** -- KAAN + KIZILELMA + ANKA-3 ekosistem diyagrami + MUM-T CTA banner
 - **Yerli Motor** -- TF35000 bolumu, Blok 10/20/30 gecis sureci
 - **Uretim & Ihracat** -- 250+ ucak hedefi, Endonezya anlasma, program ortaklari
 - **Bilgi Kartlari** -- 8 adet "Biliyor muydunuz?" fact card
@@ -83,12 +84,33 @@ Turkiye'nin 5. nesil milli muharip ucagi KAAN'in modern web teknolojileri ile na
 - Scroll ilerleme gostergesi (sol kenar, yuzde + bolum isimleri)
 - Sag kenar sahne kontrolleri (X-Ray, Kamera)
 - Mobil alt navigasyon cubugu
+- Yukari cik (Scroll-to-Top) butonu -- 600px sonra belirir
 - Boot sekansli yukleme ekrani (BIOS tarzi sistem baslatma)
 - Dinamik ses motoru (scroll hizina bagli pitch, sonik patlama)
 - Konami kodu Easter egg (afterburner patlamasi)
 - Klavye kisayollari modali
 - PWA destegi (offline, standalone)
 - Erisileblirlik (skip-to-content, focus-visible, ARIA)
+
+### MUM-T Sayfasi (Insanli-Insansiz Takim)
+
+Bagimsiz `/mum-t` rotasinda, 3D interaktif MUM-T deneyimi sunar.
+
+- **3D Hero Sahne** -- KAAN + ANKA-3 modelleri (React Three Fiber), mobil responsive olcekleme
+- **Formasyon Kontrolleri** -- V, Echelon, Line Abreast, Trail, Diamond, Stack komutlari
+- **SuperSimsek Vitrin** -- Interaktif 3D insansiz savas ucagi modeli
+- **Aviyonik Vitrin** -- AESA radar, DAS, EH, veri linki sistemleri
+- **Senaryo Simulatoru** -- CAP, Deep Strike, SEAD taktik senaryolari
+- **Gorev Timeline** -- 2020-2030 insansiz sistem programa baglantisi
+- **Nesil Karsilastirma** -- 4., 4.5 ve 5. nesil MUM-T yetenek karsilastirmasi
+- **Savunma Ekosistemi** -- Turk savunma sanayi ag diyagrami
+- **Platform Karsilastirma** -- ANKA-3 vs Global Hawk vs MQ-25 vs XQ-58A
+- **Tehdit Alanustunlugu** -- A2/AD, EW, SEAD tehdit senaryolari
+- **Video Galerisi** -- MUM-T konsept videolari
+- **Yetenek Kartlari** -- Data link, otonom karar, suru Intel kartlari
+- **HUD Dashboard** -- UCAV ALPHA/BRAVO durum panelleri, link kalitesi gostergeleri
+- **Istatistik Paneli** -- Menzil, irtifa, hiz, istasyon temel metrikleri
+- **TR/EN Ceviri** -- Tam iki dilli destek (bagimsiz mumt-translations.ts)
 
 ---
 
@@ -138,6 +160,8 @@ kaansite/
 │   ├── app/
 │   │   ├── layout.tsx       # Root layout (meta, fontlar, SEO)
 │   │   ├── page.tsx         # Ana sayfa (tum bolumler)
+│   │   ├── mum-t/
+│   │   │   └── page.tsx     # MUM-T bagimsiz sayfa
 │   │   ├── not-found.tsx    # Ozel 404 sayfasi
 │   │   └── globals.css      # Global stiller, animasyonlar
 │   ├── components/
@@ -152,10 +176,10 @@ kaansite/
 │   │   ├── AvionicsArchitecture.tsx # IMA platform diyagrami
 │   │   ├── TechnologyDetails.tsx   # Teknoloji kartlari
 │   │   ├── RCSVisualization.tsx    # RCS polar grafigi
-│   │   ├── WeaponConfig.tsx        # 7 silah profili
+│   │   ├── WeaponConfig.tsx        # 7 silah profili + GAZAP/HAYALET
 │   │   ├── MissionBriefing.tsx     # Taktik gorev haritasi
 │   │   ├── SizeComparison.tsx      # Boyut karsilastirma
-│   │   ├── LoyalWingman.tsx        # Ekosistem diyagrami
+│   │   ├── LoyalWingman.tsx        # Ekosistem diyagrami + MUM-T CTA
 │   │   ├── EngineSection.tsx       # TF35000 motor bolumu
 │   │   ├── ProductionSection.tsx   # Uretim, ihracat, ortaklar
 │   │   ├── FactCards.tsx           # Bilgi kartlari
@@ -164,18 +188,42 @@ kaansite/
 │   │   ├── TechnicalArchive.tsx    # Fotograf galerisi
 │   │   ├── SceneControls.tsx       # X-Ray / Kamera kontrolleri
 │   │   ├── ScrollProgress.tsx      # Scroll ilerleme gostergesi
+│   │   ├── ScrollToTop.tsx         # Yukari cik butonu
 │   │   ├── MobileBottomNav.tsx     # Mobil alt navigasyon
 │   │   ├── KonamiOverlay.tsx       # Easter egg efekti
 │   │   ├── ShortcutsModal.tsx      # Klavye kisayollari
 │   │   ├── SpecSheetDownload.tsx   # TXT spec indirme
 │   │   ├── RadarLoader.tsx         # Boot sekansli yukleme
-│   │   ├── Navbar.tsx              # Navigasyon + KONSEPT rozeti
+│   │   ├── Navbar.tsx              # Navigasyon + KONSEPT rozeti + MUM-T link
 │   │   ├── Footer.tsx              # Footer + yasal bildirim
 │   │   ├── LegalDisclaimer.tsx     # Giris uyarisi
 │   │   ├── ErrorBoundary.tsx       # WebGL hata yonetimi
 │   │   ├── CountUp.tsx             # Sayi animasyonu
 │   │   ├── GlitchText.tsx          # Glitch efekti
 │   │   ├── ServiceWorkerRegistration.tsx # PWA
+│   │   ├── mum-t/                  # MUM-T sayfa bileşenleri (22 dosya)
+│   │   │   ├── MumTContent.tsx     # Ana icerik orkestratoru
+│   │   │   ├── MumTScene.tsx       # 3D R3F sahne (KAAN + ANKA-3)
+│   │   │   ├── MumTHud.tsx         # HUD dashboard + UCAV panelleri
+│   │   │   ├── MumTTopBar.tsx      # Ust navigasyon + dil toggle
+│   │   │   ├── MumTKaan.tsx        # KAAN 3D model yukleyici
+│   │   │   ├── MumTStats.tsx       # Istatistik paneli
+│   │   │   ├── MumTFooter.tsx      # MUM-T footer
+│   │   │   ├── MumTConcept.tsx     # Konsept tanitim bolumu
+│   │   │   ├── FormationControls.tsx    # 6 formasyon komutu
+│   │   │   ├── SuperSimsekShowcase.tsx  # SuperSimsek 3D vitrin
+│   │   │   ├── AvionicsShowcase.tsx     # Aviyonik sistemler vitrin
+│   │   │   ├── ScenarioSimulator.tsx    # Taktik senaryo simulatoru
+│   │   │   ├── MissionTimeline.tsx      # Gorev zaman cizelgesi
+│   │   │   ├── GenerationCompare.tsx    # Nesil karsilastirma
+│   │   │   ├── DefenseEcosystem.tsx     # Savunma sanayi ag
+│   │   │   ├── PlatformCompare.tsx      # Platform karsilastirma
+│   │   │   ├── ThreatLandscape.tsx      # Tehdit alanustunlugu
+│   │   │   ├── VideoGallery.tsx         # MUM-T videolari
+│   │   │   ├── CapabilityCards.tsx      # Yetenek kartlari
+│   │   │   ├── DataLinkDiagram.tsx      # Veri linki diyagrami
+│   │   │   ├── MunitionsShowcase.tsx    # Muhimmat vitrin (standalone)
+│   │   │   └── useFormation.ts         # Formasyon state hook
 │   │   └── ui/
 │   │       ├── CockpitDashboard.tsx    # 4-panel MFD kokpit
 │   │       ├── ComparisonChart.tsx     # Radar/spider grafik
@@ -189,7 +237,8 @@ kaansite/
 │   │   ├── LanguageContext.tsx      # TR/EN dil saglayici
 │   │   └── ThemeContext.tsx         # Gece/gunduz tema
 │   └── lib/
-│       └── translations.ts         # Tum ceviriler
+│       ├── translations.ts         # Ana sayfa cevirileri + MUM-T nav linki
+│       └── mumt-translations.ts    # MUM-T sayfa cevirileri (TR/EN)
 └── package.json
 ```
 

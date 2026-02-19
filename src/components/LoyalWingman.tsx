@@ -139,6 +139,38 @@ export function LoyalWingman() {
                         </p>
                     </div>
                 </div>
+
+                {/* MUM-T CTA */}
+                <div className="lw-animate mt-10 opacity-0">
+                    <a
+                        href="/mum-t"
+                        className="group relative block overflow-hidden rounded-2xl border border-neon-blue/15 p-6 text-center transition-all duration-500 hover:border-neon-blue/30 hover:shadow-[0_0_40px_rgba(0,212,255,0.08)] md:p-8"
+                        style={{
+                            background: "linear-gradient(135deg, rgba(0,212,255,0.04) 0%, rgba(2,6,23,0.9) 50%, rgba(0,212,255,0.02) 100%)",
+                        }}
+                    >
+                        <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(circle at center, rgba(0,212,255,0.06) 0%, transparent 70%)" }} />
+
+                        <span className="mb-3 inline-block rounded-full border border-neon-blue/20 bg-neon-blue/5 px-4 py-1 text-[9px] tracking-[0.3em] text-neon-blue/70" style={{ fontFamily: "var(--font-mono)" }}>
+                            MUM-T EXPERIENCE
+                        </span>
+                        <h3 className="mb-2 text-xl font-bold text-white md:text-2xl">
+                            {locale === "tr" ? "İnsanlı-İnsansız Takım" : "Manned-Unmanned Teaming"}
+                            <span className="text-gradient ml-2">
+                                {locale === "tr" ? "Deneyimi" : "Experience"}
+                            </span>
+                        </h3>
+                        <p className="mx-auto mb-4 max-w-lg text-xs text-slate-400 md:text-sm">
+                            {locale === "tr"
+                                ? "KAAN × ANKA-3 konseptini 3D interaktif olarak keşfedin. Formasyon kontrolleri, aviyonik gösterimi ve taktik senaryolar."
+                                : "Explore the KAAN × ANKA-3 concept in 3D interactive. Formation controls, avionics showcase and tactical scenarios."}
+                        </p>
+                        <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.15em] text-neon-blue transition-all duration-300 group-hover:gap-3" style={{ fontFamily: "var(--font-mono)" }}>
+                            {locale === "tr" ? "DENEYİME GİR" : "ENTER EXPERIENCE"}
+                            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                        </span>
+                    </a>
+                </div>
             </div>
         </section>
     );

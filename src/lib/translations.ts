@@ -62,6 +62,7 @@ const nav: Record<Locale, NavLink[]> = {
         { label: "SİLAHLAR", href: "#weapons" },
         { label: "MOTOR", href: "#engine" },
         { label: "ÜRETİM", href: "#production" },
+        { label: "MUM-T", href: "/mum-t" },
     ],
     en: [
         { label: "HOME", href: "#hero" },
@@ -71,6 +72,7 @@ const nav: Record<Locale, NavLink[]> = {
         { label: "WEAPONS", href: "#weapons" },
         { label: "ENGINE", href: "#engine" },
         { label: "PRODUCTION", href: "#production" },
+        { label: "MUM-T", href: "/mum-t" },
     ],
 };
 

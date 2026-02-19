@@ -111,6 +111,8 @@ const loadouts: WeaponLoadout[] = [
         weapons: [
             { nameTR: "NEB-84", nameEN: "NEB-84", typeTR: "Nüfuz Edici Bomba — 870 kg, Ardışık Delici Harp Başlığı", typeEN: "Penetration Bomb — 870 kg, Tandem Warhead", qty: 2, devTR: "TÜBİTAK SAGE", devEN: "TÜBİTAK SAGE" },
             { nameTR: "SARB-83", nameEN: "SARB-83", typeTR: "Sığınak Delici Bomba — ~415 kg, Ardışık Delici, MK-83 Uyumlu", typeEN: "Bunker Buster — ~415 kg, Tandem Warhead, MK-83 Compatible", qty: 2, devTR: "TÜBİTAK SAGE", devEN: "TÜBİTAK SAGE" },
+            { nameTR: "GAZAP", nameEN: "GAZAP", typeTR: "Termobarik FAE Bombası — ~970 kg, 10.000+ Parçacık, 150–200 m Etki Alanı", typeEN: "Thermobaric FAE Bomb — ~970 kg, 10,000+ Fragments, 150–200 m Blast Radius", qty: 1, devTR: "MSB AR-GE", devEN: "MSB R&D" },
+            { nameTR: "HAYALET", nameEN: "HAYALET", typeTR: "Bunker Delici Penetrasyon Bombası — ~1.000 kg, 90 m Derinlik, 7 m Beton (C50)", typeEN: "Bunker-Buster Penetration Bomb — ~1,000 kg, 90 m Depth, 7 m Concrete (C50)", qty: 1, devTR: "MSB AR-GE", devEN: "MSB R&D" },
             { nameTR: "KGK-83", nameEN: "KGK-83", typeTR: "Kanatlı Güdüm Kiti — INS/GPS, ~110 km (raporlanan), MK-83", typeEN: "Wing-Assisted Guidance Kit — INS/GPS, ~110 km (reported), MK-83", qty: 2, devTR: "TÜBİTAK SAGE / ASELSAN", devEN: "TÜBİTAK SAGE / ASELSAN" },
             { nameTR: "TEBER-82", nameEN: "TEBER-82", typeTR: "Güdüm Kiti — Lazer + INS/GPS, 28 km (üretici PDF)", typeEN: "Guidance Kit — Laser + INS/GPS, 28 km (manufacturer PDF)", qty: 2, devTR: "Roketsan", devEN: "Roketsan" },
             { nameTR: "Gökdoğan", nameEN: "Gokdogan", typeTR: "Orta Menzil BVR — Aktif Radar, 65+ km", typeEN: "Medium Range BVR — Active Radar, 65+ km", qty: 2, devTR: "TÜBİTAK SAGE", devEN: "TÜBİTAK SAGE" },
@@ -187,11 +189,10 @@ export function WeaponConfig() {
                         <button
                             key={loadout.id}
                             onClick={() => setActiveLoadout(i)}
-                            className={`rounded-lg border px-3 py-2 text-[10px] tracking-[0.15em] transition-all duration-300 md:px-4 md:text-xs md:tracking-[0.2em] ${
-                                activeLoadout === i
+                            className={`rounded-lg border px-3 py-2 text-[10px] tracking-[0.15em] transition-all duration-300 md:px-4 md:text-xs md:tracking-[0.2em] ${activeLoadout === i
                                     ? "border-neon-blue/40 bg-neon-blue/10 text-neon-blue shadow-[0_0_15px_rgba(0,212,255,0.1)]"
                                     : "border-titanium/20 bg-titanium/5 text-slate-400 hover:border-titanium/40 hover:text-slate-300"
-                            }`}
+                                }`}
                             style={{ fontFamily: "var(--font-mono)" }}
                         >
                             {locale === "tr" ? loadout.labelTR : loadout.labelEN}
@@ -204,13 +205,12 @@ export function WeaponConfig() {
                     {/* Mode badge */}
                     <div className="mb-4 flex items-center gap-3">
                         <span
-                            className={`rounded border px-2.5 py-1 text-[8px] tracking-[0.2em] ${
-                                current.id === "beast-mode"
+                            className={`rounded border px-2.5 py-1 text-[8px] tracking-[0.2em] ${current.id === "beast-mode"
                                     ? "border-red-500/30 bg-red-500/10 text-red-400"
                                     : current.modeTR.includes("KARMA") || current.modeEN.includes("MIXED")
-                                    ? "border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
-                                    : "border-neon-blue/30 bg-neon-blue/10 text-neon-blue"
-                            }`}
+                                        ? "border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
+                                        : "border-neon-blue/30 bg-neon-blue/10 text-neon-blue"
+                                }`}
                             style={{ fontFamily: "var(--font-mono)" }}
                         >
                             {locale === "tr" ? current.modeTR : current.modeEN}

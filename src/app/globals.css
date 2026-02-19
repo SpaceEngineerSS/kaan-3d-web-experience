@@ -70,6 +70,10 @@ body::after {
   z-index: 0;
 }
 
+body.mumt-page::after {
+  display: none;
+}
+
 ::selection {
   background-color: rgba(0, 212, 255, 0.3);
   color: #ffffff;
