@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ShieldAlert } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import translations from "@/lib/translations";
@@ -8,14 +8,10 @@ import translations from "@/lib/translations";
 export function LegalDisclaimer() {
     const { locale } = useLanguage();
     const d = translations.disclaimer[locale];
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const dismissed = sessionStorage.getItem("kaan-disclaimer-accepted");
-        if (!dismissed) {
-            setVisible(true);
-        }
-    }, []);
+    const [visible, setVisible] = useState(() => {
+        if (typeof window === "undefined") return false;
+        return !sessionStorage.getItem("kaan-disclaimer-accepted");
+    });
 
     const handleAccept = () => {
         sessionStorage.setItem("kaan-disclaimer-accepted", "1");

@@ -704,8 +704,6 @@ function MFDCanvas({
     onCanvasClick?: (x: number, y: number, w: number, h: number) => void;
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const telRef = useRef(tel);
-    telRef.current = tel;
 
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
@@ -719,8 +717,8 @@ function MFDCanvas({
         canvas.width = cw * dpr;
         canvas.height = ch * dpr;
         ctx.scale(dpr, dpr);
-        drawFn(ctx, cw, ch, accent, warnColor, telRef.current);
-    }, [drawFn, accent, warnColor]);
+        drawFn(ctx, cw, ch, accent, warnColor, tel);
+    }, [drawFn, accent, warnColor, tel]);
 
     useEffect(() => {
         let raf: number;
@@ -783,7 +781,7 @@ export function CockpitDashboard() {
     const accent = mode === "night" ? "#22ff44" : "#00d4ff";
     const warnColor = mode === "night" ? "#ff4444" : "#ff6600";
     const [expandedPanel, setExpandedPanel] = useState<number | null>(null);
-    const [selectedWeapon, setSelectedWeapon] = useState<number | null>(null);
+    const [, setSelectedWeapon] = useState<number | null>(null);
 
     /* hover glow effect on the frame */
     const handleHover = useCallback(() => {
@@ -859,7 +857,7 @@ export function CockpitDashboard() {
                         </div>
                         <div className="hidden items-center gap-3 sm:flex">
                             <span className="text-[8px] tracking-[0.2em]" style={{ color: accent + "66", fontFamily: "var(--font-mono)" }}>
-                                HDG {pad3(tel.heading)} // ALT {tel.alt} // M{tel.mach}
+                                HDG {pad3(tel.heading)} {"//"} ALT {tel.alt} {"//"} M{tel.mach}
                             </span>
                             <span className="rounded px-2 py-0.5 text-[8px] font-bold tracking-[0.15em]"
                                 style={{ background: accent + "12", color: accent, border: `1px solid ${accent}33`, fontFamily: "var(--font-mono)" }}>
@@ -911,7 +909,7 @@ export function CockpitDashboard() {
                                             warnColor={warnColor}
                                             tel={tel}
                                             id={panel.idx === 0 ? "radar-mfd" : undefined}
-                                            onCanvasClick={panel.idx === 1 ? handleStoresClick : undefined}
+                                            onCanvasClick={panel.idx === 3 ? handleStoresClick : undefined}
                                         />
                                     </div>
                                 </div>
@@ -930,13 +928,13 @@ export function CockpitDashboard() {
                         style={{ borderColor: accent + "18", background: "#0a0a0a" }}
                     >
                         <span className="text-[6px] tracking-[0.1em] sm:text-[7px] sm:tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
-                            KAAN MMU // PCD v2.4
+                            {"KAAN MMU // PCD v2.4"}
                         </span>
                         <span className="hidden text-[7px] tracking-[0.15em] sm:inline" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
                             {locale === "tr" ? "PANORAMIK KOKPİT EKRANI" : "PANORAMIC COCKPIT DISPLAY"}
                         </span>
                         <span className="text-[6px] tracking-[0.1em] sm:text-[7px] sm:tracking-[0.15em]" style={{ color: accent + "44", fontFamily: "var(--font-mono)" }}>
-                            ASELSAN // HAVELSAN
+                            {"ASELSAN // HAVELSAN"}
                         </span>
                     </div>
 

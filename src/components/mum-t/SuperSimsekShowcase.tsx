@@ -82,7 +82,7 @@ function SuperSimsekModel() {
         });
 
         return wrapper;
-    }, [scene]);
+    }, [scene, isMobile]);
 
     useFrame((state) => {
         if (!groupRef.current) return;

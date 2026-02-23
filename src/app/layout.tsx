@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Rajdhani, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
@@ -91,6 +92,7 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
+        <Analytics />
         <ServiceWorkerRegistration />
       </body>
     </html>

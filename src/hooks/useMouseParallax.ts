@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 interface MousePosition {
     x: number;
     y: number;
 }
 
+const ZERO_POSITION: MousePosition = { x: 0, y: 0 };
+
 export function useMouseParallax(sensitivity: number = 1, enabled: boolean = true): MousePosition {
-    const position = useRef<MousePosition>({ x: 0, y: 0 });
+    const [position, setPosition] = useState<MousePosition>(ZERO_POSITION);
     const target = useRef<MousePosition>({ x: 0, y: 0 });
     const rafId = useRef<number>(0);
 
@@ -18,8 +20,7 @@ export function useMouseParallax(sensitivity: number = 1, enabled: boolean = tru
 
     useEffect(() => {
         if (!enabled) {
-            position.current = { x: 0, y: 0 };
-            target.current = { x: 0, y: 0 };
+            target.current = ZERO_POSITION;
             return;
         }
 
@@ -31,8 +32,10 @@ export function useMouseParallax(sensitivity: number = 1, enabled: boolean = tru
         };
 
         const animate = () => {
-            position.current.x = lerp(position.current.x, target.current.x, 0.05);
-            position.current.y = lerp(position.current.y, target.current.y, 0.05);
+            setPosition((prev) => ({
+                x: lerp(prev.x, target.current.x, 0.05),
+                y: lerp(prev.y, target.current.y, 0.05),
+            }));
             rafId.current = requestAnimationFrame(animate);
         };
 
@@ -45,5 +48,5 @@ export function useMouseParallax(sensitivity: number = 1, enabled: boolean = tru
         };
     }, [sensitivity, lerp, enabled]);
 
-    return position.current;
+    return enabled ? position : ZERO_POSITION;
 }

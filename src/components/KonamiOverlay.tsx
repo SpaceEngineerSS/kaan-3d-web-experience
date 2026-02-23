@@ -57,7 +57,7 @@ export function KonamiOverlay() {
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center animate-[konamiFade_2s_ease-out_forwards]">
                 <div className="text-4xl font-bold text-neon-blue text-glow-strong md:text-6xl">AFTERBURNER</div>
                 <div className="mt-2 text-sm tracking-[0.4em] text-hud-green" style={{ fontFamily: "var(--font-mono)" }}>
-                    // FULL POWER ENGAGED //
+                    {"// FULL POWER ENGAGED //"}
                 </div>
             </div>
 

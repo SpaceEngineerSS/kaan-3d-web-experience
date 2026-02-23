@@ -96,7 +96,6 @@ function DynamicDataLink({
     // Reuse vectors to avoid GC pressure
     const startPos = useMemo(() => new THREE.Vector3(), []);
     const endPos = useMemo(() => new THREE.Vector3(), []);
-    const mid = useMemo(() => new THREE.Vector3(), []);
 
     useFrame((state) => {
         if (!startRef.current || !endRef.current || !tubeRef.current) return;
@@ -116,10 +115,10 @@ function DynamicDataLink({
         startRef.current.getWorldPosition(startPos);
         endRef.current.getWorldPosition(endPos);
 
-        mid.lerpVectors(startPos, endPos, 0.5);
-        mid.y += 1.8;
+        const mid = new THREE.Vector3().lerpVectors(startPos, endPos, 0.5);
+        mid.y = mid.y + 1.8;
 
-        const curve = new THREE.QuadraticBezierCurve3(startPos.clone(), mid.clone(), endPos.clone());
+        const curve = new THREE.QuadraticBezierCurve3(startPos.clone(), mid, endPos.clone());
         const newGeo = new THREE.TubeGeometry(curve, 24, 0.012, 4, false);
 
         if (tubeRef.current.geometry) tubeRef.current.geometry.dispose();

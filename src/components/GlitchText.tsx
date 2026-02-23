@@ -18,9 +18,7 @@ export function GlitchText({ children, className = "" }: GlitchTextProps) {
         const originalText = el.textContent || "";
         const glitchChars = "!@#$%^&*()_-+=<>?/\\|{}[]~`";
         let iteration = 0;
-        let intervalId: NodeJS.Timeout;
-
-        intervalId = setInterval(() => {
+        const intervalId = setInterval(() => {
             el.textContent = originalText
                 .split("")
                 .map((char, index) => {
