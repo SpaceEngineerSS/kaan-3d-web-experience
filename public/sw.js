@@ -1,112 +1,105 @@
-/* ═══════════════════════════════════════════
-   KAAN PWA — Service Worker
-   Cache-first strategy for static assets,
-   network-first for pages/API
-   ═══════════════════════════════════════════ */
+/*
+ * KAAN service worker.
+ * The cache name carries the build id (passed as ?v= at registration), so every
+ * deploy starts a fresh cache and the old one is deleted on activate.
+ *
+ *  - HTML / RSC payloads: network first, cached copy only when offline
+ *  - /_next/static (hashed, immutable): cache first
+ *  - images, models: stale-while-revalidate, capped
+ *  - video and range requests: never touched
+ */
 
-const CACHE_NAME = "kaan-pwa-v1";
+const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
+const STATIC_CACHE = `kaan-static-${VERSION}`;
+const ASSET_CACHE = `kaan-assets-${VERSION}`;
+const PAGE_CACHE = `kaan-pages-${VERSION}`;
+const ASSET_LIMIT = 60;
 
-const PRECACHE_ASSETS = [
-    "/",
-    "/favicon.ico",
-    "/pwa.png",
-    "/og-image.png",
-    "/manifest.json",
-];
-
-/* Install — precache critical assets */
 self.addEventListener("install", (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
-    );
+    event.waitUntil(caches.open(PAGE_CACHE).then((c) => c.addAll(["/"]).catch(() => undefined)));
     self.skipWaiting();
 });
 
-/* Activate — clean old caches */
 self.addEventListener("activate", (event) => {
+    const keep = new Set([STATIC_CACHE, ASSET_CACHE, PAGE_CACHE]);
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(
-                keys
-                    .filter((key) => key !== CACHE_NAME)
-                    .map((key) => caches.delete(key))
-            )
-        )
+        caches
+            .keys()
+            .then((keys) => Promise.all(keys.filter((k) => !keep.has(k)).map((k) => caches.delete(k))))
+            .then(() => self.clients.claim())
     );
-    self.clients.claim();
 });
 
-/* Fetch — cache-first for static assets, network-first for pages */
+async function trim(cacheName, limit) {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    for (let i = 0; i < keys.length - limit; i++) await cache.delete(keys[i]);
+}
+
+function cacheable(response) {
+    return response && response.status === 200 && response.type === "basic";
+}
+
 self.addEventListener("fetch", (event) => {
     const { request } = event;
+    if (request.method !== "GET") return;
+    if (request.headers.has("range")) return;
+
     const url = new URL(request.url);
+    if (url.origin !== self.location.origin) return;
+    if (/\.(mp4|webm|mov)$/i.test(url.pathname)) return;
+    if (url.pathname.startsWith("/_vercel/")) return;
 
-    /* Skip non-GET and cross-origin requests */
-    if (request.method !== "GET" || url.origin !== self.location.origin) return;
-
-    /* Static assets (images, fonts, models, videos) — cache-first */
-    if (
-        url.pathname.match(
-            /\.(png|jpg|jpeg|webp|gif|svg|ico|woff2?|ttf|glb|gltf|stl|mp4)$/
-        )
-    ) {
+    // Hashed build output
+    if (url.pathname.startsWith("/_next/static/")) {
         event.respondWith(
             caches.match(request).then(
-                (cached) =>
-                    cached ||
-                    fetch(request).then((response) => {
-                        /* Only cache successful responses, skip large video */
-                        if (
-                            response.ok &&
-                            !url.pathname.includes("kaan.mp4")
-                        ) {
-                            const clone = response.clone();
-                            caches
-                                .open(CACHE_NAME)
-                                .then((cache) => cache.put(request, clone));
+                (hit) =>
+                    hit ||
+                    fetch(request).then((res) => {
+                        if (cacheable(res)) {
+                            const copy = res.clone();
+                            caches.open(STATIC_CACHE).then((c) => c.put(request, copy));
                         }
-                        return response;
+                        return res;
                     })
             )
         );
         return;
     }
 
-    /* JS/CSS bundles — cache-first (hashed filenames = immutable) */
-    if (
-        url.pathname.startsWith("/_next/static/") ||
-        url.pathname.match(/\.(js|css)$/)
-    ) {
+    // Images and 3D models
+    if (/\.(png|jpe?g|webp|avif|gif|svg|ico|glb|gltf|woff2?)$/i.test(url.pathname) || url.pathname.startsWith("/_next/image")) {
         event.respondWith(
-            caches.match(request).then(
-                (cached) =>
-                    cached ||
-                    fetch(request).then((response) => {
-                        if (response.ok) {
-                            const clone = response.clone();
-                            caches
-                                .open(CACHE_NAME)
-                                .then((cache) => cache.put(request, clone));
+            caches.open(ASSET_CACHE).then(async (cache) => {
+                const hit = await cache.match(request);
+                const network = fetch(request)
+                    .then((res) => {
+                        if (cacheable(res)) {
+                            cache.put(request, res.clone()).then(() => trim(ASSET_CACHE, ASSET_LIMIT));
                         }
-                        return response;
+                        return res;
                     })
-            )
-        );
-        return;
-    }
-
-    /* Pages / API — network-first with cache fallback */
-    event.respondWith(
-        fetch(request)
-            .then((response) => {
-                if (response.ok) {
-                    const clone = response.clone();
-                    caches
-                        .open(CACHE_NAME)
-                        .then((cache) => cache.put(request, clone));
-                }
-                return response;
+                    .catch(() => hit);
+                return hit || network;
             })
-            .catch(() => caches.match(request))
-    );
+        );
+        return;
+    }
+
+    // Navigations: network first, offline fallback to the last good copy
+    if (request.mode === "navigate") {
+        event.respondWith(
+            fetch(request)
+                .then((res) => {
+                    if (cacheable(res)) {
+                        const copy = res.clone();
+                        caches.open(PAGE_CACHE).then((c) => c.put(request, copy));
+                    }
+                    return res;
+                })
+                .catch(() => caches.match(request).then((hit) => hit || caches.match("/")))
+        );
+    }
+    // Everything else (RSC payloads, API) goes straight to the network.
 });

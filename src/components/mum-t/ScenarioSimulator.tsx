@@ -1,226 +1,152 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Radar, Shield, Eye, ChevronRight, RotateCcw } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useLanguage } from "@/context/LanguageContext";
-import { useMumtT } from "@/lib/mumt-translations";
+import { useT } from "@/context/LanguageContext";
+import { Chapter, SourceNote } from "@/components/site/Chapter";
+import { scenario, scenarioGeometry, type Pos } from "@/content/mumt";
+import { SegTabs } from "./SegTabs";
 
-interface ScenarioMeta {
-    id: string;
-    icon: LucideIcon;
-    codename: string;
-    color: string;
-    stepActors: { actor: string; actorColor: string }[];
+type ScenarioId = keyof typeof scenarioGeometry;
+
+const S = 6; // map units → px
+const TARGET: Pos = [86, 30];
+const RINGS = [30, 20, 10];
+
+function Craft({ pos, size, hmd = false, label }: { pos: Pos; size: number; hmd?: boolean; label?: string }) {
+    return (
+        <g style={{ transform: `translate(${pos[0] * S}px, ${pos[1] * S}px)`, transition: "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)" }}>
+            <path d={`M ${size} 0 L ${-size} ${-size * 0.75} L ${-size * 0.45} 0 L ${-size} ${size * 0.75} Z`} fill={hmd ? "var(--color-hmd)" : "var(--color-info)"} />
+            {label && (
+                <text x={-size} y={size + 14} fontFamily="var(--font-mono)" fontSize="11" fill={hmd ? "var(--color-hmd)" : "var(--color-info)"}>
+                    {label}
+                </text>
+            )}
+        </g>
+    );
 }
 
-const SCENARIO_META: ScenarioMeta[] = [
-    {
-        id: "sead",
-        icon: Shield,
-        codename: "OPERATION YILDIRIM",
-        color: "#ef4444",
-        stepActors: [
-            { actor: "KAAN", actorColor: "#00d4ff" },
-            { actor: "ANKA-3", actorColor: "#a78bfa" },
-            { actor: "S.ŞİMŞEK", actorColor: "#fbbf24" },
-            { actor: "ANKA-3", actorColor: "#a78bfa" },
-            { actor: "KAAN", actorColor: "#00d4ff" },
-        ],
-    },
-    {
-        id: "strike",
-        icon: Radar,
-        codename: "OPERATION ÇELİK FIRTINA",
-        color: "#00d4ff",
-        stepActors: [
-            { actor: "KAAN", actorColor: "#00d4ff" },
-            { actor: "ANKA-3", actorColor: "#a78bfa" },
-            { actor: "KAAN", actorColor: "#00d4ff" },
-            { actor: "ANKA-3", actorColor: "#a78bfa" },
-            { actor: "S.ŞİMŞEK", actorColor: "#fbbf24" },
-        ],
-    },
-    {
-        id: "isr",
-        icon: Eye,
-        codename: "OPERATION BAYKUŞ",
-        color: "#10b981",
-        stepActors: [
-            { actor: "KAAN", actorColor: "#00d4ff" },
-            { actor: "ANKA-3", actorColor: "#a78bfa" },
-            { actor: "S.ŞİMŞEK", actorColor: "#fbbf24" },
-            { actor: "ANKA-3", actorColor: "#a78bfa" },
-            { actor: "KAAN", actorColor: "#00d4ff" },
-        ],
-    },
-];
-
+/** Chapter 05: three step-through scenarios on a schematic map. */
 export function ScenarioSimulator() {
-    const { locale } = useLanguage();
-    const mt = useMumtT(locale);
-    const [activeScenarioIdx, setActiveScenarioIdx] = useState(0);
-    const [activeStep, setActiveStep] = useState(0);
-    const meta = SCENARIO_META[activeScenarioIdx];
-    const translated = mt.scenarios[activeScenarioIdx];
-    const stepMeta = meta.stepActors[activeStep];
-    function handleNext() {
-        if (activeStep < meta.stepActors.length - 1) {
-            setActiveStep((s) => s + 1);
-        }
-    }
-    function handleReset() {
-        setActiveStep(0);
-    }
-    function handleScenario(idx: number) {
-        setActiveScenarioIdx(idx);
-        setActiveStep(0);
-    }
+    const t = useT();
+    const c = t(scenario);
+    const [id, setId] = useState<ScenarioId>("sead");
+    const [step, setStep] = useState(0);
 
-    const translatedStep = translated.steps[activeStep];
+    const sc = c.scenarios.find((s) => s.id === id) ?? c.scenarios[0];
+    const geo = scenarioGeometry[id][step];
+    const last = sc.steps.length - 1;
+
+    const choose = (next: ScenarioId) => {
+        setId(next);
+        setStep(0);
+    };
 
     return (
-        <section className="relative bg-[#020617] px-4 py-16 sm:px-6 md:px-12 md:py-24">
-            <div className="mx-auto max-w-6xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.5 }}
-                    className="mb-16 text-center"
-                >
-                    <p className="mb-3 font-mono text-[10px] tracking-[0.3em] text-cyan-400/60">
-                        {mt.scenario.tag}
-                    </p>
-                    <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
-                        {mt.scenario.title}{" "}
-                        <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                            {mt.scenario.titleHighlight}
-                        </span>
-                    </h2>
-                    <p className="mx-auto max-w-xl text-sm text-slate-400">
-                        {mt.scenario.description}
-                    </p>
-                </motion.div>
+        <Chapter id="scenario" index={5} label={c.label} title={c.title} lede={c.lede} solid className="py-24 md:py-36">
+            <SegTabs idPrefix="scenario" label={c.label} items={c.scenarios.map((s) => ({ id: s.id, label: s.name }))} value={id} onChange={choose} />
 
-                <div className="mb-8 flex flex-wrap justify-center gap-3">
-                    {SCENARIO_META.map((s, i) => (
-                        <button
-                            key={s.id}
-                            onClick={() => handleScenario(i)}
-                            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 font-mono text-[11px] transition-all duration-300 ${activeScenarioIdx === i
-                                ? "border-cyan-500/25 bg-cyan-500/5 text-white"
-                                : "border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-300"
-                                }`}
-                        >
-                            <s.icon className="h-3.5 w-3.5" />
-                            {mt.scenarios[i].name}
+            <div id="scenario-panel" role="tabpanel" aria-labelledby={`scenario-tab-${id}`} className="mt-8 grid gap-10 lg:grid-cols-12">
+                <figure className="lg:col-span-7">
+                    <svg viewBox={`0 0 ${100 * S} ${60 * S}`} className="bezel w-full" role="img" aria-label={`${c.mapLabel}: ${sc.steps[step].title}`}>
+                        <defs>
+                            <pattern id="scn-grid" width={S * 5} height={S * 5} patternUnits="userSpaceOnUse">
+                                <path d={`M ${S * 5} 0 L 0 0 0 ${S * 5}`} fill="none" stroke="var(--color-edge)" strokeWidth="0.5" />
+                            </pattern>
+                        </defs>
+                        <rect width={100 * S} height={60 * S} fill="#000" />
+                        <rect width={100 * S} height={60 * S} fill="url(#scn-grid)" opacity="0.5" />
+
+                        {RINGS.map((r, i) => {
+                            const on = geo.rings[i];
+                            return (
+                                <circle
+                                    key={r}
+                                    cx={TARGET[0] * S}
+                                    cy={TARGET[1] * S}
+                                    r={r * S}
+                                    fill="none"
+                                    stroke={on ? "var(--color-warn)" : "var(--color-edge-2)"}
+                                    strokeDasharray={on ? "6 5" : "1 6"}
+                                    strokeWidth={on ? 1.2 : 1}
+                                    className="transition-[stroke] duration-500"
+                                />
+                            );
+                        })}
+                        <rect x={TARGET[0] * S - 6} y={TARGET[1] * S - 6} width="12" height="12" fill="none" stroke="var(--color-fg)" />
+
+                        <Craft pos={geo.kaan} size={10} hmd label="KAAN" />
+                        <Craft pos={geo.anka1} size={8} label="ANKA-3" />
+                        <Craft pos={geo.anka2} size={8} label="ANKA-3" />
+                        {geo.simsek && <Craft pos={geo.simsek} size={5} />}
+                    </svg>
+
+                    <ul className="t-label mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                        <li className="flex items-center gap-2 text-hmd">
+                            <svg width="12" height="10" viewBox="-6 -5 12 10" aria-hidden><path d="M6 0 L-6 -4.5 L-2.7 0 L-6 4.5 Z" fill="currentColor" /></svg>
+                            {c.legend.kaan}
+                        </li>
+                        <li className="flex items-center gap-2">
+                            <svg width="12" height="10" viewBox="-6 -5 12 10" aria-hidden><path d="M6 0 L-6 -4.5 L-2.7 0 L-6 4.5 Z" fill="var(--color-info)" /></svg>
+                            {c.legend.anka}
+                        </li>
+                        <li className="flex items-center gap-2">
+                            <svg width="8" height="8" viewBox="-4 -4 8 8" aria-hidden><path d="M4 0 L-4 -3 L-1.8 0 L-4 3 Z" fill="var(--color-info)" /></svg>
+                            {c.legend.simsek}
+                        </li>
+                        <li className="flex items-center gap-2">
+                            <svg width="20" height="2" aria-hidden><line x1="0" y1="1" x2="20" y2="1" stroke="var(--color-warn)" strokeDasharray="6 5" /></svg>
+                            {c.legend.ring}
+                        </li>
+                        <li className="flex items-center gap-2">
+                            <svg width="20" height="2" aria-hidden><line x1="0" y1="1" x2="20" y2="1" stroke="var(--color-edge-2)" strokeDasharray="1 4" /></svg>
+                            {c.legend.ringOff}
+                        </li>
+                    </ul>
+                </figure>
+
+                <div className="lg:col-span-5">
+                    <p className="t-body">{sc.summary}</p>
+                    <ol className="mt-6 border-t border-edge-2">
+                        {sc.steps.map((s, i) => {
+                            const current = i === step;
+                            return (
+                                <li key={s.title} className="border-b border-edge">
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(i)}
+                                        aria-current={current ? "step" : undefined}
+                                        className={`grid min-h-11 w-full grid-cols-[2.5rem_1fr] gap-3 py-3 text-left transition-colors ${current ? "text-fg" : "text-muted hover:text-fg-2"}`}
+                                    >
+                                        <span className={`t-data text-sm ${current ? "text-hmd" : ""}`}>{String(i + 1).padStart(2, "0")}</span>
+                                        <span>
+                                            <span className="block font-medium">{s.title}</span>
+                                            {current && <span className="mt-1 block text-[0.9375rem] leading-relaxed text-fg-2">{s.body}</span>}
+                                        </span>
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ol>
+                    <div className="mt-6 flex flex-wrap items-center gap-3">
+                        <button type="button" className="btn" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>
+                            {c.prev}
                         </button>
-                    ))}
+                        {step < last ? (
+                            <button type="button" className="btn" onClick={() => setStep((s) => Math.min(last, s + 1))}>
+                                {c.next}
+                            </button>
+                        ) : (
+                            <button type="button" className="btn" onClick={() => setStep(0)}>
+                                {c.reset}
+                            </button>
+                        )}
+                        <span className="t-data ml-auto text-sm text-muted" aria-live="polite">
+                            {c.step} {step + 1} {c.of} {sc.steps.length}
+                        </span>
+                    </div>
                 </div>
-
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={meta.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                    >
-                        <div className="mb-6 rounded-xl border border-cyan-500/10 bg-cyan-500/[0.02] p-4 text-center">
-                            <p className="font-mono text-[9px] tracking-[0.3em] text-cyan-400/50">
-                                {meta.codename}
-                            </p>
-                            <p className="mt-1 text-sm text-slate-400">
-                                {translated.description}
-                            </p>
-                        </div>
-
-                        <div className="mb-6 flex items-center justify-center gap-0">
-                            {meta.stepActors.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setActiveStep(i)}
-                                    className="flex min-h-[44px] min-w-[44px] items-center justify-center"
-                                >
-                                    <span
-                                        className={`block h-1.5 rounded-full transition-all duration-300 ${i === activeStep
-                                            ? "w-8 bg-cyan-400"
-                                            : i < activeStep
-                                                ? "w-3 bg-cyan-400/40"
-                                                : "w-3 bg-white/10"
-                                            }`}
-                                    />
-                                </button>
-                            ))}
-                        </div>
-
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activeStep}
-                                initial={{ opacity: 0, x: 30 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -30 }}
-                                transition={{ duration: 0.25 }}
-                                className="rounded-xl border border-white/5 p-6 md:p-8"
-                                style={{
-                                    background: "rgba(10, 10, 20, 0.5)",
-                                    backdropFilter: "blur(12px)",
-                                }}
-                            >
-                                <div className="mb-4 flex items-center gap-3">
-                                    <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-500/20 bg-cyan-500/5 font-mono text-sm font-bold text-cyan-400">
-                                        {activeStep + 1}
-                                    </span>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <span
-                                                className="inline-block rounded-md border px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider"
-                                                style={{
-                                                    borderColor: `${stepMeta.actorColor}30`,
-                                                    color: stepMeta.actorColor,
-                                                }}
-                                            >
-                                                {stepMeta.actor}
-                                            </span>
-                                            <span className="text-sm font-bold text-white">
-                                                {translatedStep.action}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p className="text-[13px] leading-relaxed text-slate-400">
-                                    {translatedStep.detail}
-                                </p>
-                            </motion.div>
-                        </AnimatePresence>
-
-                        <div className="mt-6 flex items-center justify-center gap-3">
-                            <button
-                                onClick={handleReset}
-                                className="flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/5 px-4 py-2 font-mono text-[10px] text-slate-500 transition-colors hover:border-white/10 hover:text-slate-300"
-                            >
-                                <RotateCcw className="h-3 w-3" />
-                                {mt.scenario.reset}
-                            </button>
-                            <button
-                                onClick={handleNext}
-                                disabled={
-                                    activeStep >= meta.stepActors.length - 1
-                                }
-                                className={`flex min-h-[44px] items-center gap-1.5 rounded-lg border px-5 py-2 font-mono text-[10px] transition-all ${activeStep >= meta.stepActors.length - 1
-                                    ? "cursor-not-allowed border-white/5 text-slate-600"
-                                    : "border-cyan-500/25 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10"
-                                    }`}
-                            >
-                                {mt.scenario.nextStep}
-                                <ChevronRight className="h-3 w-3" />
-                            </button>
-                        </div>
-                    </motion.div>
-                </AnimatePresence>
             </div>
-        </section>
+            <SourceNote>{c.note}</SourceNote>
+        </Chapter>
     );
 }

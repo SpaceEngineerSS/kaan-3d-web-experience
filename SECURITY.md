@@ -1,45 +1,29 @@
-# Security Policy
+# Security
 
-## Supported Versions
+## Supported versions
+
+Only the current major line gets fixes.
 
 | Version | Supported |
-|---------|-----------|
-| Latest  | ✅        |
+| ------- | --------- |
+| 3.x     | yes       |
+| < 3     | no        |
 
-## Reporting a Vulnerability
+## Reporting a problem
 
-If you discover a security vulnerability in this project, please report it responsibly:
+Please don't open a public issue for a vulnerability. Use GitHub's private reporting instead:
+**Security → Report a vulnerability** on this repository. Describe what you found, how to reproduce it and what you think the impact is. I'll answer within a week and will credit you in the fix unless you'd rather not be named.
 
-1. **DO NOT** open a public issue
-2. Email: Contact via [GitHub profile](https://github.com/SpaceEngineerSS)
-3. Include a detailed description of the vulnerability
-4. Allow reasonable time for a fix before public disclosure
+## What the site does and doesn't do
 
-## Security Measures
+It's a front-end showcase. There are no accounts, no forms, no database and no API routes.
 
-This project implements the following security practices:
+- **Response headers** are set in `next.config.ts`: a Content Security Policy (scripts, styles, images, media and fonts from the same origin only; no framing), `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy` and HSTS. The CSP still allows `'unsafe-inline'` for scripts and styles because Next.js injects inline bootstrap code; moving to nonces is on the list. `'wasm-unsafe-eval'` is allowed because the 3D model decoder (Meshopt) runs as WebAssembly.
+- **Analytics**: the deployed site uses Vercel Web Analytics, which counts page views without cookies. It is served from the same origin (`/_vercel/insights/*`).
+- **Browser storage**: one cookie (`kaan-locale`) remembers the language, and `localStorage` remembers that the notice bar was dismissed. Nothing else is stored.
+- **Service worker** (`public/sw.js`): caches build assets, images and 3D models for offline use. Its cache name carries the deploy's commit id, so each deploy starts clean. It never caches video or range requests.
+- **Inline HTML**: the only `dangerouslySetInnerHTML` is the static JSON-LD block in `src/app/layout.tsx`, built from constants.
 
-### Client-Side
-- **Content Security Policy** — Meta tags restrict script sources
-- **No user data collection** — No authentication, no databases, no cookies
-- **Session storage only** — Disclaimer acceptance stored in `sessionStorage` (cleared on tab close)
-- **No external API calls** — Fully static site, no server-side endpoints
-- **XSS prevention** — React's built-in escaping, no `dangerouslySetInnerHTML`
+## Dependencies
 
-### Dependencies
-- Regular `npm audit` checks recommended
-- Minimal dependency footprint
-- No server-side code execution
-
-### Deployment
-- Static export compatible
-- No environment variables or secrets required
-- No database connections
-
-## Scope
-
-This is a **static frontend project** with no backend, no user authentication, and no data persistence beyond `sessionStorage`. The attack surface is minimal.
-
----
-
-**Maintainer:** [Mehmet Gümüş](https://github.com/SpaceEngineerSS)
+Run `npm audit` before a release. Dependabot alerts are enabled on the repository.

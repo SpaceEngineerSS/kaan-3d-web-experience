@@ -1,18 +1,58 @@
 @import "tailwindcss";
 
+/*
+ * KAAN — tokens.
+ * Colours come from the aircraft's own world: a morning sky over Ankara, the grey of the P0 topcoat,
+ * the black of a cockpit display, the green of the TULGAR visor, the red of the flag on the fin.
+ * Display colours keep their cockpit meaning: green = own/normal, yellow = caution,
+ * red = warning/hostile, cyan = information.
+ */
 @theme inline {
-  --font-sans: "Rajdhani", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: var(--font-rajdhani), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-b612), system-ui, sans-serif;
+  --font-mono: var(--font-b612-mono), ui-monospace, monospace;
 
-  --color-neon-blue: #00d4ff;
-  --color-neon-blue-dim: #0099bb;
-  --color-stealth-black: #050508;
-  --color-cockpit-dark: #0b0b14;
-  --color-hud-green: #00ff88;
-  --color-titanium: #2a2a3a;
-  --color-titanium-light: #c5c5d8;
-  --color-panel-bg: rgba(10, 10, 20, 0.7);
-  --color-panel-border: rgba(0, 212, 255, 0.12);
+  --color-ink: #05070a;
+  --color-ink-2: #0b0f14;
+  --color-plate: #10161d;
+  --color-edge: #26313c;
+  --color-edge-2: #3a4754;
+  --color-fg: #eef1f3;
+  --color-fg-2: #c9d0d6;
+  --color-muted: #9aa6b1;
+  --color-faint: #76828d;
+  --color-topcoat: #7d858c;
+  --color-flag: #e30a17;
+  --color-hmd: #5cff8f;
+  --color-info: #7fd4ff;
+  --color-caution: #ffd34d;
+  --color-warn: #ff4d3d;
+
+  /* Legacy names used by older sections, mapped onto the palette. */
+  --color-neon-blue: var(--color-info);
+  --color-neon-blue-dim: #4f9fc4;
+  --color-stealth-black: var(--color-ink);
+  --color-cockpit-dark: var(--color-ink-2);
+  --color-hud-green: var(--color-hmd);
+  --color-titanium: var(--color-edge-2);
+  --color-titanium-light: var(--color-fg-2);
+  --color-panel-bg: #0b0f14e6;
+  --color-panel-border: var(--color-edge);
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+:root {
+  --step--1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-0: clamp(0.9375rem, 0.91rem + 0.15vw, 1.0625rem);
+  --step-1: clamp(1.125rem, 1.07rem + 0.3vw, 1.3125rem);
+  --step-2: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  --step-3: clamp(1.875rem, 1.5rem + 1.6vw, 3rem);
+  --step-4: clamp(2.5rem, 1.8rem + 3.2vw, 5rem);
+  --step-5: clamp(3.75rem, 2rem + 8vw, 10rem);
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 3rem);
+  color-scheme: dark;
 }
 
 *,
@@ -22,428 +62,313 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
 }
 
 body {
   margin: 0;
-  padding: 0;
-  background-color: var(--color-stealth-black);
-  color: #ffffff;
+  background: var(--color-ink);
+  color: var(--color-fg);
   font-family: var(--font-sans);
-  overflow-x: hidden;
-  cursor: url('/cursor.png') 16 0, auto;
-  background-image:
-    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-x: clip;
 }
 
-a,
-button,
-[role="button"],
-input,
-select,
-textarea,
-label,
-summary {
-  cursor: url('/cursor.png') 16 0, auto !important;
+::selection {
+  background: var(--color-hmd);
+  color: var(--color-ink);
 }
 
-/* Focus-visible styles for keyboard navigation */
 :focus-visible {
-  outline: 2px solid var(--color-neon-blue);
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 2px solid var(--color-hmd);
+  outline-offset: 3px;
 }
 
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, transparent 0%, #000000 90%);
-  pointer-events: none;
-  z-index: 0;
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
 }
 
-body.mumt-page::after {
-  display: none;
+canvas {
+  touch-action: pan-y;
 }
 
-::selection {
-  background-color: rgba(0, 212, 255, 0.3);
-  color: #ffffff;
+/* ── Type roles ─────────────────────────────────── */
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-5);
+  line-height: 0.84;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
-::-webkit-scrollbar {
-  width: 5px;
+.t-h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-4);
+  line-height: 0.9;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-stealth-black);
+.t-h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-2);
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-neon-blue-dim);
-  border-radius: 3px;
+.t-lede {
+  font-size: var(--step-1);
+  line-height: 1.55;
+  color: var(--color-fg-2);
+  text-wrap: pretty;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-neon-blue);
+.t-body {
+  line-height: 1.65;
+  color: var(--color-fg-2);
+  text-wrap: pretty;
 }
 
-.glass-panel {
-  background: var(--color-panel-bg);
-  border: 1px solid var(--color-panel-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Cockpit-style label: B612 Mono, caps, a little tracking. */
+.t-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
 
-.text-glow {
-  text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+.t-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
-.text-glow-strong {
-  text-shadow: 0 0 30px rgba(0, 212, 255, 0.7), 0 0 60px rgba(0, 212, 255, 0.3);
+.t-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.9;
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, var(--color-neon-blue) 0%, #ffffff 50%, var(--color-neon-blue) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ── Layout ─────────────────────────────────────── */
+.wrap {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
-@keyframes radar-sweep {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+.grid > *,
+.flex > * {
+  min-width: 0;
 }
 
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
-  }
-
-  50% {
-    box-shadow: 0 0 24px rgba(0, 212, 255, 0.5);
-  }
+.chapter {
+  position: relative;
+  z-index: 10;
+  padding-block: clamp(5rem, 3rem + 7vw, 9rem);
 }
 
-@keyframes hud-blink {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.3;
-  }
+.chapter--tight {
+  padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
 }
 
-@keyframes scan-line {
-  0% {
-    transform: translateY(-100%);
-  }
-
-  100% {
-    transform: translateY(100vh);
-  }
+.chapter--solid {
+  background: var(--color-ink);
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+.chapter + .chapter {
+  border-top: 1px solid var(--color-edge);
 }
 
-.animate-hud-blink {
-  animation: hud-blink 2s ease-in-out infinite;
+/* A data plate: what an instrument card looks like, not a glass panel. */
+.plate {
+  background: color-mix(in srgb, var(--color-ink) 88%, transparent);
+  border: 1px solid var(--color-edge);
+}
+
+.glass-panel,
+.content-panel {
+  background: color-mix(in srgb, var(--color-ink-2) 90%, transparent);
+  border: 1px solid var(--color-edge);
 }
 
 .content-panel {
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
   padding: 1.5rem;
 }
 
-/* ── Day/Night Theme ── */
-[data-theme="day"] body {
-  background-image:
-    linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+/* Display bezel, the frame of a cockpit screen. */
+.bezel {
+  position: relative;
+  background: #000;
+  border: 1px solid var(--color-edge-2);
+  box-shadow: 0 0 0 6px #0b0e12, 0 0 0 7px var(--color-edge);
 }
 
-[data-theme="night"] body {
-  background-image:
-    linear-gradient(rgba(34, 255, 68, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 255, 68, 0.03) 1px, transparent 1px);
+.link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.35s var(--ease-out-quart), color 0.2s;
 }
 
-/* ── HUD Animations ── */
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
+.link:hover,
+.link:focus-visible {
+  background-size: 100% 1px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.65rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-fg);
+  border: 1px solid var(--color-edge-2);
+  background: var(--color-ink);
+  transition: border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.btn:hover {
+  border-color: var(--color-hmd);
+  color: var(--color-hmd);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--color-edge-2);
+  background: var(--color-ink);
+}
+
+.seg > button {
+  min-height: 36px;
+  padding: 0.35rem 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  transition: color 0.15s, background-color 0.15s;
+}
+
+@media (pointer: coarse) {
+  .seg > button {
+    min-height: 44px;
+  }
+}
+
+.seg > button + button {
+  border-left: 1px solid var(--color-edge-2);
+}
+
+.seg > button:hover {
+  color: var(--color-fg);
+}
+
+.seg > button[aria-pressed="true"],
+.seg > button[aria-selected="true"] {
+  color: var(--color-ink);
+  background: var(--color-hmd);
+}
+
+/* ── Motion ─────────────────────────────────────── */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.js-reveal [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s var(--ease-out-quart), transform 0.8s var(--ease-out-quart);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 
+  .js-reveal [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Legacy utility names kept for older sections until they are replaced. */
+.text-glow,
+.text-glow-strong {
+  text-shadow: none;
+}
+
+.text-gradient {
+  color: var(--color-fg);
+}
+
+@keyframes spin-slow {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes scan-slow {
-  0% {
-    top: -2px;
-  }
-
-  100% {
-    top: 100%;
   }
 }
 
 .animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
+  animation: spin-slow 6s linear infinite;
 }
 
-.animate-scan-slow {
-  animation: scan-slow 4s linear infinite;
+.overflow-locked {
+  overflow: hidden !important;
 }
 
-/* ── Mobile Touch Utilities ── */
 @media (pointer: coarse) {
   * {
     -webkit-tap-highlight-color: transparent;
   }
-
-  a,
-  button,
-  [role="button"],
-  input,
-  select,
-  textarea {
-    touch-action: manipulation;
-  }
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  html {
-    scrollbar-width: none;
-  }
 }
 
-canvas {
-  touch-action: none;
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-/* Safe-area for notched phones (iPhone X+) */
-@supports (padding: env(safe-area-inset-bottom)) {
-  body {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
 }
 
-/* Body scroll lock for mobile menus */
-.overflow-locked {
-  overflow: hidden !important;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-}
-
-/* ── Boot sequence animation ── */
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ── Section transition glitch ── */
-@keyframes glitch-section {
-  0% {
-    clip-path: inset(0 0 100% 0);
-  }
-
-  100% {
-    clip-path: inset(0 0 0% 0);
-  }
-}
-
-/* ── Scroll Progress Pulse ── */
-@keyframes progress-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 4px rgba(0, 212, 255, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.7);
-  }
-}
-
-.animate-progress-pulse {
-  animation: progress-pulse 2s ease-in-out infinite;
-}
-
-/* ── Cursor improvements ── */
-body {
-  cursor: url('/cursor.png') 16 0, crosshair;
-}
-
-a:hover,
-button:hover,
-[role="button"]:hover {
-  cursor: url('/cursor.png') 16 0, pointer !important;
-}
-
-/* ── Snap scrolling ── */
-@media (min-width: 768px) {
-  .snap-container {
-    scroll-snap-type: y proximity;
-  }
-
-  .snap-section {
-    scroll-snap-align: start;
-  }
-}
-
-/* ── Night mode overrides ── */
-[data-theme="night"] .text-neon-blue {
-  color: #22ff44;
-}
-
-[data-theme="night"] .bg-neon-blue {
-  background-color: #22ff44;
-}
-
-[data-theme="night"] .border-neon-blue\/10 {
-  border-color: rgba(34, 255, 68, 0.1);
-}
-
-/* ── Particle glow ── */
-@keyframes engine-glow {
-  0%,
-  100% {
-    opacity: 0.6;
-    filter: blur(2px);
-  }
-
-  50% {
-    opacity: 1;
-    filter: blur(4px);
-  }
-}
-
-.animate-engine-glow {
-  animation: engine-glow 1.5s ease-in-out infinite;
-}
-
-/* ── Minimum font size for readability ── */
-[style*="font-family: var(--font-mono)"] {
-  font-size: max(var(--tw-font-size, 10px), 10px);
-}
-
-/* Bump all extremely small text to readable minimums */
-.text-\[6px\]  { font-size: 9px !important; }
-.text-\[7px\]  { font-size: 10px !important; }
-.text-\[8px\]  { font-size: 10px !important; }
-.text-\[9px\]  { font-size: 11px !important; }
-
-/* On mobile, bump even higher for thumb-friendly readability */
-@media (max-width: 767px) {
-  .text-\[6px\]  { font-size: 10px !important; }
-  .text-\[7px\]  { font-size: 11px !important; }
-  .text-\[8px\]  { font-size: 11px !important; }
-  .text-\[9px\]  { font-size: 12px !important; }
-  .text-\[10px\] { font-size: 12px !important; }
-}
-
-/* ── Mobile touch improvements ── */
-@media (max-width: 767px) {
-  .glass-panel {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-}
-
-/* ── Typewriter effect ── */
-.typewriter {
-  overflow: hidden;
-  border-right: 1px solid var(--color-neon-blue);
-  white-space: nowrap;
-  animation: typewriter-cursor 1s step-end infinite;
-}
-
-@keyframes typewriter-cursor {
-  0%, 100% { border-color: var(--color-neon-blue); }
-  50% { border-color: transparent; }
-}
-
-/* ── Konami Code Animations ── */
-@keyframes konamiFlash {
-  0% { opacity: 0.3; }
-  100% { opacity: 0; }
-}
-
-@keyframes konamiRing {
-  0% { width: 4px; height: 4px; opacity: 1; }
-  100% { width: 600px; height: 600px; opacity: 0; margin-left: -300px; margin-top: -300px; }
-}
-
-@keyframes konamiFade {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-  15% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-  30% { transform: translate(-50%, -50%) scale(1); }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes konamiParticle {
-  0% { opacity: 0; transform: rotate(var(--rotation, 0deg)) translateX(0); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: rotate(var(--rotation, 0deg)) translateX(200px); }
-}
-
-.konami-shake {
-  animation: konamiShake 0.6s ease-out;
-}
-
-@keyframes konamiShake {
-  0%, 100% { transform: translateX(0); }
-  10% { transform: translateX(-8px); }
-  20% { transform: translateX(8px); }
-  30% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  50% { transform: translateX(-4px); }
-  60% { transform: translateX(4px); }
-  70% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-}
-
-/* ── Glitch transition ── */
-@keyframes glitch-in {
-  0% { clip-path: inset(0 0 100% 0); filter: blur(4px); }
-  50% { clip-path: inset(0 0 30% 0); filter: blur(1px); }
-  100% { clip-path: inset(0 0 0% 0); filter: blur(0px); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-edge-2);
 }

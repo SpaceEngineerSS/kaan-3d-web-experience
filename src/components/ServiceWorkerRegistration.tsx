@@ -2,22 +2,16 @@
 
 import { useEffect } from "react";
 
+const BUILD_ID = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
+
 export function ServiceWorkerRegistration() {
     useEffect(() => {
-        if (
-            typeof window !== "undefined" &&
-            "serviceWorker" in navigator &&
-            process.env.NODE_ENV === "production"
-        ) {
-            navigator.serviceWorker
-                .register("/sw.js")
-                .then((reg) => {
-                    console.log("[PWA] Service Worker registered:", reg.scope);
-                })
-                .catch((err) => {
-                    console.warn("[PWA] Service Worker registration failed:", err);
-                });
-        }
+        if (process.env.NODE_ENV !== "production" || !("serviceWorker" in navigator)) return;
+        const register = () => {
+            navigator.serviceWorker.register(`/sw.js?v=${BUILD_ID}`).catch(() => undefined);
+        };
+        if (document.readyState === "complete") register();
+        else window.addEventListener("load", register, { once: true });
     }, []);
 
     return null;
