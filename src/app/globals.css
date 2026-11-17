@@ -8,36 +8,27 @@
  * red = warning/hostile, cyan = information.
  */
 @theme inline {
-  --font-display: var(--font-rajdhani), "Arial Narrow", sans-serif;
-  --font-sans: var(--font-b612), system-ui, sans-serif;
-  --font-mono: var(--font-b612-mono), ui-monospace, monospace;
+  --font-display: var(--font-chakra), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  --color-ink: #05070a;
-  --color-ink-2: #0b0f14;
-  --color-plate: #10161d;
-  --color-edge: #26313c;
-  --color-edge-2: #3a4754;
-  --color-fg: #eef1f3;
-  --color-fg-2: #c9d0d6;
-  --color-muted: #9aa6b1;
-  --color-faint: #76828d;
-  --color-topcoat: #7d858c;
-  --color-flag: #e30a17;
-  --color-hmd: #5cff8f;
-  --color-info: #7fd4ff;
-  --color-caution: #ffd34d;
-  --color-warn: #ff4d3d;
-
-  /* Legacy names used by older sections, mapped onto the palette. */
-  --color-neon-blue: var(--color-info);
-  --color-neon-blue-dim: #4f9fc4;
-  --color-stealth-black: var(--color-ink);
-  --color-cockpit-dark: var(--color-ink-2);
-  --color-hud-green: var(--color-hmd);
-  --color-titanium: var(--color-edge-2);
-  --color-titanium-light: var(--color-fg-2);
-  --color-panel-bg: #0b0f14e6;
-  --color-panel-border: var(--color-edge);
+  /* Flight-test terminal: carbon black, anodised titanium, hairlines, two tactical accents. */
+  --color-ink: #050608;
+  --color-ink-2: #0b0d12;
+  --color-plate: #0b0d12;
+  --color-edge: rgba(255, 255, 255, 0.07);
+  --color-edge-2: rgba(255, 255, 255, 0.14);
+  --color-fg: #eceff4;
+  --color-fg-2: #b4bcc5;
+  --color-muted: #7c8692;
+  --color-faint: #646e78;
+  --color-topcoat: #8a939c;
+  --color-burn: #ff3b00;
+  --color-flag: #ff3b00;
+  --color-hmd: #00e575;
+  --color-info: #8fb8d8;
+  --color-caution: #ffcc3d;
+  --color-warn: #ff3b00;
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
@@ -85,7 +76,7 @@ body {
 }
 
 ::selection {
-  background: var(--color-hmd);
+  background: var(--color-fg);
   color: var(--color-ink);
 }
 
@@ -115,8 +106,8 @@ canvas {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--step-5);
-  line-height: 0.84;
-  letter-spacing: -0.02em;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
   text-transform: uppercase;
 }
 
@@ -124,8 +115,8 @@ canvas {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--step-4);
-  line-height: 0.9;
-  letter-spacing: -0.012em;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
   text-transform: uppercase;
   text-wrap: balance;
 }
@@ -155,9 +146,9 @@ canvas {
 /* Cockpit-style label: B612 Mono, caps, a little tracking. */
 .t-label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  line-height: 1.3;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
@@ -172,6 +163,80 @@ canvas {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 0.9;
+}
+
+/* Telemetry readout: what every number on the terminal uses. */
+.t-tele {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+/* 1px engineering rule and 5×5 crosshair marks at grid intersections. */
+.hair {
+  border-color: var(--color-edge);
+}
+
+.cross {
+  position: relative;
+}
+
+.cross::before,
+.cross::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--color-edge-2), var(--color-edge-2)) center / 1px 100% no-repeat,
+    linear-gradient(var(--color-edge-2), var(--color-edge-2)) center / 100% 1px no-repeat;
+}
+
+.cross::before {
+  top: -5px;
+  left: -5px;
+}
+
+.cross::after {
+  bottom: -5px;
+  right: -5px;
+}
+
+/* Bracketed engineering toggle: [ AUDIO // MUTE ] */
+.toggle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  min-height: 32px;
+  padding: 0 2px;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.toggle::before {
+  content: "[ ";
+  color: var(--color-faint);
+}
+
+.toggle::after {
+  content: " ]";
+  color: var(--color-faint);
+}
+
+.toggle:hover,
+.toggle[aria-pressed="true"] {
+  color: var(--color-fg);
+}
+
+.toggle[data-live="true"] {
+  color: var(--color-hmd);
 }
 
 /* ── Layout ─────────────────────────────────────── */
@@ -205,29 +270,8 @@ canvas {
   border-top: 1px solid var(--color-edge);
 }
 
-/* A data plate: what an instrument card looks like, not a glass panel. */
-.plate {
-  background: color-mix(in srgb, var(--color-ink) 88%, transparent);
-  border: 1px solid var(--color-edge);
-}
 
-.glass-panel,
-.content-panel {
-  background: color-mix(in srgb, var(--color-ink-2) 90%, transparent);
-  border: 1px solid var(--color-edge);
-}
 
-.content-panel {
-  padding: 1.5rem;
-}
-
-/* Display bezel, the frame of a cockpit screen. */
-.bezel {
-  position: relative;
-  background: #000;
-  border: 1px solid var(--color-edge-2);
-  box-shadow: 0 0 0 6px #0b0e12, 0 0 0 7px var(--color-edge);
-}
 
 .link {
   background-image: linear-gradient(currentColor, currentColor);
@@ -259,8 +303,7 @@ canvas {
 }
 
 .btn:hover {
-  border-color: var(--color-hmd);
-  color: var(--color-hmd);
+  border-color: var(--color-fg);
 }
 
 .btn:active {
@@ -300,7 +343,7 @@ canvas {
 .seg > button[aria-pressed="true"],
 .seg > button[aria-selected="true"] {
   color: var(--color-ink);
-  background: var(--color-hmd);
+  background: var(--color-fg);
 }
 
 /* ── Motion ─────────────────────────────────────── */
@@ -331,15 +374,6 @@ canvas {
   }
 }
 
-/* Legacy utility names kept for older sections until they are replaced. */
-.text-glow,
-.text-glow-strong {
-  text-shadow: none;
-}
-
-.text-gradient {
-  color: var(--color-fg);
-}
 
 @keyframes spin-slow {
   to {
@@ -371,4 +405,11 @@ canvas {
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-edge-2);
+}
+
+/* [ TELEMETRY: OFF ] hides every overlay layer. */
+[data-telemetry="off"] [data-overlay] {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0s 0.2s;
 }

@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
-import { Rajdhani } from "next/font/google";
-import localFont from "next/font/local";
+import { Chakra_Petch, Inter, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { LanguageProvider, type Locale } from "@/context/LanguageContext";
@@ -10,35 +9,28 @@ import { MotionRuntime } from "@/components/site/MotionRuntime";
 import { NoticeBar } from "@/components/site/NoticeBar";
 import { LOCALE_COOKIE, SITE_URL } from "@/lib/site";
 
-const rajdhani = Rajdhani({
-    variable: "--font-rajdhani",
+const chakra = Chakra_Petch({
+    variable: "--font-chakra",
     subsets: ["latin", "latin-ext"],
     weight: ["500", "600", "700"],
     display: "swap",
 });
 
-/* B612 (Airbus / Polarsys, SIL OFL 1.1), self-hosted. The upstream files lack Ş ş İ ı Ğ ğ;
-   those six letters were composed from the font's own S, s, I, i, G, g, cedilla, breve and dot glyphs. */
-const b612 = localFont({
-    variable: "--font-b612",
-    src: [
-        { path: "./fonts/B612-Regular.woff2", weight: "400", style: "normal" },
-        { path: "./fonts/B612-Bold.woff2", weight: "700", style: "normal" },
-    ],
+const inter = Inter({
+    variable: "--font-inter",
+    subsets: ["latin", "latin-ext"],
     display: "swap",
 });
 
-const b612Mono = localFont({
-    variable: "--font-b612-mono",
-    src: [
-        { path: "./fonts/B612Mono-Regular.woff2", weight: "400", style: "normal" },
-        { path: "./fonts/B612Mono-Bold.woff2", weight: "700", style: "normal" },
-    ],
+const jetbrains = JetBrains_Mono({
+    variable: "--font-jetbrains",
+    subsets: ["latin", "latin-ext"],
+    weight: ["400", "500", "700"],
     display: "swap",
 });
 
 export const viewport: Viewport = {
-    themeColor: "#05070a",
+    themeColor: "#050608",
     width: "device-width",
     initialScale: 1,
     maximumScale: 5,
@@ -89,7 +81,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     const locale: Locale = saved === "en" ? "en" : "tr";
 
     return (
-        <html lang={locale} className={`${rajdhani.variable} ${b612.variable} ${b612Mono.variable}`}>
+        <html lang={locale} className={`${chakra.variable} ${inter.variable} ${jetbrains.variable}`}>
             <body className="antialiased">
                 <a
                     href="#main"

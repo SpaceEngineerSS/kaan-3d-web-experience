@@ -1,40 +1,29 @@
 <p align="center">
-  <img src="docs/images/hero.png" alt="KAAN sitesinin açılışı: 2024 uçuş testinden gerçek görüntü, üstünde KAAN yazısı ve program durumu" width="100%" />
+  <img src="docs/images/s01.png" alt="KAAN uçuş test terminali: nokta bulutu olarak çizilmiş KAAN, işaret çizgileri ve uçuş kaydı" width="100%" />
 </p>
 
 # KAAN
 
 **[kaan-3d-web-experience.vercel.app](https://kaan-3d-web-experience.vercel.app)** · [English below](#english)
 
-Türkiye'nin beşinci nesil muharip uçağı KAAN'ı uçağın kendi dünyasından anlatan bağımsız bir site. Kullanılan malzemeler:
-- TUSAŞ'ın 2024 uçuş testi görüntüleri
-- resmi rakamlar
-- ASELSAN'ın açıkladığı sistemler
-- uçağın 3D modeli
-
-Site bilim kurgu süsü kullanmıyor ve başka uçakları vekil olarak göstermiyor. Her rakamın kaynağı var ya da hedef, bildirilen veya tahmini olduğu açıkça yazıyor.
+Türkiye'nin beşinci nesil muharip uçağı KAAN için bağımsız bir **uçuş test ve telemetri terminali**. Sayfanın kendisi 3D sahnedir: uçağın modeli lidar nokta bulutu, kesit çizgileri ve X-ışını kabuğu olarak çiziliyor. Gövde boyunca ilerleyen tarama dalgası iç yapıyı ortaya çıkarıyor. Metinler kart değil; 3D noktalara kilitlenen 1 piksellik işaret çizgileriyle uçağa bağlanıyor.
 
 > TUSAŞ ile resmi bir bağı yoktur ve kâr amacı gütmez. Kaynak kodu MIT lisanslıdır. Görsellerin, videoların ve modellerin hakları sahiplerine aittir; listesi [/kaynaklar](https://kaan-3d-web-experience.vercel.app/kaynaklar) sayfasında.
 
 | | |
 |---|---|
-| ![İlk uçuş kartı ve gerçek kalkış görüntüsü](docs/images/first-flight.png) | ![TULGAR vizöründen tırmanış: sahnedeki uçağın canlı verisinden çizilen semboloji](docs/images/visor.png) |
-| ![Geniş alan ekranı: taktik durum ve radar sayfaları](docs/images/cockpit.png) | ![3D model incelemesi, numaralı noktalar ve P0/P1 farkları](docs/images/airframe.png) |
+| ![02 Gövde: tarama dalgası iç yapıyı gösteriyor](docs/images/s02.png) | ![03 Kokpit: geniş alan ekranı ve BVR görünümü](docs/images/s03.png) |
+| ![04 MUM-T: KAAN ve iki ANKA-3 veri bağıyla](docs/images/s04.png) | ![05 Mühendislik dosyası: karşılaştırma ve arşiv](docs/images/s05.png) |
 
-## Sayfada neler var
+## Bölümler
 
-1. **Açılış.** KAAN P0'ın 2024 uçuş testinden kesilmiş sessiz bir döngü. Yanında Kasım 2026 itibarıyla program durumu: P0, P1, Blok 10 siparişi ve Endonezya.
-2. **İlk uçuş.** 21 Şubat 2024, saat 08.50, Mürted. Pilot, süre, 8.000 ft, 230 knot, açık iniş takımları, fren paraşütü ve eskort F-16D bir uçuş test kartında; yanında gerçek kalkış görüntüsü.
-3. **TULGAR vizöründen bakış.** Kaydırdıkça uçak tırmanır, bulutları geçer ve yatışa girer. Vizördeki semboller, sahnedeki uçağın o anki hızından, irtifasından ve duruşundan çizilir. Canlandırma ilk uçuşun açıklanan sınırlarının içinde kalır.
-4. **Gövde.** Döndürülebilen 3D model. Sekiz numaralı noktayla KARAT 100, TOYGUN 100, alıklar, silah yuvaları ve T18T koltuk gösteriliyor; P0'dan P1'e değişenler ayrıca listeleniyor.
-5. **Kokpit.**
-   - Geniş alan ekranı: iki portal ve alt pencere şeridi; TSD, radar, mühimmat, motor, yakıt ve uçuş kontrol sayfaları.
-   - ASELSAN yedek uçuş göstergesi.
-   - Ölçekli TULGAR vizör çerçevesi.
-   - Hepsi temsili olarak işaretli; KAAN'ın gerçek ekran sayfaları yayımlanmadı.
-6. **Sensörler, veriler, silahlar, motor, program ve arşiv.** Hepsi kaynaklı.
+1. **01 İlk uçuş:** 21 Şubat 2024, 08.50, Mürted uçuş kaydı. Gerçek P0 görüntüleri FLIR beyaz-sıcak filtresiyle açılır. Egzozda şok elmasları görünür.
+2. **02 Gövde:** Kamera gövde altına iner. Tarama dalgası S-kanal hava alıklarını, iç silah yuvasını (temsili yükler) ve motor fanlarını gösterir; bildirilen silahlar ve istasyon sayıları yanında listelenir.
+3. **03 Kokpit:** Kanopi içinden birinci şahıs bakış. Geniş alan ekranı / BVR görünümü, fareyle oynayan yunuslama merdiveni ve MIL-STD-2525 izleri yer alır. Hepsi temsili; KAAN'ın gerçek ekran sayfaları yayımlanmadı.
+4. **04 MUM-T:** Tepeden bakışta KAAN ve iki ANKA-3, aralarında veri bağı darbeleri. KIZILELMA, KAAN ile entegrasyonu açıklanmadığı için konsept düğüm olarak gösteriliyor.
+5. **05 Mühendislik dosyası:** KAAN / F-35A / Su-57 karşılaştırma matrisi, program takvimi, yatay arşiv şeridi ve uçuş videosu.
 
-İkinci sayfa [/mum-t](https://kaan-3d-web-experience.vercel.app/mum-t), KAAN'ın ANKA-3 ile insanlı–insansız ekip olarak çalışmasını anlatıyor.
+Ekranın kenarındaki çerçeve canlı görev saatini, ölçülen FPS'i, dikey hızı ve kaydırma derinliğini gösterir. `[ TELEMETRY ]` anahtarı katmanları gizler.
 
 ## Çalıştırmak
 
@@ -49,11 +38,11 @@ Node 20.9 veya üstü gerekiyor. Yayın öncesi kontrol: `npm run typecheck && n
 
 ## Nasıl kuruldu
 
-Next.js 16, React 19, Tailwind CSS 4, React Three Fiber 9 ve drei, GSAP ve Lenis kullanılıyor. Yazı tipi B612; Airbus'ın kokpit ekranları için yaptırdığı açık kaynak yazı tipi, eksik Türkçe harfleri tamamlanarak siteye gömüldü.
+Next.js 16, React 19, Tailwind CSS 4, React Three Fiber 9, drei, özel GLSL shader'lar, simplex-noise, motion ve Lenis kullanılıyor. Yazı tipleri Chakra Petch, JetBrains Mono ve Inter.
 
 ```mermaid
 flowchart LR
-    F["lib/flight/profile.ts<br/>senaryolu uçuş"] --> S["3D sahne"] & H["TULGAR vizörü"]
+    T["lib/terminal/state.ts<br/>kaydırma · hız · çapa noktaları"] --> S["3D sahne<br/>nokta bulutu · tarama · akış"] & L["işaret çizgileri"]
     C["content/*.ts<br/>TR + EN, kaynaklı"] --> P["bölümler"]
     D["useDeviceProfile<br/>seviye 0–3"] --> S
 ```
@@ -71,19 +60,14 @@ Ayrıntılar:
 
 ## English
 
-An independent site about Türkiye's fifth-generation fighter, KAAN, told through the aircraft's own world. It is built from:
-- Turkish Aerospace's 2024 flight-test footage
-- the official figures
-- the systems ASELSAN has disclosed
-- a 3D model of the aircraft
+An independent **flight-test telemetry terminal** for Türkiye's fifth-generation fighter, KAAN. The 3D scene is the page. The model is drawn as a lidar point cloud, blueprint edges and an X-ray shell. A scan band sweeps it to reveal the internals, and 1px leader lines tie the text to points on the aircraft.
 
-There is no sci-fi decoration and no other aircraft standing in for KAAN.
-
-Highlights:
-- **First-flight card.** Details of the flight on 21 February 2024, shown next to real take-off footage.
-- **Climb-out through the TULGAR visor.** A scroll-driven 3D sequence whose helmet symbology is computed live from the aircraft in the scene.
-- **3D inspection of the airframe.** The model, with the differences between P0 and P1 marked.
-- **Large-area cockpit display.** Drawn to documented display conventions and clearly marked as representative.
+The page has five sections:
+- **01:** The first flight, with the real P0 footage behind a FLIR white-hot filter.
+- **02:** The airframe and internal bays.
+- **03:** A first-person cockpit view with a wide-area display and a BVR picture, marked representative.
+- **04:** The MUM-T network with two ANKA-3; KIZILELMA appears as a concept.
+- **05:** The engineering file: a KAAN / F-35A / Su-57 comparison, the programme timeline, and the archive.
 
 **Not affiliated with Turkish Aerospace (TUSAŞ). Non-commercial.** The source code is MIT licensed. Images, videos and models belong to their owners, who are listed on the [sources page](https://kaan-3d-web-experience.vercel.app/kaynaklar) and in [docs/CREDITS.md](docs/CREDITS.md).
 

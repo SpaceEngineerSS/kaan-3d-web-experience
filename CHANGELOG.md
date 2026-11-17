@@ -2,6 +2,37 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [SemVer](https://semver.org/).
 
+## [4.0.0] — 2026-11-18
+
+The home page becomes a flight-test telemetry terminal. The 3D scene is the page.
+
+### Added
+- **Blueprint render of `KAAN.glb`.** The model is drawn as a lidar point cloud (up to 120k surface samples), edge lines and a fresnel X-ray shell, all as custom shaders. A scan band sweeps nose to tail. Inside it the shell clears and the procedural internals light up: fans, S-ducts, the weapons bay with notional stores, and the AESA face with a ±60° cone.
+- **Airflow and exhaust.**
+  - Vortex streamlines from the LERX, wing tips and fin tips, shaped by curl noise and reacting to scroll speed.
+  - Shock-diamond plumes at both nozzles.
+- **Camera.** It moves along a Catmull–Rom spline: chine, belly and bay, first-person canopy, MUM-T overhead. Scroll speed adds a slight FOV stretch and roll.
+- **Diegetic labels.** 1px SVG leader lines lock onto 3D anchors.
+- **Terminal frame and status bar.**
+  - A 16px-inset hairline frame with a mission clock, measured FPS, vertical speed and a scroll-depth ruler.
+  - A status bar (`SYS.MMU.KAAN // REV 2026.4`) with section indices and a `[ TELEMETRY ]` toggle.
+- **Section 01.** A FLIR white-hot filter, written as a raw WebGL shader, over the real P0 footage. It has a timecode and a track box.
+- **Section 03.** A BVR / wide-area display view in 1px SVG with a pointer-parallax pitch ladder and MIL-STD-2525 tracks. Every element is marked representative.
+- **Section 04.** A MUM-T network: two ANKA-3 point clouds, data-link pulses, clickable nodes with mission-profile schematics, and KIZILELMA as a labelled concept node.
+- **Section 05.**
+  - Comparison matrix (KAAN / F-35A / Su-57) with bars and same-scale plan frames.
+  - Programme matrix.
+  - Horizontal archive strip with telemetry tags.
+  - Full flight video.
+
+### Changed
+- **Type:** Chakra Petch, JetBrains Mono and Inter.
+- **Palette:** carbon black, anodised titanium and hairlines, with two accents: afterburner red and phosphor green.
+- **Styles:** no rounded corners, glass, panels, or 3-up stat tiles.
+
+### Removed
+- The v3 chapter components, the scripted flight scene and the B612 fonts. The sourced content modules stay.
+
 ## [3.0.0] — 2026-11-17
 
 A new direction. The site keeps v1's immersive feel, but everything on the page now comes from KAAN's own world: real flight footage, published figures, and cockpit visuals drawn to documented conventions.

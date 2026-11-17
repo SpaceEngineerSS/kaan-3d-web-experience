@@ -1,43 +1,47 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/Navbar";
+import { StatusBar } from "@/components/terminal/StatusBar";
+import { Frame } from "@/components/terminal/Frame";
+import { TerminalDriver } from "@/components/terminal/TerminalDriver";
+import { LeaderLines } from "@/components/terminal/LeaderLines";
+import { S01 } from "@/components/terminal/sections/S01";
+import { S02 } from "@/components/terminal/sections/S02";
+import { S03 } from "@/components/terminal/sections/S03";
+import { S04 } from "@/components/terminal/sections/S04";
+import { S05 } from "@/components/terminal/sections/S05";
 import { Footer } from "@/components/Footer";
-import { Hero } from "@/components/chapters/Hero";
-import { FirstFlight } from "@/components/chapters/FirstFlight";
-import { FlightExperience } from "@/components/flight/FlightExperience";
-import { Airframe } from "@/components/chapters/Airframe";
-import { Cockpit } from "@/components/chapters/Cockpit";
-import { Sensors } from "@/components/chapters/Sensors";
-import { Specifications } from "@/components/chapters/Specifications";
-import { Weapons } from "@/components/chapters/Weapons";
-import { Engine } from "@/components/chapters/Engine";
-import { Programme } from "@/components/chapters/Programme";
-import { Archive } from "@/components/chapters/Archive";
-import { MumtTeaser } from "@/components/chapters/MumtTeaser";
-import { LazyMount } from "@/components/site/LazyMount";
+import { SceneMount } from "@/components/terminal/SceneMount";
 
 export const metadata: Metadata = {
     alternates: { canonical: "/" },
 };
 
+/**
+ * The home page is a flight-test terminal. Sections 01–04 scroll over one pinned 3D scene (#track);
+ * section 05 is the editorial engineering part that follows it.
+ */
 export default function Home() {
     return (
         <>
-            <Navbar />
-            <main id="main" className="relative">
-                <Hero />
-                <FirstFlight />
-                <FlightExperience />
-                <Airframe />
-                <LazyMount minHeight="100svh" id="cockpit">
-                    <Cockpit />
-                </LazyMount>
-                <Sensors />
-                <Specifications />
-                <Weapons />
-                <Engine />
-                <Programme />
-                <Archive />
-                <MumtTeaser />
+            <StatusBar />
+            <Frame />
+            <TerminalDriver />
+            <main id="main" className="relative bg-ink">
+                <div id="track" className="relative">
+                    <div className="sticky top-0 h-[100svh] overflow-hidden">
+                        <SceneMount />
+                        {/* On phones the text blocks share the screen with the model; the leader lines would cross them. */}
+                        <div className="hidden md:contents">
+                            <LeaderLines />
+                        </div>
+                    </div>
+                    <div className="relative -mt-[100svh]">
+                        <S01 />
+                        <S02 />
+                        <S03 />
+                        <S04 />
+                    </div>
+                </div>
+                <S05 />
             </main>
             <Footer />
         </>

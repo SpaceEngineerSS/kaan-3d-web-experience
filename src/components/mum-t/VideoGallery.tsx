@@ -19,7 +19,7 @@ export function VideoGallery() {
                     <li key={v.name} className={i === 0 ? "md:col-span-12 lg:col-span-6" : "md:col-span-6 lg:col-span-3"} data-reveal>
                         <figure>
                             <video
-                                className="bezel aspect-video w-full object-cover"
+                                className="border border-edge-2 bg-black aspect-video w-full object-cover"
                                 controls
                                 playsInline
                                 preload="none"

@@ -66,7 +66,7 @@ export function DataLinkDiagram() {
                         ))}
                     </div>
 
-                    <svg viewBox="0 0 640 400" className="bezel mt-6 w-full" role="img" aria-label={`${active.label}: ${active.body}`}>
+                    <svg viewBox="0 0 640 400" className="border border-edge-2 bg-black mt-6 w-full" role="img" aria-label={`${active.label}: ${active.body}`}>
                         <defs>
                             <pattern id="dl-grid" width="20" height="20" patternUnits="userSpaceOnUse">
                                 <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--color-edge)" strokeWidth="0.5" />
