@@ -2,6 +2,24 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [SemVer](https://semver.org/).
 
+## [4.0.1] — 2026-11-18
+
+### Fixed
+- **Overlapping sections.** Sections 01–04 no longer cover each other while scrolling. Each section's text fades in and out on its own, and headings no longer slide under the status bar.
+- **Readability over the point cloud.** These now have a solid backing and brighter labels:
+  - the flight log
+  - the airframe text column
+  - the MUM-T node list
+  - the cockpit page switches
+  - the frame readouts
+- **Leader labels.** A label never lands on a text column: it moves to the other side, or hides. Below 1024 px all leader labels are hidden.
+- **Phone layout.**
+  - Section 01 keeps the model visible between the title and the flight log.
+  - The disclaimer is a single slim line that dismisses itself after the first screen of scrolling.
+  - The MUM-T hero camera sits higher, so the formation fills the screen.
+- **Archive images.** They now load at 1200 px instead of 3840 px, and the first two load eagerly.
+- **Status bar.** Section names show only at 1280 px and wider, so the bar no longer overlaps at 1024 px.
+
 ## [4.0.0] — 2026-11-18
 
 The home page becomes a flight-test telemetry terminal. The 3D scene is the page.

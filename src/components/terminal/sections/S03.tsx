@@ -5,6 +5,8 @@ import { useT } from "@/context/LanguageContext";
 import { LAD_PAGES, s03Copy, type LadPage } from "@/content/terminal";
 import { useDeviceProfile } from "@/hooks/useDeviceProfile";
 import { terminal } from "@/lib/terminal/state";
+import { useSectionFade } from "@/components/terminal/useSectionFade";
+
 
 /*
  * Representative wide-area display drawn in thin SVG (stroke 1). KAAN's real pages are unpublished.
@@ -234,6 +236,8 @@ export function S03() {
     const [page, setPage] = useState<LadPage>("RDR");
     const section = useRef<HTMLElement>(null);
     const ladder = useRef<SVGGElement>(null);
+    const block = useRef<HTMLDivElement>(null);
+    useSectionFade(section, block);
     const alt = useRef<SVGTSpanElement>(null);
     const mach = useRef<SVGTSpanElement>(null);
     const hdg = useRef<SVGTextElement>(null);
@@ -309,8 +313,8 @@ export function S03() {
 
     return (
         <section ref={section} id="s03" aria-labelledby="s03-title" className="pointer-events-none relative min-h-[150svh]">
-            <div className="min-h-[100svh] md:sticky md:top-0 md:h-[100svh]">
-                <div className="wrap grid min-h-[100svh] grid-cols-12 grid-rows-[auto_1fr_auto] gap-x-6 gap-y-4 pb-14 pt-20 sm:pb-16 sm:pt-24 md:h-full md:min-h-0">
+            <div ref={block} className="min-h-[100svh] md:sticky md:top-0 md:h-[100svh]">
+                <div className="wrap grid min-h-[100svh] grid-cols-12 grid-rows-[auto_1fr_auto] gap-x-6 gap-y-4 pb-14 pt-20 sm:pb-16 md:pt-28 md:h-full md:min-h-0">
                     <header className="col-span-12 md:col-span-6">
                         <p className="t-tele mb-3 text-fg-2">{c.index}</p>
                         <h2 id="s03-title" className="t-h2 text-fg">
@@ -375,7 +379,7 @@ export function S03() {
                             </text>
                         </svg>
 
-                        <div role="group" aria-label={c.pagesLabel} className="pointer-events-auto mx-auto mt-2 flex flex-wrap justify-center gap-x-3">
+                        <div role="group" aria-label={c.pagesLabel} className="pointer-events-auto mx-auto mt-2 flex flex-wrap justify-center gap-x-3 border-t border-edge bg-ink px-3 py-1">
                             {LAD_PAGES.map((p) => (
                                 <button key={p} type="button" className="toggle" aria-pressed={page === p} data-live={page === p} title={c.pageNames[p]} onClick={() => setPage(p)}>
                                     {p}
@@ -384,7 +388,7 @@ export function S03() {
                         </div>
                     </div>
 
-                    <div className="col-span-12 border-t border-edge pt-2 md:col-span-7 lg:col-span-5">
+                    <div className="col-span-12 border-t border-edge bg-ink/92 px-3 pb-2 pt-2 md:col-span-7 lg:col-span-5">
                         <p className="t-tele m-0 normal-case tracking-[0.04em] text-fg-2">{c.tulgar}</p>
                         <p className="t-tele m-0 mt-1 normal-case tracking-[0.04em] text-faint">{c.honest}</p>
                     </div>

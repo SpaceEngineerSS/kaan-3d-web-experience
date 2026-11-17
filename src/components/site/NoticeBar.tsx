@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { useT } from "@/context/LanguageContext";
 
 const KEY = "kaan-notice-v2";
@@ -19,12 +19,12 @@ function read(): boolean {
 
 const copy = {
     tr: {
-        text: "Bu site resmi değildir. TUSAŞ ile bağı olmayan, kâr amacı gütmeyen bağımsız bir çalışmadır; marka ve görsellerin hakları sahiplerine aittir.",
-        ok: "Anladım",
+        text: "Resmi site değildir · TUSAŞ ile bağı olmayan bağımsız, kâr amacı gütmeyen çalışma · görsel hakları sahiplerine aittir.",
+        ok: "TAMAM",
     },
     en: {
-        text: "This is not an official site. It is an independent, non-commercial study with no link to Turkish Aerospace; trademarks and images belong to their owners.",
-        ok: "Got it",
+        text: "Not an official site · independent, non-commercial study, not affiliated with Turkish Aerospace · image rights belong to their owners.",
+        ok: "OK",
     },
 };
 
@@ -50,14 +50,24 @@ export function NoticeBar() {
         listeners.forEach((fn) => fn());
     }, []);
 
+    // Once the visitor has scrolled a screen, they have seen it: dismiss on its own.
+    useEffect(() => {
+        if (!open) return;
+        const onScroll = () => {
+            if (window.scrollY > window.innerHeight) close();
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, [open, close]);
+
     if (!open) return null;
     const c = t(copy);
 
     return (
-        <div role="region" aria-label="Notice" className="fixed inset-x-0 bottom-0 z-50 border-t border-edge bg-ink-2/95">
-            <div className="wrap flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[0.8125rem] leading-snug text-fg-2">{c.text}</p>
-                <button type="button" onClick={close} className="btn shrink-0 self-start sm:self-auto">
+        <div role="region" aria-label="Notice" className="fixed inset-x-0 bottom-0 z-50 border-t border-edge bg-ink sm:inset-x-4 sm:bottom-4 sm:border">
+            <div className="flex items-center gap-3 px-4 py-2">
+                <p className="t-tele flex-1 normal-case leading-snug tracking-[0.04em] text-fg-2">{c.text}</p>
+                <button type="button" onClick={close} className="toggle shrink-0 text-fg">
                     {c.ok}
                 </button>
             </div>

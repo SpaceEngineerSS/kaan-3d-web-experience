@@ -234,7 +234,7 @@ function SceneCanvas({ profile, mode, active }: { profile: DeviceProfile; mode: 
         <Canvas
             frameloop={active ? "demand" : "never"}
             dpr={profile.dpr}
-            camera={{ position: [0, 3, profile.isMobile ? 26 : 15], fov: 45, near: 2, far: 80 }}
+            camera={{ position: profile.isMobile ? [0, 13, 14] : [0, 3, 15], fov: 45, near: 2, far: 80 }}
             gl={{
                 antialias: profile.antialias,
                 alpha: false,

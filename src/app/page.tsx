@@ -29,8 +29,8 @@ export default function Home() {
                 <div id="track" className="relative">
                     <div className="sticky top-0 h-[100svh] overflow-hidden">
                         <SceneMount />
-                        {/* On phones the text blocks share the screen with the model; the leader lines would cross them. */}
-                        <div className="hidden md:contents">
+                        {/* On phones and tablets the text blocks share the screen with the model; the leader lines would cross them. */}
+                        <div className="hidden lg:contents">
                             <LeaderLines />
                         </div>
                     </div>

@@ -1,20 +1,26 @@
 "use client";
 
+import { useRef } from "react";
 import { useT } from "@/context/LanguageContext";
+import { useSectionFade } from "@/components/terminal/useSectionFade";
+
 import { s02Copy } from "@/content/terminal";
 
 /** 02 // Airframe & low observability: the camera sits at the belly/chine while the scan reveals bays and S-ducts. */
 export function S02() {
+    const section = useRef<HTMLElement>(null);
+    const block = useRef<HTMLDivElement>(null);
+    useSectionFade(section, block);
     const t = useT();
     const c = t(s02Copy);
 
     return (
-        <section id="s02" aria-labelledby="s02-title" className="pointer-events-none relative min-h-[150svh]">
-            <div className="relative min-h-[100svh] md:sticky md:top-0 md:h-[100svh]">
+        <section ref={section} id="s02" aria-labelledby="s02-title" className="pointer-events-none relative min-h-[150svh]">
+            <div ref={block} className="relative min-h-[100svh] md:sticky md:top-0 md:h-[100svh]">
                 {/* Shade behind the text column so it reads over the point cloud. */}
                 <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 hidden w-[46%] bg-gradient-to-r from-ink via-ink/85 to-transparent md:block" />
-                <div className="wrap relative grid min-h-[100svh] grid-cols-12 content-center md:h-full md:min-h-0 gap-x-6 pb-14 pt-20 sm:pb-16 sm:pt-24">
-                    <div className="col-span-12 max-w-[42ch] md:col-span-6 lg:col-span-5">
+                <div className="wrap relative grid min-h-[100svh] grid-cols-12 content-center md:h-full md:min-h-0 gap-x-6 pb-14 pt-20 sm:pb-16 md:pt-28">
+                    <div data-keepout className="col-span-12 max-w-[42ch] bg-ink/92 md:col-span-6 md:p-4 lg:col-span-5 lg:bg-transparent lg:p-0">
                         <p className="t-tele mb-3 text-fg-2">{c.index}</p>
                         <h2 id="s02-title" className="t-h2 text-fg">
                             {c.title}

@@ -38,7 +38,7 @@ export function MumtHero() {
     return (
         <section ref={ref} id="top" aria-labelledby="mumt-title" className="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink pb-[max(2.5rem,6vh)] pt-14 lg:justify-end lg:pt-28">
             {/* Phones: the scene sits above the copy. Desktop: it fills the upper part of the screen behind it. */}
-            <div className="relative h-[46svh] w-full border-b border-edge lg:absolute lg:inset-0 lg:h-full lg:border-0" role="img" aria-label={h.sceneLabel}>
+            <div className="relative h-[50svh] w-full border-b border-edge lg:absolute lg:inset-0 lg:h-full lg:border-0" role="img" aria-label={h.sceneLabel}>
                 <MumTScene mode={mode} active={onScreen && tabVisible} />
             </div>
             {/* Scrim so the copy stays readable over the scene. */}

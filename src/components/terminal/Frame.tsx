@@ -48,13 +48,13 @@ export function Frame() {
             ))}
 
             {/* bottom-left: mission clock + reference */}
-            <div className="t-tele absolute bottom-3 left-4 flex gap-5">
+            <div className="t-tele absolute bottom-3 left-4 flex gap-5 bg-ink px-1.5 text-fg-2">
                 <span ref={clock}>T+00:00:00.000</span>
                 <span className="hidden md:inline">REF 40°04′K 32°34′D · MÜRTED</span>
             </div>
 
             {/* bottom-right: fps + scroll velocity */}
-            <div className="t-tele absolute bottom-3 right-4 flex gap-5">
+            <div className="t-tele absolute bottom-3 right-4 flex gap-5 bg-ink px-1.5 text-fg-2">
                 <span>
                     V/S <span ref={vel}>+0000</span>
                 </span>
@@ -73,7 +73,7 @@ export function Frame() {
                     <div className="h-4 w-full bg-hmd" />
                 </div>
             </div>
-            <div className="t-tele absolute right-6 top-20">
+            <div className="t-tele absolute right-6 top-20 bg-ink px-1.5 text-fg-2">
                 Z <span ref={depth}>000.0</span>
             </div>
         </div>

@@ -62,7 +62,7 @@ export function StatusBar() {
                                 className={`t-tele flex items-center gap-2 border-r border-edge px-3 transition-colors hover:text-fg ${section === i ? "text-fg" : ""}`}
                             >
                                 <span className={section === i ? "text-hmd" : ""}>{String(i + 1).padStart(2, "0")}</span>
-                                <span className="hidden lg:inline">{names[i]}</span>
+                                <span className="hidden xl:inline">{names[i]}</span>
                             </a>
                         </li>
                     ))}

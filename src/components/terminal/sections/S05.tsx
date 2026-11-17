@@ -532,7 +532,8 @@ function ArchiveStrip() {
                                         width={w}
                                         height={h}
                                         draggable={false}
-                                        sizes="(min-width: 768px) 80vw, 100vw"
+                                        sizes="(min-width: 768px) min(1200px, 90vw), 100vw"
+                                        loading={i < 2 ? "eager" : "lazy"}
                                         className="archive-img select-none object-cover contrast-125 grayscale transition-[filter] duration-300 group-hover:contrast-100 group-hover:grayscale-0 group-focus-visible:contrast-100 group-focus-visible:grayscale-0"
                                     />
                                 </button>
@@ -663,6 +664,7 @@ function Lightbox({ items, index, onIndex, onClose }: { items: MediaCredit[]; in
                     width={item.width ?? 1600}
                     height={item.height ?? 900}
                     sizes="100vw"
+                    quality={80}
                     className="h-auto max-h-full w-auto max-w-full border border-edge object-contain"
                 />
             </div>

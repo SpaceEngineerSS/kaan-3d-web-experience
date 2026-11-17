@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useT } from "@/context/LanguageContext";
 import { NODE_PROFILE, s04Copy, type NodeId, type ProfileId } from "@/content/terminal";
 import { terminal } from "@/lib/terminal/state";
+import { useSectionFade } from "@/components/terminal/useSectionFade";
+
 
 const NODES: NodeId[] = ["kaanNode", "anka1", "anka2", "kizilelma"];
 
@@ -66,6 +68,7 @@ export function S04() {
     const [selected, setSelected] = useState<NodeId | null>(null);
     const section = useRef<HTMLElement>(null);
     const layer = useRef<HTMLDivElement>(null);
+    useSectionFade(section, layer);
     const buttons = useRef<Partial<Record<NodeId, HTMLButtonElement | null>>>({});
 
     // Keep the node buttons over the projected anchors.
@@ -146,8 +149,8 @@ export function S04() {
                     ))}
                 </div>
 
-                <div className="wrap grid min-h-[100svh] grid-cols-12 grid-rows-[auto_1fr_auto] gap-x-6 gap-y-4 pb-14 pt-20 sm:pb-16 sm:pt-24 md:h-full md:min-h-0">
-                    <header className="col-span-12 max-w-[42ch] md:col-span-5">
+                <div className="wrap grid min-h-[100svh] grid-cols-12 grid-rows-[auto_1fr_auto] gap-x-6 gap-y-4 pb-14 pt-20 sm:pb-16 md:pt-28 md:h-full md:min-h-0">
+                    <header data-keepout className="col-span-12 max-w-[42ch] md:col-span-5">
                         <p className="t-tele mb-3 text-fg-2">{c.index}</p>
                         <h2 id="s04-title" className="t-h2 text-fg">
                             {c.title}
@@ -156,7 +159,7 @@ export function S04() {
                     </header>
 
                     {/* Fallback list of nodes */}
-                    <nav aria-label={c.nodesLabel} className="col-span-12 row-start-3 self-end md:col-span-4 lg:col-span-3">
+                    <nav aria-label={c.nodesLabel} className="col-span-12 row-start-3 self-end bg-ink/92 md:col-span-4 lg:col-span-3">
                         <p className="t-tele border-b border-edge-2 pb-1.5 text-fg">{c.nodesLabel}</p>
                         <ul className="m-0 list-none p-0">
                             {NODES.map((id, i) => (
