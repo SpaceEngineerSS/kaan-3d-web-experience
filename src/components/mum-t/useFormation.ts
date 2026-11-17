@@ -1,136 +1,67 @@
-"use client";
+import type { FormationMode } from "@/content/mumt";
 
-import { createContext, useContext, useReducer, type Dispatch } from "react";
+export type { FormationMode };
 
-export type FormationMode =
-    | "FORMATION"
-    | "BANK_LEFT"
-    | "BANK_RIGHT"
-    | "SEAD_DEPLOY"
-    | "STRIKE_RELEASE"
-    | "FREE";
+type V3 = [number, number, number];
 
-interface FormationState {
-    mode: FormationMode;
-    kaan: { bankAngle: number; yawOffset: number };
-    alpha: { pos: [number, number, number]; rot: [number, number, number]; deployed: boolean };
-    bravo: { pos: [number, number, number]; rot: [number, number, number]; deployed: boolean };
-    linkAlpha: { opacity: number };
-    linkBravo: { opacity: number };
+export interface FormationPose {
+    kaan: { bank: number; yaw: number };
+    alpha: { pos: V3; rot: V3 };
+    bravo: { pos: V3; rot: V3 };
+    /** Data-link line opacity per wingman, 0..1. */
+    linkAlpha: number;
+    linkBravo: number;
 }
 
-type FormationAction = { type: "SET_MODE"; mode: FormationMode };
+export const FORMATION_MODES: FormationMode[] = ["FORMATION", "BANK_LEFT", "BANK_RIGHT", "SEAD_DEPLOY", "STRIKE_RELEASE"];
 
-const BASE_ALPHA: [number, number, number] = [-6, -1, -2.5];
-const BASE_BRAVO: [number, number, number] = [6, -1, -2.5];
+const ALPHA: V3 = [-6.5, -0.8, -3];
+const BRAVO: V3 = [6.5, -0.8, -3];
+const BANK = 0.3;
 
-const BANK_ANGLE = 0.3;
-
-function computeState(mode: FormationMode): FormationState {
+/** Target pose of each aircraft for a formation command. The scene eases toward it. */
+export function formationPose(mode: FormationMode): FormationPose {
     switch (mode) {
-        case "FORMATION":
-            return {
-                mode,
-                kaan: { bankAngle: 0, yawOffset: 0 },
-                alpha: { pos: BASE_ALPHA, rot: [0, 0, 0], deployed: false },
-                bravo: { pos: BASE_BRAVO, rot: [0, 0, 0], deployed: false },
-                linkAlpha: { opacity: 0.35 },
-                linkBravo: { opacity: 0.35 },
-            };
-
         case "BANK_LEFT":
             return {
-                mode,
-                kaan: { bankAngle: -BANK_ANGLE, yawOffset: -0.08 },
-                alpha: {
-                    pos: [BASE_ALPHA[0] + 1.2, BASE_ALPHA[1] - 0.4, BASE_ALPHA[2]],
-                    rot: [0, 0, -BANK_ANGLE * 0.7],
-                    deployed: false,
-                },
-                bravo: {
-                    pos: [BASE_BRAVO[0] + 1.2, BASE_BRAVO[1] + 0.3, BASE_BRAVO[2]],
-                    rot: [0, 0, -BANK_ANGLE * 0.7],
-                    deployed: false,
-                },
-                linkAlpha: { opacity: 0.35 },
-                linkBravo: { opacity: 0.35 },
+                kaan: { bank: -BANK, yaw: -0.08 },
+                alpha: { pos: [ALPHA[0] + 1.2, ALPHA[1] - 0.4, ALPHA[2]], rot: [0, 0, -BANK * 0.8] },
+                bravo: { pos: [BRAVO[0] + 1.2, BRAVO[1] + 0.4, BRAVO[2]], rot: [0, 0, -BANK * 0.8] },
+                linkAlpha: 0.55,
+                linkBravo: 0.55,
             };
-
         case "BANK_RIGHT":
             return {
-                mode,
-                kaan: { bankAngle: BANK_ANGLE, yawOffset: 0.08 },
-                alpha: {
-                    pos: [BASE_ALPHA[0] - 1.2, BASE_ALPHA[1] + 0.3, BASE_ALPHA[2]],
-                    rot: [0, 0, BANK_ANGLE * 0.7],
-                    deployed: false,
-                },
-                bravo: {
-                    pos: [BASE_BRAVO[0] - 1.2, BASE_BRAVO[1] - 0.4, BASE_BRAVO[2]],
-                    rot: [0, 0, BANK_ANGLE * 0.7],
-                    deployed: false,
-                },
-                linkAlpha: { opacity: 0.35 },
-                linkBravo: { opacity: 0.35 },
+                kaan: { bank: BANK, yaw: 0.08 },
+                alpha: { pos: [ALPHA[0] - 1.2, ALPHA[1] + 0.4, ALPHA[2]], rot: [0, 0, BANK * 0.8] },
+                bravo: { pos: [BRAVO[0] - 1.2, BRAVO[1] - 0.4, BRAVO[2]], rot: [0, 0, BANK * 0.8] },
+                linkAlpha: 0.55,
+                linkBravo: 0.55,
             };
-
         case "SEAD_DEPLOY":
             return {
-                mode,
-                kaan: { bankAngle: 0, yawOffset: 0 },
-                alpha: { pos: BASE_ALPHA, rot: [0, 0, 0], deployed: false },
-                bravo: {
-                    pos: [10, 0.5, -6],
-                    rot: [0.08, -0.35, BANK_ANGLE * 0.5],
-                    deployed: true,
-                },
-                linkAlpha: { opacity: 0.35 },
-                linkBravo: { opacity: 0.08 },
+                kaan: { bank: 0, yaw: 0 },
+                alpha: { pos: ALPHA, rot: [0, 0, 0] },
+                bravo: { pos: [9.5, 0.6, -8], rot: [0.08, -0.3, BANK * 0.4] },
+                linkAlpha: 0.55,
+                linkBravo: 0.25,
             };
-
         case "STRIKE_RELEASE":
             return {
-                mode,
-                kaan: { bankAngle: 0.04, yawOffset: 0 },
-                alpha: {
-                    pos: [-9, -2.5, 3],
-                    rot: [-0.15, 0.12, -0.1],
-                    deployed: true,
-                },
-                bravo: { pos: BASE_BRAVO, rot: [0, 0, 0], deployed: false },
-                linkAlpha: { opacity: 0.08 },
-                linkBravo: { opacity: 0.35 },
+                kaan: { bank: 0.04, yaw: 0 },
+                alpha: { pos: [-9, -2.6, 2], rot: [-0.15, 0.12, -0.12] },
+                bravo: { pos: BRAVO, rot: [0, 0, 0] },
+                linkAlpha: 0.25,
+                linkBravo: 0.55,
             };
-
-        case "FREE":
+        case "FORMATION":
+        default:
             return {
-                mode,
-                kaan: { bankAngle: 0, yawOffset: 0 },
-                alpha: { pos: BASE_ALPHA, rot: [0, 0, 0], deployed: false },
-                bravo: { pos: BASE_BRAVO, rot: [0, 0, 0], deployed: false },
-                linkAlpha: { opacity: 0.35 },
-                linkBravo: { opacity: 0.35 },
+                kaan: { bank: 0, yaw: 0 },
+                alpha: { pos: ALPHA, rot: [0, 0, 0] },
+                bravo: { pos: BRAVO, rot: [0, 0, 0] },
+                linkAlpha: 0.55,
+                linkBravo: 0.55,
             };
     }
-}
-
-function formationReducer(_: FormationState, action: FormationAction): FormationState {
-    return computeState(action.mode);
-}
-
-const initialState = computeState("FORMATION");
-
-export const FormationStateCtx = createContext<FormationState>(initialState);
-export const FormationDispatchCtx = createContext<Dispatch<FormationAction>>(() => { });
-
-export function useFormationState() {
-    return useContext(FormationStateCtx);
-}
-
-export function useFormationDispatch() {
-    return useContext(FormationDispatchCtx);
-}
-
-export function useFormationReducer() {
-    return useReducer(formationReducer, initialState);
 }

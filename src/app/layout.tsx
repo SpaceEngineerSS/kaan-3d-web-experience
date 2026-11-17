@@ -1,100 +1,104 @@
 import type { Metadata, Viewport } from "next";
-import { Rajdhani, JetBrains_Mono } from "next/font/google";
+import { cookies } from "next/headers";
+import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import { LanguageProvider, type Locale } from "@/context/LanguageContext";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { MotionRuntime } from "@/components/site/MotionRuntime";
+import { NoticeBar } from "@/components/site/NoticeBar";
+import { LOCALE_COOKIE, SITE_URL } from "@/lib/site";
 
-const rajdhani = Rajdhani({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
+const archivo = Archivo({
+    variable: "--font-archivo",
+    subsets: ["latin", "latin-ext"],
+    axes: ["wdth"],
+    display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
+const plexSans = IBM_Plex_Sans({
+    variable: "--font-plex-sans",
+    subsets: ["latin", "latin-ext"],
+    weight: ["400", "500", "600"],
+    display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+    variable: "--font-plex-mono",
+    subsets: ["latin", "latin-ext"],
+    weight: ["400", "500"],
+    display: "swap",
 });
 
 export const viewport: Viewport = {
-  themeColor: "#050508",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
+    themeColor: "#0d1013",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    colorScheme: "dark",
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kaan-3d-web-experience.vercel.app"),
-  title: "KAAN — 5th Generation Fighter Aircraft",
-  description:
-    "Türkiye's next-generation stealth fighter jet. An interactive 3D experience showcasing the KAAN's advanced capabilities, avionics, stealth technology, weapon systems, and indigenous engine development.",
-  authors: [{ name: "Mehmet Gümüş", url: "https://github.com/SpaceEngineerSS" }],
-  icons: { icon: "/favicon.ico" },
-  keywords: [
-    "KAAN",
-    "TF-X",
-    "MMU",
-    "5th generation fighter",
-    "stealth aircraft",
-    "Turkish aerospace",
-    "TAI",
-    "TUSAS",
-    "fighter jet",
-    "military aviation",
-  ],
-  openGraph: {
-    title: "KAAN — 5th Generation Fighter Aircraft",
+    metadataBase: new URL(SITE_URL),
+    title: {
+        default: "KAAN — Etkileşimli 3D İnceleme",
+        template: "%s · KAAN",
+    },
     description:
-      "Interactive experience of Türkiye's next-generation stealth fighter jet. Explore specifications, avionics, and capabilities.",
-    type: "website",
-    locale: "en_US",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "KAAN 5th Generation Stealth Fighter Jet",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "KAAN — 5th Generation Fighter Aircraft",
-    description:
-      "Interactive experience of Türkiye's next-generation stealth fighter jet.",
-    images: ["/og-image.png"],
-  },
-  manifest: "/manifest.json",
+        "Türkiye'nin beşinci nesil muharip uçağı KAAN'ı açık kaynaklardan derlenmiş verilerle ve 3D model üzerinden anlatan bağımsız bir çalışma. An independent, interactive 3D study of the KAAN fighter.",
+    applicationName: "KAAN 3D",
+    authors: [{ name: "Mehmet Gümüş", url: "https://github.com/SpaceEngineerSS" }],
+    creator: "Mehmet Gümüş",
+    keywords: ["KAAN", "TF-X", "MMU", "Milli Muharip Uçak", "TUSAŞ", "beşinci nesil", "fifth-generation fighter", "three.js", "WebGL"],
+    alternates: { canonical: "/" },
+    openGraph: {
+        type: "website",
+        siteName: "KAAN 3D",
+        locale: "tr_TR",
+        alternateLocale: ["en_US"],
+        url: "/",
+        images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "KAAN 3D: the aircraft seen from above under the title" }],
+    },
+    twitter: { card: "summary_large_image", images: ["/og-image.png"] },
+    robots: { index: true, follow: true },
+    manifest: "/manifest.json",
+    icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
+    appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "KAAN" },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" className="dark">
-      <head>
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      </head>
-      <body
-        className={`${rajdhani.variable} ${jetbrainsMono.variable} antialiased`}
-      >
-        <a
-          href="#overview"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded focus:border focus:border-neon-blue/40 focus:bg-cockpit-dark focus:px-4 focus:py-2 focus:text-neon-blue focus:outline-none"
-        >
-          Skip to content
-        </a>
-        {children}
-        <Analytics />
-        <ServiceWorkerRegistration />
-      </body>
-    </html>
-  );
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "KAAN — Interactive 3D Study",
+    url: SITE_URL,
+    inLanguage: ["tr", "en"],
+    author: { "@type": "Person", name: "Mehmet Gümüş", url: "https://github.com/SpaceEngineerSS" },
+    about: { "@type": "Thing", name: "TUSAŞ KAAN", sameAs: "https://en.wikipedia.org/wiki/TAI_TF_Kaan" },
+};
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+    const store = await cookies();
+    const saved = store.get(LOCALE_COOKIE)?.value;
+    const locale: Locale = saved === "en" ? "en" : "tr";
+
+    return (
+        <html lang={locale} className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable}`}>
+            <body className="antialiased">
+                <a
+                    href="#main"
+                    className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-fg focus:px-4 focus:py-2 focus:text-ground"
+                >
+                    {locale === "tr" ? "İçeriğe geç" : "Skip to content"}
+                </a>
+                <LanguageProvider initialLocale={locale}>
+                    {children}
+                    <NoticeBar />
+                </LanguageProvider>
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+                <MotionRuntime />
+                <Analytics />
+                <ServiceWorkerRegistration />
+            </body>
+        </html>
+    );
 }

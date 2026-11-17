@@ -1,287 +1,74 @@
-# KAAN - 5. Nesil Savas Ucagi Interaktif Web Deneyimi
-
 <p align="center">
-  <img src="public/og-image.png" alt="KAAN 5th Generation Fighter" width="100%"/>
+  <img src="docs/images/hero.png" alt="KAAN 3D: the opening screen with the aircraft seen from above" width="100%" />
 </p>
 
-> **YASAL UYARI (LEGAL DISCLAIMER)**
-> Bu proje, **Mehmet Gumus (SpaceEngineerSS)** tarafindan gelistirilmis kar amaci gutmeyen bir **FAN-MADE (Hayran Yapimi)** calismasidir.
->
-> 1. Bu web sitesi **TUSAS (Turk Havacilik ve Uzay Sanayii)** ile resmi bir baga sahip degildir.
-> 2. "KAAN" ismi, tasarimlari ve ilgili tum materyaller TUSAS'in tescilli markasdir.
-> 3. Bu proje yalnizca WebGL, Next.js ve 3D animasyon yeteneklerini sergilemek amaciyla uretilmis bir "Konsept Portfolyo" calismasidir.
-> 4. Icerikte yer alan gorseller ve videolar, kamuya acik kaynaklardan egitim amacli derlenmistir.
-> 5. Projenin herhangi bir ticari amaci **yoktur**.
+# KAAN — etkileşimli 3D inceleme
 
-**Canli Demo:** [kaan-3d-web-experience.vercel.app](https://kaan-3d-web-experience.vercel.app)
+**[kaan-3d-web-experience.vercel.app](https://kaan-3d-web-experience.vercel.app)** · [English below](#english)
 
----
+Türkiye'nin beşinci nesil muharip uçağı KAAN'ı, açık kaynaklardan derlediğim verilerle ve uçağın 3D modeli üzerinden anlatan bağımsız bir çalışma. Sayfayı kaydırdıkça uçak üstten görünüşten yan profile döner. Ardından teknik veriler, gizlilik tasarımı, kokpit ve aviyonik, silahlar, motor, rakiplerle karşılaştırma, sanayi ortakları ve program takvimi geliyor. İkinci sayfa [/mum-t](https://kaan-3d-web-experience.vercel.app/mum-t), KAAN'ın ANKA-3 insansız savaş uçaklarıyla birlikte uçtuğu insanlı–insansız ekip kavramını işliyor.
 
-## Proje Hakkinda
+> TUSAŞ ile resmi bir bağı yoktur ve kâr amacı gütmez. Kaynak kodu MIT lisanslıdır. Görseller ve modeller sahiplerine aittir; hepsinin kaynağı [/kaynaklar](https://kaan-3d-web-experience.vercel.app/kaynaklar) sayfasında yazıyor.
 
-Turkiye'nin 5. nesil milli muharip ucagi KAAN'in modern web teknolojileri ile nasil sunulabilecegine dair bir vizyon projesidir. Gercek zamanli 3D render, post-processing efektleri, kokpit simulasyonu, silah sistemleri, aviyonik mimari diyagrami ve interaktif gorev haritasi gibi ileri duzey ozellikler icerir.
+| | |
+|---|---|
+| ![Teknik veriler ve aynı ölçekte boyut karşılaştırması](docs/images/specs.png) | ![Kokpit bölümü: temsili panoramik ekran sayfaları](docs/images/cockpit.png) |
+| ![MUM-T: KAAN ve iki ANKA-3 kol düzeninde](docs/images/mumt.png) | ![Telefonda açılış ekranı](docs/images/mobile.png) |
 
----
+### Neler var
 
-## Teknoloji Yigini
+- **Kaydırmayla dönen 3D model.** Ön, yan, üst, arka ve kokpit açılarını seçebilir, tel kafes görünümüne geçebilirsiniz.
+- **Kaynaklı veriler.** Her rakam ya yayımlanmış bir değer ya da açıkça *tasarım hedefi*, *bildirilen*, *planlanan* veya *tahmini* olarak işaretli. Hesaplanamayan, kaynağı bulunamayan rakamları sildim.
+- **Etkileşimli teknik çizimler.** Gizlilik için kenar hizalama ve temsili yansıma deseni, kokpit ekran sayfaları, aviyonik blok şeması, görev profiline göre silah istasyonları ve turbofan kesiti.
+- **Türkçe ve İngilizce.** Dil seçimi sayfalar arasında korunuyor.
+- **Her cihazda akıcı.** Cihaz dört seviyeden birine ayrılıyor. Zayıf telefonlar daha hafif malzeme ve daha az ışık alıyor, WebGL olmayan cihazlar sabit görsel görüyor. 3D sahne yalnızca bir şey hareket ettiğinde çiziliyor.
 
-| Teknoloji | Kullanim |
-|-----------|----------|
-| **Next.js 16** | App Router, SSR, Turbopack |
-| **React 19** | Hooks, Context API, Dynamic Imports |
-| **React Three Fiber** | 3D sahne, STL model render |
-| **@react-three/postprocessing** | Bloom, Vignette, Chromatic Aberration |
-| **@react-three/drei** | Environment, Stars, Html overlays |
-| **Three.js** | WebGL, BufferGeometry, MeshPhysicalMaterial |
-| **GSAP** | Scroll animasyonlari, gecisler |
-| **Tailwind CSS v4** | Utility-first stil sistemi |
-| **TypeScript 5** | Tip guvenli gelistirme |
-| **Web Audio API** | Dinamik motor sesi, sonik patlama, SFX |
-| **Canvas API** | Kokpit MFD, RCS grafigi, ucus zarfi, gorev haritasi |
-| **Framer Motion** | MUM-T animasyonlar, layout gecisleri, gesture |
-| **Lucide React** | Ikon kutuphanesi |
-
----
-
-## Ozellikler
-
-### 3D Sahne ve Gorsel
-- 3D KAAN modeli (STL) -- MeshPhysicalMaterial ile gercekci metal yuzey
-- Post-processing: Bloom, Vignette, Chromatic Aberration
-- Afterburner partikul sistemi (200 partikul + iz efekti)
-- Yildizli gokyuzu arka plani
-- X-Ray wireframe modu
-- 5 kamera on-ayari (On, Yan, Ust, Arka, Kokpit) -- aninda snap gecis
-- Mouse parallax ve scroll-driven rotasyon
-- Glow mesh efekti
-
-### Bolumler ve Icerik
-- **Scroll Sections** -- Typewriter efekti, radar tarama cizgisi, HUD animasyonlari
-- **Teknik Ozellikler** -- 6 spec karti, tiklanabilir detay panelleri, CountUp animasyonu
-- **Ucus Zarfi** -- Mach vs irtifa interaktif Canvas grafigi, superseyir bolgesi
-- **G-Force Simulatoru** -- 3G/6G/9G butonlari, tunel gorusu, kirmizi ekran, titresim
-- **Kokpit Dashboard** -- 4 panelli MFD (Taktik Harita, Durum, HSI, Silah)
-- **TULGAR HMD** -- Dunya ilki renkli HMD, interaktif HUD simulasyonu
-- **Aviyonik Mimari** -- 9 dugumlu IMA platform diyagrami, tiklanabilir sistemler
-- **Teknoloji Detaylari** -- 4 genisletilebilir kart (Stealth, Aviyonik, Itki, Yapi)
-- **RCS Analizi** -- Polar radar kesit alani gorsellestirmesi (goreli seviyeler)
-- **Silah Sistemleri** -- 7 gorev profili, Stealth/Karma/Beast mod etiketleri + GAZAP (termobarik FAE) ve HAYALET (bunker delici) muhimmatlari
-- **Gorev Briefing** -- Taktik harita, 3 animasyonlu gorev rotasi (CAP, Taarruz, SEAD)
-- **Karsilastirma Grafigi** -- KAAN vs F-22 vs F-35 radar/spider chart
-- **Boyut Karsilastirma** -- KAAN vs F-16/F-35/Su-57/Eurofighter gorsel barlar
-- **Loyal Wingman** -- KAAN + KIZILELMA + ANKA-3 ekosistem diyagrami + MUM-T CTA banner
-- **Yerli Motor** -- TF35000 bolumu, Blok 10/20/30 gecis sureci
-- **Uretim & Ihracat** -- 250+ ucak hedefi, Endonezya anlasma, program ortaklari
-- **Bilgi Kartlari** -- 8 adet "Biliyor muydunuz?" fact card
-- **Timeline** -- 2010'dan 2032'ye 11 kilometre tasi
-- **Video Briefing** -- Modal video oynatici
-- **Fotograf Galerisi** -- Yatay scroll, lightbox, klavye navigasyon
-- **Spec Sheet Indirme** -- Tek tikla TXT dosyasi olarak teknik ozellikler
-
-### UX ve Etkilesim
-- Gece/Gunduz tema (otomatik saat algilama)
-- TR/EN dil destegi (anlik gecis)
-- Scroll ilerleme gostergesi (sol kenar, yuzde + bolum isimleri)
-- Sag kenar sahne kontrolleri (X-Ray, Kamera)
-- Mobil alt navigasyon cubugu
-- Yukari cik (Scroll-to-Top) butonu -- 600px sonra belirir
-- Boot sekansli yukleme ekrani (BIOS tarzi sistem baslatma)
-- Dinamik ses motoru (scroll hizina bagli pitch, sonik patlama)
-- Konami kodu Easter egg (afterburner patlamasi)
-- Klavye kisayollari modali
-- PWA destegi (offline, standalone)
-- Erisileblirlik (skip-to-content, focus-visible, ARIA)
-
-### MUM-T Sayfasi (Insanli-Insansiz Takim)
-
-Bagimsiz `/mum-t` rotasinda, 3D interaktif MUM-T deneyimi sunar.
-
-- **3D Hero Sahne** -- KAAN + ANKA-3 modelleri (React Three Fiber), mobil responsive olcekleme
-- **Formasyon Kontrolleri** -- V, Echelon, Line Abreast, Trail, Diamond, Stack komutlari
-- **SuperSimsek Vitrin** -- Interaktif 3D insansiz savas ucagi modeli
-- **Aviyonik Vitrin** -- AESA radar, DAS, EH, veri linki sistemleri
-- **Senaryo Simulatoru** -- CAP, Deep Strike, SEAD taktik senaryolari
-- **Gorev Timeline** -- 2020-2030 insansiz sistem programa baglantisi
-- **Nesil Karsilastirma** -- 4., 4.5 ve 5. nesil MUM-T yetenek karsilastirmasi
-- **Savunma Ekosistemi** -- Turk savunma sanayi ag diyagrami
-- **Platform Karsilastirma** -- ANKA-3 vs Global Hawk vs MQ-25 vs XQ-58A
-- **Tehdit Alanustunlugu** -- A2/AD, EW, SEAD tehdit senaryolari
-- **Video Galerisi** -- MUM-T konsept videolari
-- **Yetenek Kartlari** -- Data link, otonom karar, suru Intel kartlari
-- **HUD Dashboard** -- UCAV ALPHA/BRAVO durum panelleri, link kalitesi gostergeleri
-- **Istatistik Paneli** -- Menzil, irtifa, hiz, istasyon temel metrikleri
-- **TR/EN Ceviri** -- Tam iki dilli destek (bagimsiz mumt-translations.ts)
-
----
-
-## Klavye Kisayollari
-
-| Kisayol | Islev |
-|---------|-------|
-| `N` | Gece/Gunduz modu |
-| `M` | Ses ac/kapat |
-| `L` | TR/EN dil degistir |
-| `X` | X-Ray modu |
-| `1-5` | Kamera on-ayarlari |
-| `0` | Kamera sifirla |
-| `F` | Tam ekran |
-| `?` | Kisayollar modali |
-| `Esc` | Lightbox / panel kapat |
-
----
-
-## Kurulum
+### Çalıştırmak
 
 ```bash
 git clone https://github.com/SpaceEngineerSS/kaan-3d-web-experience.git
 cd kaan-3d-web-experience
-
 npm install
-
-npm run dev
+npm run dev          # http://localhost:3000
 ```
 
-[http://localhost:3000](http://localhost:3000) adresini tarayicinizda acin.
+Node 20.9 veya üstü gerekiyor. Yayın öncesi kontrol: `npm run typecheck && npm run lint && npm run build`.
+
+### Nasıl çalışıyor
+
+```mermaid
+flowchart LR
+    A["content/*.ts<br/>TR + EN metin ve veriler"] --> B["chapters/*<br/>bölümler"]
+    B --> P["/ ve /mum-t"]
+    D["useDeviceProfile<br/>seviye 0–3"] --> S["3D sahne<br/>frameloop: demand"]
+    M["useModel<br/>GLB yükle · ölçekle · temizle"] --> S
+    S --> P
+```
+
+Next.js 16 (App Router), React 19, Tailwind CSS 4, React Three Fiber 9 ve drei, GSAP, Lenis ve Motion kullanıyor. Ayrıntılar [docs/](docs) klasöründe:
+
+- [Mimari](docs/architecture.md)
+- [Performans](docs/performance.md)
+- [İçerik ve kaynaklar](docs/content-and-sources.md)
+- [Görsel hakları](docs/CREDITS.md)
+- [Değişiklikler](CHANGELOG.md)
 
 ---
 
-## Proje Yapisi
+<a id="english"></a>
 
-```
-kaansite/
-├── public/
-│   ├── models/KAAN/         # 3D STL model
-│   ├── gallery/             # 12 galeri gorseli
-│   ├── videos/kaan.mp4      # Ucus videosu
-│   ├── og-image.png         # Open Graph gorseli
-│   ├── manifest.json        # PWA manifest
-│   └── cursor.png           # Ozel imlec
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx       # Root layout (meta, fontlar, SEO)
-│   │   ├── page.tsx         # Ana sayfa (tum bolumler)
-│   │   ├── mum-t/
-│   │   │   └── page.tsx     # MUM-T bagimsiz sayfa
-│   │   ├── not-found.tsx    # Ozel 404 sayfasi
-│   │   └── globals.css      # Global stiller, animasyonlar
-│   ├── components/
-│   │   ├── HeroScene.tsx           # 3D Canvas sahne + post-processing
-│   │   ├── KaanModel.tsx           # STL model + kamera preset + X-Ray
-│   │   ├── AfterburnerEffect.tsx   # Motor partikul sistemi
-│   │   ├── ScrollSections.tsx      # GSAP scroll animasyonlari
-│   │   ├── SpecsGrid.tsx           # Teknik ozellikler (genisletilebilir)
-│   │   ├── FlightEnvelope.tsx      # Ucus zarfi diyagrami
-│   │   ├── GForceSimulator.tsx     # G-kuvveti simulasyonu
-│   │   ├── TulgarSection.tsx       # TULGAR HMD bolumu
-│   │   ├── AvionicsArchitecture.tsx # IMA platform diyagrami
-│   │   ├── TechnologyDetails.tsx   # Teknoloji kartlari
-│   │   ├── RCSVisualization.tsx    # RCS polar grafigi
-│   │   ├── WeaponConfig.tsx        # 7 silah profili + GAZAP/HAYALET
-│   │   ├── MissionBriefing.tsx     # Taktik gorev haritasi
-│   │   ├── SizeComparison.tsx      # Boyut karsilastirma
-│   │   ├── LoyalWingman.tsx        # Ekosistem diyagrami + MUM-T CTA
-│   │   ├── EngineSection.tsx       # TF35000 motor bolumu
-│   │   ├── ProductionSection.tsx   # Uretim, ihracat, ortaklar
-│   │   ├── FactCards.tsx           # Bilgi kartlari
-│   │   ├── Timeline.tsx            # Kronoloji (2010-2032)
-│   │   ├── VideoBriefing.tsx       # Video oynatici
-│   │   ├── TechnicalArchive.tsx    # Fotograf galerisi
-│   │   ├── SceneControls.tsx       # X-Ray / Kamera kontrolleri
-│   │   ├── ScrollProgress.tsx      # Scroll ilerleme gostergesi
-│   │   ├── ScrollToTop.tsx         # Yukari cik butonu
-│   │   ├── MobileBottomNav.tsx     # Mobil alt navigasyon
-│   │   ├── KonamiOverlay.tsx       # Easter egg efekti
-│   │   ├── ShortcutsModal.tsx      # Klavye kisayollari
-│   │   ├── SpecSheetDownload.tsx   # TXT spec indirme
-│   │   ├── RadarLoader.tsx         # Boot sekansli yukleme
-│   │   ├── Navbar.tsx              # Navigasyon + KONSEPT rozeti + MUM-T link
-│   │   ├── Footer.tsx              # Footer + yasal bildirim
-│   │   ├── LegalDisclaimer.tsx     # Giris uyarisi
-│   │   ├── ErrorBoundary.tsx       # WebGL hata yonetimi
-│   │   ├── CountUp.tsx             # Sayi animasyonu
-│   │   ├── GlitchText.tsx          # Glitch efekti
-│   │   ├── ServiceWorkerRegistration.tsx # PWA
-│   │   ├── mum-t/                  # MUM-T sayfa bileşenleri (22 dosya)
-│   │   │   ├── MumTContent.tsx     # Ana icerik orkestratoru
-│   │   │   ├── MumTScene.tsx       # 3D R3F sahne (KAAN + ANKA-3)
-│   │   │   ├── MumTHud.tsx         # HUD dashboard + UCAV panelleri
-│   │   │   ├── MumTTopBar.tsx      # Ust navigasyon + dil toggle
-│   │   │   ├── MumTKaan.tsx        # KAAN 3D model yukleyici
-│   │   │   ├── MumTStats.tsx       # Istatistik paneli
-│   │   │   ├── MumTFooter.tsx      # MUM-T footer
-│   │   │   ├── MumTConcept.tsx     # Konsept tanitim bolumu
-│   │   │   ├── FormationControls.tsx    # 6 formasyon komutu
-│   │   │   ├── SuperSimsekShowcase.tsx  # SuperSimsek 3D vitrin
-│   │   │   ├── AvionicsShowcase.tsx     # Aviyonik sistemler vitrin
-│   │   │   ├── ScenarioSimulator.tsx    # Taktik senaryo simulatoru
-│   │   │   ├── MissionTimeline.tsx      # Gorev zaman cizelgesi
-│   │   │   ├── GenerationCompare.tsx    # Nesil karsilastirma
-│   │   │   ├── DefenseEcosystem.tsx     # Savunma sanayi ag
-│   │   │   ├── PlatformCompare.tsx      # Platform karsilastirma
-│   │   │   ├── ThreatLandscape.tsx      # Tehdit alanustunlugu
-│   │   │   ├── VideoGallery.tsx         # MUM-T videolari
-│   │   │   ├── CapabilityCards.tsx      # Yetenek kartlari
-│   │   │   ├── DataLinkDiagram.tsx      # Veri linki diyagrami
-│   │   │   ├── MunitionsShowcase.tsx    # Muhimmat vitrin (standalone)
-│   │   │   └── useFormation.ts         # Formasyon state hook
-│   │   └── ui/
-│   │       ├── CockpitDashboard.tsx    # 4-panel MFD kokpit
-│   │       ├── ComparisonChart.tsx     # Radar/spider grafik
-│   │       ├── HUDOverlay.tsx          # HUD nisangah overlay
-│   │       └── SoundEngine.tsx         # Web Audio ses sistemi
-│   ├── hooks/
-│   │   ├── useMouseParallax.ts     # Mouse parallax
-│   │   ├── useKeyboardShortcuts.ts # Klavye kisayollari
-│   │   └── useKonamiCode.ts        # Konami kodu algilama
-│   ├── context/
-│   │   ├── LanguageContext.tsx      # TR/EN dil saglayici
-│   │   └── ThemeContext.tsx         # Gece/gunduz tema
-│   └── lib/
-│       ├── translations.ts         # Ana sayfa cevirileri + MUM-T nav linki
-│       └── mumt-translations.ts    # MUM-T sayfa cevirileri (TR/EN)
-└── package.json
-```
+## English
 
----
+An independent study of Türkiye's fifth-generation fighter, KAAN, built from public sources around a 3D model of the aircraft. As you scroll, the model turns from plan view to profile. The page then covers the specifications, stealth shaping, cockpit and avionics, weapons, engines, a comparison with other fighters, the industrial team and the programme timeline. A second page, [/mum-t](https://kaan-3d-web-experience.vercel.app/mum-t), covers manned–unmanned teaming with the ANKA-3 unmanned combat aircraft.
 
-## Komutlar
+**Not affiliated with Turkish Aerospace (TUSAŞ). Non-commercial.** Source code is MIT licensed. Images and models belong to their owners, who are listed on the [sources page](https://kaan-3d-web-experience.vercel.app/kaynaklar) and in [docs/CREDITS.md](docs/CREDITS.md).
+
+Every figure on the site is either published, or labelled as a *design target*, *reported*, *planned* or *estimate*. Programme status is current as of November 2026.
 
 ```bash
-npm run dev      # Gelistirme sunucusu (localhost:3000)
-npm run build    # Production build (Turbopack)
-npm run start    # Production sunucusu
-npm run lint     # ESLint kontrolu
+npm install && npm run dev
 ```
 
----
+Contributions, especially corrections with a source, are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Fair Use Kapsami
-
-| Ilke | Uygulama |
-|------|----------|
-| **Amac** | Egitim ve portfolyo, ticari degil |
-| **Nitelik** | Orijinal kod + kamusal gorseller |
-| **Oran** | Tum kod %100 orijinal, gorseller kamuya acik kaynaklardan |
-| **Etki** | TUSAS'in ticari faaliyetlerine zarar vermez |
-
-### Yasal Koruma Katmanlari
-
-1. **Giris Ekrani Uyarisi** -- "RESMI SITE DEGILDIR" bildirimi
-2. **Navbar Rozeti** -- "KONSEPT" / "FAN PROJECT" etiketi
-3. **Footer Bildirimi** -- TUSAS marka haklari bildirimi
-
----
-
-## Lisans
-
-Kaynak kodu **MIT Lisansi** altinda sunulmaktadir. Gorsel varliklar, 3D modeller ve "KAAN" markasi TUSAS/TAI'nin mulkiyetindedir ve yalnizca konsept gosterim amaciyla kullanilmistir.
-
-**Non-commercial use only.** Ticari kullanim icin TUSAS'tan ayri izin alinmasi gerekmektedir.
-
----
-
-<p align="center">
-  <strong>Mehmet Gumus</strong> tarafindan gelistirildi<br>
-  <a href="https://github.com/SpaceEngineerSS">github.com/SpaceEngineerSS</a><br><br>
-  <strong>3D Model:</strong> Kaan Azman
-</p>
+Made by [Mehmet Gümüş](https://github.com/SpaceEngineerSS). 3D model of KAAN by [Kaan Azman](https://www.linkedin.com/in/kaan-azman-591776201/).

@@ -1,45 +1,16 @@
 {
-    "name": "KAAN - 5th Gen Fighter Concept",
-    "short_name": "KAAN Ops",
-    "description": "Interactive experience of Türkiye's 5th generation stealth fighter jet",
+    "name": "KAAN — Interactive 3D Study",
+    "short_name": "KAAN",
+    "description": "An independent, interactive 3D study of Türkiye's KAAN fighter programme.",
     "start_url": "/",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#050508",
-    "theme_color": "#050508",
-    "orientation": "portrait",
+    "background_color": "#0d1013",
+    "theme_color": "#0d1013",
     "icons": [
-        {
-            "src": "/favicon.ico",
-            "sizes": "48x48",
-            "type": "image/x-icon"
-        },
-        {
-            "src": "/icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/pwa.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "/pwa.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
+        { "src": "/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "/pwa.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
     ],
-    "categories": [
-        "education",
-        "entertainment"
-    ]
+    "categories": ["education"]
 }

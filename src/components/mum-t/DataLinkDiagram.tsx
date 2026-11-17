@@ -1,313 +1,131 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { useLanguage } from "@/context/LanguageContext";
-import { useMumtT } from "@/lib/mumt-translations";
+import { useState } from "react";
+import { useT } from "@/context/LanguageContext";
+import { Chapter, SourceNote } from "@/components/site/Chapter";
+import { datalink, type LinkId } from "@/content/mumt";
 
-interface LinkType {
-    id: string;
-    label: string;
-    color: string;
+type NodeId = "kaan" | "anka1" | "anka2" | "simsek" | "ground";
+
+const NODES: Record<NodeId, { x: number; y: number }> = {
+    kaan: { x: 320, y: 70 },
+    anka1: { x: 150, y: 210 },
+    anka2: { x: 490, y: 210 },
+    simsek: { x: 560, y: 340 },
+    ground: { x: 130, y: 345 },
+};
+
+/** Directed edges per message type. */
+const FLOWS: Record<LinkId, [NodeId, NodeId][]> = {
+    tasking: [["kaan", "anka1"], ["kaan", "anka2"], ["anka2", "simsek"]],
+    sensor: [["anka1", "kaan"], ["anka2", "kaan"], ["simsek", "anka2"]],
+    status: [["anka1", "kaan"], ["anka2", "kaan"], ["anka1", "ground"], ["kaan", "ground"]],
+    warning: [["anka1", "kaan"], ["anka2", "kaan"], ["anka1", "anka2"], ["anka2", "anka1"]],
+};
+
+/** All physical links, drawn faint underneath. */
+const LINKS: [NodeId, NodeId][] = [["kaan", "anka1"], ["kaan", "anka2"], ["anka2", "simsek"], ["anka1", "ground"], ["kaan", "ground"], ["anka1", "anka2"]];
+
+/** Point on the segment, pulled back from both node centres so arrows do not hit the labels. */
+function trimmed(a: NodeId, b: NodeId, offset: number, bend: number) {
+    const p = NODES[a];
+    const q = NODES[b];
+    const dx = q.x - p.x;
+    const dy = q.y - p.y;
+    const len = Math.hypot(dx, dy);
+    const ux = dx / len;
+    const uy = dy / len;
+    // Perpendicular shift separates the two directions of a link.
+    const nx = -uy * bend;
+    const ny = ux * bend;
+    return {
+        x1: p.x + ux * offset + nx,
+        y1: p.y + uy * offset + ny,
+        x2: q.x - ux * offset + nx,
+        y2: q.y - uy * offset + ny,
+    };
 }
 
-const LINK_META = [
-    { id: "target", color: "#ff4444" },
-    { id: "sensor", color: "#00d4ff" },
-    { id: "mission", color: "#fbbf24" },
-    { id: "status", color: "#00ff88" },
-    { id: "swarm", color: "#a78bfa" },
-    { id: "threat", color: "#f97316" },
-];
-
-function PulsingNode({
-    cx,
-    cy,
-    label,
-    isMain,
-    active,
-}: {
-    cx: number;
-    cy: number;
-    label: string;
-    isMain?: boolean;
-    active: boolean;
-}) {
-    const radius = isMain ? 28 : 20;
-    const color = isMain ? "#00d4ff" : "#00ff88";
-    return (
-        <g>
-            <circle
-                cx={cx}
-                cy={cy}
-                r={radius + 12}
-                fill="none"
-                stroke={color}
-                strokeWidth={0.5}
-                opacity={active ? 0.3 : 0.1}
-            >
-                <animate
-                    attributeName="r"
-                    values={`${radius + 8};${radius + 18};${radius + 8}`}
-                    dur="3s"
-                    repeatCount="indefinite"
-                />
-                <animate
-                    attributeName="opacity"
-                    values={active ? "0.3;0.1;0.3" : "0.1;0.04;0.1"}
-                    dur="3s"
-                    repeatCount="indefinite"
-                />
-            </circle>
-            <circle
-                cx={cx}
-                cy={cy}
-                r={radius}
-                fill={`${color}10`}
-                stroke={color}
-                strokeWidth={active ? 1.5 : 0.8}
-                opacity={active ? 0.9 : 0.4}
-            />
-            <text
-                x={cx}
-                y={cy}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill={active ? "#ffffff" : "#94a3b8"}
-                fontSize={isMain ? 10 : 8}
-                fontFamily="var(--font-mono)"
-                fontWeight="bold"
-                letterSpacing="0.1em"
-            >
-                {label}
-            </text>
-        </g>
-    );
-}
-
-function DataStream({
-    x1,
-    y1,
-    x2,
-    y2,
-    color,
-    active,
-    curveDir,
-}: {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-    color: string;
-    active: boolean;
-    curveDir: number;
-}) {
-    const mx = (x1 + x2) / 2;
-    const my = (y1 + y2) / 2 + curveDir * 30;
-    const d = `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
-
-    return (
-        <g>
-            <path
-                d={d}
-                fill="none"
-                stroke={color}
-                strokeWidth={active ? 1.5 : 0.6}
-                strokeDasharray={active ? "6 4" : "3 6"}
-                opacity={active ? 0.7 : 0.15}
-            >
-                {active && (
-                    <animate
-                        attributeName="stroke-dashoffset"
-                        values="0;-20"
-                        dur="1s"
-                        repeatCount="indefinite"
-                    />
-                )}
-            </path>
-            {active && (
-                <circle r="3" fill={color} opacity="0.9">
-                    <animateMotion dur="2s" repeatCount="indefinite" path={d} />
-                </circle>
-            )}
-        </g>
-    );
-}
-
+/** Chapter 07: which information flows where between the team members. */
 export function DataLinkDiagram() {
-    const { locale } = useLanguage();
-    const mt = useMumtT(locale);
-    const DATA_LINKS = LINK_META.map((l, i) => ({ ...l, label: mt.dataLinks[i]?.label ?? l.id }));
-    const [activeLink, setActiveLink] = useState<string | null>(null);
-
-    const handleLinkHover = useCallback((id: string | null) => {
-        setActiveLink(id);
-    }, []);
-
-    const kaanPos = { x: 300, y: 150 };
-    const alphaPos = { x: 100, y: 280 };
-    const bravoPos = { x: 500, y: 280 };
+    const t = useT();
+    const c = t(datalink);
+    const [type, setType] = useState<LinkId>("tasking");
+    const active = c.links.find((l) => l.id === type) ?? c.links[0];
+    const labels: Record<NodeId, string> = c.nodes;
 
     return (
-        <section className="relative bg-stealth-black px-4 py-16 sm:px-6 md:px-12 md:py-24">
-            <div className="mx-auto max-w-5xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.5 }}
-                    className="mb-16 text-center"
-                >
-                    <p className="mb-3 font-mono text-[10px] tracking-[0.3em] text-neon-blue/60">
-                        {mt.datalink.tag}
-                    </p>
-                    <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
-                        {mt.datalink.title}{" "}
-                        <span className="text-neon-blue">{mt.datalink.titleHighlight}</span>
-                    </h2>
-                </motion.div>
-
-                <div className="flex flex-col items-center gap-10 lg:flex-row lg:gap-12">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="w-full max-w-lg shrink-0"
-                    >
-                        <svg viewBox="0 0 600 380" className="w-full">
-                            <defs>
-                                <radialGradient id="bg-glow" cx="50%" cy="40%" r="50%">
-                                    <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.04" />
-                                    <stop offset="100%" stopColor="#00d4ff" stopOpacity="0" />
-                                </radialGradient>
-                            </defs>
-                            <rect width="600" height="380" fill="url(#bg-glow)" rx="12" />
-
-                            {DATA_LINKS.map((link, i) => {
-                                const isActive = activeLink === link.id || activeLink === null;
-                                const toAlpha = i % 2 === 0;
-                                return (
-                                    <DataStream
-                                        key={link.id}
-                                        x1={kaanPos.x}
-                                        y1={kaanPos.y}
-                                        x2={toAlpha ? alphaPos.x : bravoPos.x}
-                                        y2={toAlpha ? alphaPos.y : bravoPos.y}
-                                        color={link.color}
-                                        active={isActive && activeLink !== null}
-                                        curveDir={i % 3 === 0 ? -1 : 1}
-                                    />
-                                );
-                            })}
-
-                            <DataStream
-                                x1={alphaPos.x}
-                                y1={alphaPos.y}
-                                x2={bravoPos.x}
-                                y2={bravoPos.y}
-                                color="#00d4ff"
-                                active={activeLink === "swarm"}
-                                curveDir={1}
-                            />
-
-                            <PulsingNode
-                                cx={kaanPos.x}
-                                cy={kaanPos.y}
-                                label="KAAN"
-                                isMain
-                                active={activeLink !== null}
-                            />
-                            <PulsingNode
-                                cx={alphaPos.x}
-                                cy={alphaPos.y}
-                                label="ALPHA"
-                                active={activeLink !== null}
-                            />
-                            <PulsingNode
-                                cx={bravoPos.x}
-                                cy={bravoPos.y}
-                                label="BRAVO"
-                                active={activeLink !== null}
-                            />
-
-                            <text
-                                x={kaanPos.x}
-                                y={kaanPos.y - 42}
-                                textAnchor="middle"
-                                fill="#94a3b8"
-                                fontSize="8"
-                                fontFamily="var(--font-mono)"
-                                letterSpacing="0.15em"
-                            >
-                                COMBAT MANAGER
-                            </text>
-                            <text
-                                x={alphaPos.x}
-                                y={alphaPos.y + 36}
-                                textAnchor="middle"
-                                fill="#94a3b8"
-                                fontSize="8"
-                                fontFamily="var(--font-mono)"
-                                letterSpacing="0.12em"
-                            >
-                                ANKA-3 ALPHA
-                            </text>
-                            <text
-                                x={bravoPos.x}
-                                y={bravoPos.y + 36}
-                                textAnchor="middle"
-                                fill="#94a3b8"
-                                fontSize="8"
-                                fontFamily="var(--font-mono)"
-                                letterSpacing="0.12em"
-                            >
-                                ANKA-3 BRAVO
-                            </text>
-                        </svg>
-                    </motion.div>
-
-                    <div className="flex flex-wrap justify-center gap-2 lg:flex-col lg:gap-2.5">
-                        {DATA_LINKS.map((link, i) => (
-                            <motion.button
-                                key={link.id}
-                                initial={{ opacity: 0, x: 20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.06, duration: 0.35 }}
-                                onMouseEnter={() => handleLinkHover(link.id)}
-                                onMouseLeave={() => handleLinkHover(null)}
-                                onClick={() =>
-                                    setActiveLink((prev) =>
-                                        prev === link.id ? null : link.id
-                                    )
-                                }
-                                className="flex min-h-[44px] items-center gap-2.5 rounded-lg border px-4 py-2.5 font-mono text-[11px] tracking-wide transition-all"
-                                style={{
-                                    borderColor:
-                                        activeLink === link.id
-                                            ? `${link.color}40`
-                                            : "rgba(255,255,255,0.06)",
-                                    background:
-                                        activeLink === link.id
-                                            ? `${link.color}08`
-                                            : "rgba(10,10,20,0.5)",
-                                    color:
-                                        activeLink === link.id
-                                            ? link.color
-                                            : "#94a3b8",
-                                }}
-                            >
-                                <span
-                                    className="h-2 w-2 rounded-full"
-                                    style={{ background: link.color }}
-                                />
-                                {link.label}
-                            </motion.button>
+        <Chapter id="datalink" index={7} label={c.label} title={c.title} lede={c.lede} solid>
+            <div className="grid gap-10 lg:grid-cols-12">
+                <figure className="lg:col-span-7">
+                    <div className="seg flex-wrap" role="group" aria-label={c.figureLabel}>
+                        {c.links.map((l) => (
+                            <button key={l.id} type="button" aria-pressed={type === l.id} onClick={() => setType(l.id)} className="pointer-coarse:min-h-11!">
+                                {l.label}
+                            </button>
                         ))}
                     </div>
+
+                    <svg viewBox="0 0 640 400" className="mt-6 w-full border border-line bg-ground-2" role="img" aria-label={`${active.label}: ${active.body}`}>
+                        <defs>
+                            <pattern id="dl-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--color-line)" strokeWidth="0.5" />
+                            </pattern>
+                            <marker id="dl-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                                <path d="M0 0 L10 5 L0 10 Z" fill="var(--color-fg)" />
+                            </marker>
+                        </defs>
+                        <rect width="640" height="400" fill="url(#dl-grid)" opacity="0.6" />
+
+                        {LINKS.map(([a, b]) => {
+                            const s = trimmed(a, b, 34, 0);
+                            return <line key={`${a}-${b}`} {...s} stroke="var(--color-line-strong)" strokeDasharray="2 5" />;
+                        })}
+
+                        {FLOWS[type].map(([a, b]) => {
+                            const s = trimmed(a, b, 38, 6);
+                            return <line key={`${type}-${a}-${b}`} {...s} stroke="var(--color-fg)" strokeWidth="1.3" markerEnd="url(#dl-arrow)" />;
+                        })}
+
+                        <g fontFamily="var(--font-mono)" fontSize="12">
+                            {(Object.keys(NODES) as NodeId[]).map((id) => {
+                                const n = NODES[id];
+                                const isKaan = id === "kaan";
+                                const isGround = id === "ground";
+                                return (
+                                    <g key={id}>
+                                        {isGround ? (
+                                            <rect x={n.x - 12} y={n.y - 12} width="24" height="24" fill="var(--color-ground-2)" stroke="var(--color-airframe)" />
+                                        ) : (
+                                            <circle cx={n.x} cy={n.y} r={id === "simsek" ? 9 : 14} fill="var(--color-ground-2)" stroke={isKaan ? "var(--color-signal)" : "var(--color-fg-2)"} strokeWidth={isKaan ? 1.6 : 1} />
+                                        )}
+                                        <text x={n.x} y={n.y + (id === "simsek" ? 26 : 32)} textAnchor="middle" fill={isKaan ? "var(--color-signal)" : "var(--color-fg-2)"}>
+                                            {labels[id]}
+                                        </text>
+                                    </g>
+                                );
+                            })}
+                        </g>
+                    </svg>
+                    <div className="mt-6 border-t border-line-strong pt-5" aria-live="polite">
+                        <p className="font-medium text-fg">{active.label}</p>
+                        <p className="t-body mt-2 max-w-[60ch]">{active.body}</p>
+                    </div>
+                </figure>
+
+                <div className="lg:col-span-4 lg:col-start-9">
+                    <h3 className="t-h3">{c.needsTitle}</h3>
+                    <dl className="mt-6 border-t border-line">
+                        {c.needs.map((n) => (
+                            <div key={n.term} className="border-b border-line py-4" data-reveal>
+                                <dt className="font-medium text-fg">{n.term}</dt>
+                                <dd className="mt-1 text-[0.9375rem] leading-relaxed text-fg-2">{n.body}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                    <SourceNote>{c.source}</SourceNote>
                 </div>
             </div>
-        </section>
+        </Chapter>
     );
 }

@@ -1,26 +1,26 @@
 {
-  "name": "kaansite",
-  "version": "0.1.0",
+  "name": "kaan-3d-web-experience",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
-    "@react-three/postprocessing": "^3.0.4",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
     "@vercel/analytics": "^1.6.1",
-    "framer-motion": "^12.34.0",
-    "gsap": "^3.14.2",
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.27",
     "lucide-react": "^0.563.0",
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "three": "^0.182.0",
-    "three-stdlib": "^2.36.1"
+    "motion": "^12.43.0",
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -29,8 +29,12 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.182.0",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "^16.4.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "description": "An independent, interactive 3D study of the KAAN fighter programme.",
+  "engines": {
+    "node": ">=20.9"
   }
 }

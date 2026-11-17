@@ -22,15 +22,15 @@ SOFTWARE.
 
 ---
 
-ASSET DISCLAIMER:
+ASSETS ARE NOT COVERED BY THIS LICENCE
 
-The source code of this project is licensed under MIT. However, all visual
-assets, 3D models, photographs, videos, and the "KAAN" trademark are the
-property of TUSAŞ (Turkish Aerospace Industries / Türk Havacılık ve Uzay
-Sanayii A.Ş.) and are used here for conceptual demonstration purposes only.
+The MIT licence above applies to the source code only. Photographs, videos,
+3D models and the "KAAN" name and design are not covered. They belong to
+their respective owners, who are listed in docs/CREDITS.md and on the site's
+Sources page (/kaynaklar), and are used here for non-commercial, educational
+purposes.
 
-Non-commercial use only. No commercial rights are granted for any TUSAŞ/TAI
-proprietary materials included in this repository.
-
-This project is a fan-made portfolio piece and is not affiliated with,
-endorsed by, or connected to TUSAŞ/TAI in any way.
+This project is an independent study. It is not affiliated with, endorsed by
+or connected to Turkish Aerospace (TUSAŞ). If you own an image used here and
+want it credited differently or removed, open an issue and it will be handled
+promptly.
