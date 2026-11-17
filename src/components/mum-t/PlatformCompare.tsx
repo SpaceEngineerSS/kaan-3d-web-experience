@@ -81,7 +81,7 @@ function PlanDrawing() {
     ];
 
     return (
-        <svg viewBox={`0 0 ${W} ${H}`} className="bezel mt-4 w-full" role="img" aria-label={items.map((i) => `${i.name} ${i.d.length} × ${i.d.span} m`).join(", ")}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="border border-edge-2 bg-black mt-4 w-full" role="img" aria-label={items.map((i) => `${i.name} ${i.d.length} × ${i.d.span} m`).join(", ")}>
             <defs>
                 <pattern id="plan-grid" width={s} height={s} patternUnits="userSpaceOnUse">
                     <path d={`M ${s} 0 L 0 0 0 ${s}`} fill="none" stroke="var(--color-edge)" strokeWidth="0.5" />

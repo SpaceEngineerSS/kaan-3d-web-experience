@@ -47,7 +47,7 @@ export function ScenarioSimulator() {
 
             <div id="scenario-panel" role="tabpanel" aria-labelledby={`scenario-tab-${id}`} className="mt-8 grid gap-10 lg:grid-cols-12">
                 <figure className="lg:col-span-7">
-                    <svg viewBox={`0 0 ${100 * S} ${60 * S}`} className="bezel w-full" role="img" aria-label={`${c.mapLabel}: ${sc.steps[step].title}`}>
+                    <svg viewBox={`0 0 ${100 * S} ${60 * S}`} className="border border-edge-2 bg-black w-full" role="img" aria-label={`${c.mapLabel}: ${sc.steps[step].title}`}>
                         <defs>
                             <pattern id="scn-grid" width={S * 5} height={S * 5} patternUnits="userSpaceOnUse">
                                 <path d={`M ${S * 5} 0 L 0 0 0 ${S * 5}`} fill="none" stroke="var(--color-edge)" strokeWidth="0.5" />

@@ -10,7 +10,7 @@ export function FormationControls({ mode, onChange }: { mode: FormationMode; onC
     const h = t(hero);
 
     return (
-        <div className="plate">
+        <div className="border border-edge bg-ink">
             <div className="flex items-center justify-between border-b border-edge px-4 py-2">
                 <p id="formation-label" className="t-label">
                     {h.controls}

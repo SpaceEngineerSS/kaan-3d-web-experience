@@ -23,13 +23,12 @@ const CHROME =
 
 /** name, path, viewport, what to do before the shot */
 const SHOTS = [
-    { name: "hero", path: "/", w: 1440, h: 900, wait: 2500 },
-    { name: "first-flight", path: "/", w: 1440, h: 900, scrollTo: "#first-flight", offset: 260, wait: 2500 },
-    { name: "visor", path: "/", w: 1440, h: 900, scrollTo: "#visor", offset: 2600, wait: 4000 },
-    { name: "airframe", path: "/", w: 1440, h: 900, scrollTo: "#airframe", offset: 520, wait: 4000 },
-    { name: "cockpit", path: "/", w: 1440, h: 900, scrollTo: "#cockpit", offset: 560, wait: 3000 },
-    { name: "mumt", path: "/mum-t", w: 1440, h: 900, wait: 3000 },
-    { name: "mobile", path: "/", w: 390, h: 844, mobile: true, wait: 2500 },
+    { name: "s01", path: "/", w: 1440, h: 900, wait: 4000 },
+    { name: "s02", path: "/", w: 1440, h: 900, scrollTo: "#s02", offset: 500, wait: 4000 },
+    { name: "s03", path: "/", w: 1440, h: 900, scrollTo: "#s03", offset: 700, wait: 4000 },
+    { name: "s04", path: "/", w: 1440, h: 900, scrollTo: "#s04", offset: 700, wait: 4000 },
+    { name: "s05", path: "/", w: 1440, h: 900, scrollTo: "#s05", offset: 200, wait: 2500 },
+    { name: "mobile", path: "/", w: 390, h: 844, mobile: true, wait: 4000 },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

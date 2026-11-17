@@ -88,7 +88,7 @@ export function SourcesContent() {
                     <p className="t-body max-w-[62ch]">{c.dataLede}</p>
                     <div className="mt-10 grid gap-10 lg:grid-cols-3 lg:gap-6">
                         {dataSources.map((g) => (
-                            <div key={g.id} className="plate p-5">
+                            <div key={g.id} className="border border-edge bg-ink p-5">
                                 <h3 className="t-label border-b border-edge-2 pb-3 text-fg-2">{g.title[locale]}</h3>
                                 <dl>
                                     {g.items.map((s) => (
@@ -150,7 +150,7 @@ export function SourcesContent() {
                             </li>
                         ))}
                     </ul>
-                    <div className="plate mt-10 border-l-2 border-l-caution p-5 sm:p-6">
+                    <div className="border border-edge bg-ink mt-10 border-l-2 border-l-caution p-5 sm:p-6">
                         <p className="text-[0.9375rem] leading-relaxed text-fg-2">{c.takedown}</p>
                         <div className="mt-5 flex flex-wrap gap-3">
                             <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer" className="btn">

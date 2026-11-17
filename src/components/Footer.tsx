@@ -37,43 +37,45 @@ export function Footer() {
     const c = copy[locale];
 
     return (
-        <footer className="relative z-10 border-t border-edge bg-ink-2 pb-24 pt-16 sm:pb-16">
-            <div className="wrap grid gap-12 md:grid-cols-12">
-                <div className="md:col-span-5">
-                    <p className="font-display text-4xl font-semibold uppercase">KAAN</p>
-                    <p className="t-body mt-4 max-w-[46ch] text-[0.9375rem]">{c.about}</p>
-                    <p className="t-label mt-6">
-                        {c.dataAsOf}: <span className="text-fg-2">{DATA_AS_OF[locale]}</span>
-                    </p>
-                </div>
+        <footer className="relative z-10 border-t border-edge bg-ink pb-24 pt-12 sm:pb-12">
+            <div className="wrap">
+                <div className="cross grid gap-px border border-edge bg-edge md:grid-cols-12">
+                    <div className="bg-ink p-4 md:col-span-5 md:p-6">
+                        <p className="t-tele mb-3">SYS // KAAN-TERMINAL</p>
+                        <p className="font-display text-3xl font-bold uppercase tracking-[-0.03em] text-fg">KAAN</p>
+                        <p className="t-body mt-3 max-w-[42ch] text-[0.875rem]">{c.about}</p>
+                    </div>
 
-                <nav aria-label={c.pages} className="md:col-span-3">
-                    <p className="t-label mb-4">{c.pages}</p>
-                    <ul className="space-y-2 text-[0.9375rem]">
-                        <li><Link href="/" className="link text-fg-2 hover:text-fg">{c.home}</Link></li>
-                        <li><Link href="/mum-t" className="link text-fg-2 hover:text-fg">{c.mumt}</Link></li>
-                        <li><Link href="/kaynaklar" className="link text-fg-2 hover:text-fg">{c.credits}</Link></li>
-                    </ul>
-                </nav>
+                    <nav aria-label={c.pages} className="bg-ink p-4 md:col-span-3 md:p-6">
+                        <p className="t-tele mb-3">{c.pages}</p>
+                        <ul className="grid gap-px border border-edge bg-edge text-[0.875rem]">
+                            <li className="bg-ink"><Link href="/" className="block px-3 py-2 text-fg-2 hover:text-fg">{c.home}</Link></li>
+                            <li className="bg-ink"><Link href="/mum-t" className="block px-3 py-2 text-fg-2 hover:text-fg">{c.mumt}</Link></li>
+                            <li className="bg-ink"><Link href="/kaynaklar" className="block px-3 py-2 text-fg-2 hover:text-fg">{c.credits}</Link></li>
+                        </ul>
+                    </nav>
 
-                <div className="md:col-span-4">
-                    <dl className="space-y-4 text-[0.9375rem]">
-                        <div>
-                            <dt className="t-label">{c.made}</dt>
+                    <dl className="grid content-start gap-px bg-edge text-[0.875rem] md:col-span-4">
+                        <div className="bg-ink px-4 py-3">
+                            <dt className="t-tele">{c.made}</dt>
                             <dd className="mt-1"><a href={AUTHOR_URL} target="_blank" rel="noopener noreferrer" className="link text-fg">Mehmet Gümüş</a></dd>
                         </div>
-                        <div>
-                            <dt className="t-label">{c.model}</dt>
+                        <div className="bg-ink px-4 py-3">
+                            <dt className="t-tele">{c.model}</dt>
                             <dd className="mt-1"><a href="https://www.linkedin.com/in/kaan-azman-591776201/" target="_blank" rel="noopener noreferrer" className="link text-fg">Kaan Azman</a></dd>
                         </div>
-                        <div>
-                            <dt className="t-label">{c.source}</dt>
-                            <dd className="mt-1"><a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="link t-data text-sm text-fg">github.com/SpaceEngineerSS/kaan-3d-web-experience</a></dd>
+                        <div className="bg-ink px-4 py-3">
+                            <dt className="t-tele">{c.source}</dt>
+                            <dd className="mt-1 break-all"><a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="link t-data text-[0.75rem] text-fg">github.com/SpaceEngineerSS/kaan-3d-web-experience</a></dd>
+                        </div>
+                        <div className="bg-ink px-4 py-3">
+                            <dt className="t-tele">{c.dataAsOf}</dt>
+                            <dd className="t-data mt-1 text-[0.75rem] text-fg-2">{DATA_AS_OF[locale]}</dd>
                         </div>
                     </dl>
-                </div>
 
-                <p className="border-t border-edge pt-6 text-[0.8125rem] leading-relaxed text-faint md:col-span-12">{c.legal}</p>
+                    <p className="bg-ink px-4 py-3 text-[0.75rem] leading-relaxed text-faint md:col-span-12">{c.legal}</p>
+                </div>
             </div>
         </footer>
     );

@@ -33,7 +33,7 @@ export function ThreatLandscape() {
         <Chapter id="threats" index={3} label={c.label} title={c.title} lede={c.lede} solid className="py-24 md:py-36">
             <div className="grid gap-10 lg:grid-cols-12">
                 <figure className="lg:col-span-8">
-                    <svg viewBox="0 0 640 400" className="bezel w-full" role="img" aria-label={c.layers.map((l) => l.label).join(", ")}>
+                    <svg viewBox="0 0 640 400" className="border border-edge-2 bg-black w-full" role="img" aria-label={c.layers.map((l) => l.label).join(", ")}>
                         <defs>
                             <pattern id="threat-grid" width="20" height="20" patternUnits="userSpaceOnUse">
                                 <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--color-edge)" strokeWidth="0.5" />

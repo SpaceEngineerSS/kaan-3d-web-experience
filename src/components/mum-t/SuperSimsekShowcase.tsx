@@ -22,7 +22,7 @@ export function SuperSimsekShowcase() {
         <Chapter id="super-simsek" index={8} label={c.label} title={c.title} lede={c.lede} solid className="py-24 md:py-36">
             <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
                 <div className="lg:col-span-6">
-                    <figure className="bezel relative aspect-[4/3]">
+                    <figure className="relative border border-edge-2 bg-black aspect-[4/3]">
                         <LazyMount minHeight="100%" rootMargin="300px 0px">
                             <SuperSimsekScene label={c.canvasLabel} />
                         </LazyMount>

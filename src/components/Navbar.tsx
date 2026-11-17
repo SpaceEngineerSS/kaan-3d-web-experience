@@ -10,13 +10,11 @@ export interface NavItem {
 }
 
 export const HOME_NAV: NavItem[] = [
-    { href: "#first-flight", label: { tr: "İlk uçuş", en: "First flight" } },
-    { href: "#visor", label: { tr: "Vizör", en: "Visor" } },
-    { href: "#cockpit", label: { tr: "Kokpit", en: "Cockpit" } },
-    { href: "#sensors", label: { tr: "Sensörler", en: "Sensors" } },
-    { href: "#specs", label: { tr: "Veriler", en: "Specs" } },
-    { href: "#programme", label: { tr: "Program", en: "Programme" } },
-    { href: "#archive", label: { tr: "Arşiv", en: "Archive" } },
+    { href: "/#s01", label: { tr: "01", en: "01" } },
+    { href: "/#s02", label: { tr: "02", en: "02" } },
+    { href: "/#s03", label: { tr: "03", en: "03" } },
+    { href: "/#s04", label: { tr: "04", en: "04" } },
+    { href: "/#s05", label: { tr: "05 Dosya", en: "05 File" } },
 ];
 
 interface NavbarProps {
@@ -27,9 +25,8 @@ interface NavbarProps {
     homeHref?: string;
 }
 
-export function Navbar({ items = HOME_NAV, route = { href: "/mum-t", label: { tr: "MUM-T", en: "MUM-T" } }, homeHref = "#hero" }: NavbarProps) {
+export function Navbar({ items = HOME_NAV, route = { href: "/mum-t", label: { tr: "MUM-T", en: "MUM-T" } }, homeHref = "/" }: NavbarProps) {
     const { locale, setLocale } = useLanguage();
-    const [scrolled, setScrolled] = useState(false);
     const [open, setOpen] = useState(false);
     const progress = useRef<HTMLDivElement>(null);
     const menuBtn = useRef<HTMLButtonElement>(null);
@@ -40,7 +37,6 @@ export function Navbar({ items = HOME_NAV, route = { href: "/mum-t", label: { tr
             cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => {
                 const y = window.scrollY;
-                setScrolled(y > 40);
                 const max = document.documentElement.scrollHeight - window.innerHeight;
                 if (progress.current) progress.current.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
             });
@@ -70,9 +66,9 @@ export function Navbar({ items = HOME_NAV, route = { href: "/mum-t", label: { tr
     }, [open]);
 
     const langSwitch = (
-        <div className="seg" role="group" aria-label={locale === "tr" ? "Dil" : "Language"}>
+        <div className="flex items-center gap-2" role="group" aria-label={locale === "tr" ? "Dil" : "Language"}>
             {(["tr", "en"] as Locale[]).map((l) => (
-                <button key={l} type="button" aria-pressed={locale === l} onClick={() => setLocale(l)} lang={l}>
+                <button key={l} type="button" className="toggle" aria-pressed={locale === l} onClick={() => setLocale(l)} lang={l}>
                     {l.toUpperCase()}
                 </button>
             ))}
@@ -82,67 +78,62 @@ export function Navbar({ items = HOME_NAV, route = { href: "/mum-t", label: { tr
     const RouteLink = route.href.startsWith("/") ? Link : "a";
 
     return (
-        <header
-            className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,height] duration-300 ${
-                scrolled || open ? "border-b border-edge bg-ink/90 backdrop-blur-md" : "border-b border-transparent"
-            }`}
-        >
-            <nav aria-label={locale === "tr" ? "Ana menü" : "Main"} className={`wrap flex items-center justify-between gap-6 transition-[height] duration-300 ${scrolled ? "h-14" : "h-[4.5rem]"}`}>
-                <a href={homeHref} className="flex items-baseline gap-3" onClick={() => setOpen(false)}>
-                    <span className="font-display text-xl font-semibold uppercase tracking-[-0.01em]">KAAN</span>
-                    <span className="t-label hidden text-faint sm:inline">{locale === "tr" ? "bağımsız çalışma" : "independent study"}</span>
+        <header className="fixed inset-x-0 top-0 z-50 border-b border-edge bg-ink sm:inset-x-4 sm:top-4 sm:border-x">
+            <nav aria-label={locale === "tr" ? "Ana menü" : "Main"} className="flex h-11 items-stretch">
+                <a href={homeHref} className="flex items-center gap-3 border-r border-edge px-4" onClick={() => setOpen(false)}>
+                    <span className="font-display text-base font-bold uppercase tracking-[-0.03em] text-fg">KAAN</span>
+                    <span className="t-tele hidden text-faint sm:inline">{locale === "tr" ? "BAĞIMSIZ ÇALIŞMA" : "INDEPENDENT STUDY"}</span>
                 </a>
 
-                <ul className="hidden items-center gap-6 lg:flex">
+                <ul className="hidden min-w-0 flex-1 items-stretch lg:flex">
                     {items.map((it) => (
-                        <li key={it.href}>
-                            <a href={it.href} className="t-label link text-fg-2 hover:text-fg">
+                        <li key={it.href} className="flex border-r border-edge">
+                            <a href={it.href} className="t-tele flex items-center px-3 text-fg-2 transition-colors hover:text-fg">
                                 {it.label[locale]}
                             </a>
                         </li>
                     ))}
-                    <li>
-                        <RouteLink href={route.href} className="t-label border border-edge-2 px-2.5 py-1.5 text-fg transition-colors hover:border-hmd hover:text-hmd">
-                            {route.label[locale]}
-                        </RouteLink>
-                    </li>
                 </ul>
 
-                <div className="flex items-center gap-3">
-                    {langSwitch}
-                    <button
-                        ref={menuBtn}
-                        type="button"
-                        className="flex h-10 w-10 items-center justify-center border border-edge-2 lg:hidden"
-                        aria-expanded={open}
-                        aria-controls="mobile-menu"
-                        aria-label={open ? (locale === "tr" ? "Menüyü kapat" : "Close menu") : locale === "tr" ? "Menüyü aç" : "Open menu"}
-                        onClick={() => setOpen((o) => !o)}
-                    >
-                        <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden>
-                            <path d={open ? "M2 1l14 10M2 11L16 1" : "M0 1h18M0 6h18M0 11h12"} stroke="currentColor" strokeWidth="1.3" fill="none" className="transition-all" />
-                        </svg>
-                    </button>
+                <div className="ml-auto flex items-stretch">
+                    <div className="hidden items-center border-l border-edge px-3 lg:flex">
+                        <RouteLink href={route.href} className="toggle inline-flex items-center hover:text-hmd">
+                            {route.label[locale]}
+                        </RouteLink>
+                    </div>
+                    <div className="flex items-center border-l border-edge px-3">{langSwitch}</div>
+                    <div className="flex items-center border-l border-edge px-3 lg:hidden">
+                        <button
+                            ref={menuBtn}
+                            type="button"
+                            className="toggle"
+                            aria-expanded={open}
+                            aria-controls="mobile-menu"
+                            aria-label={open ? (locale === "tr" ? "Menüyü kapat" : "Close menu") : locale === "tr" ? "Menüyü aç" : "Open menu"}
+                            onClick={() => setOpen((o) => !o)}
+                        >
+                            {open ? "×" : "MENU"}
+                        </button>
+                    </div>
                 </div>
             </nav>
 
             <div className="h-px w-full origin-left bg-hmd" ref={progress} style={{ transform: "scaleX(0)" }} aria-hidden />
 
             {open && (
-                <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-14 z-40 overflow-y-auto bg-ink lg:hidden">
-                    <ul className="wrap flex flex-col py-6">
+                <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-11 z-40 overflow-y-auto border-t border-edge bg-ink lg:hidden">
+                    <ul className="grid gap-px bg-edge">
                         {items.map((it, i) => (
-                            <li key={it.href} className="border-b border-edge">
-                                <a href={it.href} onClick={() => setOpen(false)} className="flex items-baseline gap-4 py-4">
-                                    <span className="t-data text-sm text-faint">{String(i + 1).padStart(2, "0")}</span>
-                                    <span className="font-display text-3xl font-semibold uppercase">{it.label[locale]}</span>
+                            <li key={it.href} className="bg-ink">
+                                <a href={it.href} onClick={() => setOpen(false)} className="flex items-baseline gap-4 px-4 py-4">
+                                    <span className="t-tele text-faint">{String(i + 1).padStart(2, "0")}</span>
+                                    <span className="font-display text-2xl font-bold uppercase tracking-[-0.03em]">{it.label[locale]}</span>
                                 </a>
                             </li>
                         ))}
-                        <li className="pt-6">
-                            <RouteLink href={route.href} onClick={() => setOpen(false)} className="btn">
-                                {route.label[locale]}
-                                <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden><path d="M0 5h12M8 1l4 4-4 4" stroke="currentColor" fill="none" strokeWidth="1.2" /></svg>
+                        <li className="bg-ink px-4 py-4">
+                            <RouteLink href={route.href} onClick={() => setOpen(false)} className="toggle inline-flex items-center">
+                                {route.label[locale]} →
                             </RouteLink>
                         </li>
                     </ul>

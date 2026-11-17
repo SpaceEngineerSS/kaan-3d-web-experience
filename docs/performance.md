@@ -6,19 +6,19 @@
 
 | Tier | Who | What they get |
 | ---- | --- | ------------- |
-| 0 | no WebGL, software renderer, Save-Data on | stills and real footage only, no 3D |
-| 1 | weak phones | 3D at DPR 1, Lambert materials, no clouds, coarser terrain |
-| 2 | other phones, mid laptops | DPR up to 1.5, PBR, sky-lit reflections, 12 clouds |
-| 3 | desktop-class | DPR up to 2, antialiasing, shadows, 22 clouds |
+| 0 | no WebGL, software renderer, Save-Data on | a still image; three.js is never downloaded |
+| 1 | weak phones | 25k points, static streamlines, DPR 1 |
+| 2 | other phones, mid laptops | 60k points, animated streamlines, DPR up to 1.5 |
+| 3 | desktop-class | 120k points, bloom/noise/vignette pass, DPR up to 2 |
 
-When reduced motion is on, the visor scene is replaced by a still image.
+With reduced motion on, the camera snaps between section keyframes. There is no FOV stretch, roll, clock or noise.
 
 ## When things draw
 
-- **Visor scene:** a `frameloop` of `"always"` while its section is on screen and the tab is visible, `"never"` otherwise. It mounts one screen early so the shaders compile before you reach it.
-- **Airframe:** `frameloop="demand"`, which draws only while you interact or a camera move is finishing.
-- **Cockpit:** one `requestAnimationFrame` loop for all display pages. It runs only while the chapter is on screen and the tab is visible, and resizes through a `ResizeObserver`.
-- **Footage clips** (`site/Film.tsx`): they play only while on screen and pause in background tabs. The first-screen clip is the only one that preloads.
+- **Terminal scene:** a `frameloop` of `"always"` while `#track` is on screen and the tab is visible, `"never"` otherwise.
+- **Point sampling and edge extraction:** these run once when the model loads, which takes about 100–200 ms on desktop.
+- **Frame, status bar and leader lines:** each runs one rAF that writes `textContent` and SVG attributes directly. There are no React re-renders per frame.
+- **FLIR feed:** a raw WebGL program. The video and the loop run only while it is on screen. The texture, buffer and program are deleted on unmount.
 
 ## Assets
 

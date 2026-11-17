@@ -1,69 +1,46 @@
 # Architecture
 
-A Next.js 16 App Router site with three pages. The home page tells the aircraft's story in eleven parts. Some of them use real flight footage, two of them are WebGL scenes, and the cockpit is drawn on canvas.
+The home page is a flight-test telemetry terminal. One pinned WebGL scene sits behind sections 01–04, and section 05 is a normal editorial page after it.
 
 ```mermaid
 flowchart TD
-    L["app/layout.tsx<br/>fonts (Rajdhani, B612) · LanguageProvider (cookie) · MotionRuntime · NoticeBar · SW"]
-    L --> H["/"] & M["/mum-t"] & K["/kaynaklar"]
-
-    H --> HE["Hero<br/>real footage loop"]
-    H --> FF["FirstFlight<br/>flight-test card + take-off clip"]
-    H --> VI["FlightExperience (visor)<br/>pinned WebGL climb-out + TULGAR symbology"]
-    H --> AF["Airframe<br/>3D inspection, P0/P1 notes"]
-    H --> CO["Cockpit<br/>Large Area Display pages · standby · TULGAR"]
-    H --> REST["Sensors · Specifications · Weapons · Engine · Programme · Archive"]
-
-    VI --> FP["lib/flight/profile.ts<br/>scripted sortie → shared state"]
-    FP --> HMD["HelmetDisplay (canvas)"]
-    VI & AF & M --> UM["lib/three/useModel"]
-    VI & AF & M --> DP["useDeviceProfile (tiers 0–3)"]
-    CO --> DL["cockpit/useDisplayLoop<br/>one rAF, paused off-screen"]
+    D["TerminalDriver<br/>scroll → track, velocity, section, pointer"] --> T["lib/terminal/state.ts<br/>shared mutable store"]
+    T --> S["terminal/Scene → scene/*<br/>CameraRig · KaanBlueprint · Streamlines · ShockDiamonds · MumT"]
+    S -->|"projected anchors"| T
+    T --> L["LeaderLines (SVG)"]
+    T --> F["Frame + StatusBar<br/>clock · FPS · V/S · depth"]
+    T --> X["sections S01–S04<br/>FLIR feed · BVR view · node panels"]
+    C["content/*.ts (TR + EN, sourced)"] --> X & L & Y["S05<br/>matrix · programme · archive"]
 ```
 
-## Home page, in order
+## Page structure (`src/app/page.tsx`)
 
-| # | Chapter | File | What it is |
-| - | ------- | ---- | ---------- |
-| — | Hero | `chapters/Hero.tsx` | Real KAAN flight footage in a loop, the name, and the programme status as of November 2026 |
-| 01 | First flight | `chapters/FirstFlight.tsx` | 21 Feb 2024: a flight-test card next to the real take-off footage |
-| 02 | Visor | `flight/FlightExperience.tsx` | Scroll-scrubbed WebGL climb-out seen through the TULGAR visor. It stays within the first flight's published limits (8,000 ft, 230 kt, gear down) |
-| 03 | Airframe | `chapters/Airframe.tsx` | Orbitable 3D model with view presets, a wireframe mode, numbered features and the P0 → P1 changes |
-| 04 | Cockpit | `chapters/Cockpit.tsx` + `cockpit/*` | A 2.5:1 Large Area Display (two portals plus a strip of small windows; TSD, RDR, SMS, ENG, FUEL, FCS pages), the standby display and the TULGAR frame |
-| 05 | Sensors | `chapters/Sensors.tsx` | The ASELSAN sensor family, with illustrative coverage shapes |
-| 06 | Specs | `chapters/Specifications.tsx` | Official TUSAŞ figures and a same-scale size comparison |
-| 07 | Weapons | `chapters/Weapons.tsx` | Reported station counts, notional mission loadouts |
-| 08 | Engine | `chapters/Engine.tsx` | F110-GE-129 now, TEI TF35000 later |
-| 09 | Programme | `chapters/Programme.tsx` | Prototypes, timeline, orders, industrial team |
-| 10 | Archive | `chapters/Archive.tsx` | Full flight video and the credited gallery |
+```
+StatusBar · Frame · TerminalDriver
+main
+  #track
+    sticky 100svh stage: SceneMount (WebGL) + LeaderLines (SVG, md and up)
+    S01 · S02 · S03 · S04   (each 150svh, pulled over the stage with -mt-[100svh])
+  S05
+Footer
+```
 
-## The visor scene
+`terminal.track` is the progress through `#track`, from 0 to 1. Each section owns one quarter of it.
 
-`lib/flight/profile.ts` defines the flight path (a Catmull–Rom curve), plus speed and afterburner curves keyed to scroll progress. It writes one shared `flight` object: position, orientation, pitch, roll, heading, knots, Mach, altitude and g.
+## The scene (`src/components/terminal/scene/`)
 
-- `FlightScene.tsx` reads scroll progress, eases towards it, samples the profile and poses the aircraft. It moves the camera between external shots and the cockpit eye point.
-- `HelmetDisplay.tsx` draws the visor symbology from that same object. Pixels per degree come from the camera's field of view, so the pitch ladder lines up with the rendered horizon.
-- The world is built from code, with no downloaded assets:
-  - Anatolian terrain from deterministic noise
-  - a canvas-drawn runway
-  - a sky shader also used for reflections
-  - instanced cloud sprites from a locally generated texture
-  - an additive afterburner plume shader
+| File | Role |
+| ---- | ---- |
+| `CameraRig.tsx` | Two centripetal Catmull–Rom curves, one for position and one for the look-at point. It damps progress and adds a velocity-driven FOV stretch and roll. It also computes per-frame shared values (`rig.ts`). |
+| `KaanBlueprint.tsx` | Merges the GLB meshes. On top of that it draws a surface-sampled point cloud, `EdgesGeometry` lines and a fresnel shell, all as `ShaderMaterial`s sharing the scan uniforms. |
+| `internals.ts` | Procedural line geometry built from the model's bounds: fans, S-ducts, the bay with notional stores, the AESA cone. |
+| `Streamlines.tsx` | Vortex trails baked from a seeded curl-noise field, with travelling pulses in the shader. |
+| `ShockDiamonds.tsx` | Banded additive cones at the nozzles. |
+| `MumT.tsx` | ANKA-3 point clouds, the KIZILELMA concept node and data-link pulse lines (section 04). |
+| `Anchors.tsx` | Projects named 3D points to CSS pixels in `terminal.anchors` every frame. |
 
-## Text and languages
+The scene runs `frameloop="always"` only while `#track` is on screen and the tab is visible. The point count depends on the device tier (`useDeviceProfile`). Tier 0 gets a still image and never downloads three.js.
 
-All text lives in `src/content/*.ts` as typed `Record<"tr" | "en", …>` objects. The language is stored in a `kaan-locale` cookie that the root layout reads on the server, so the first HTML arrives in the right language.
+## Content
 
-## Design tokens
-
-`src/app/globals.css` holds the tokens. The colours come from the aircraft's world:
-
-- ink black of a display
-- P0 topcoat grey
-- TULGAR green for own/normal/selected
-- caution yellow
-- warning red
-- info cyan
-- the flag red
-
-The type is Rajdhani for display text and B612 (Airbus's cockpit font) for body and data.
+All text and figures live in `src/content/*.ts` as typed `Record<"tr" | "en", …>` objects. `terminal.ts` holds the copy for the terminal sections; the others (`aircraft`, `sensors`, `weapons`, `cockpit`, `mumt`, `comparison`, `programme`, `media-credits`, `sources`) are shared with `/mum-t` and `/kaynaklar`.
