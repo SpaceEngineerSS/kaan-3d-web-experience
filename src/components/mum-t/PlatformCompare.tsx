@@ -1,228 +1,102 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Plane, Target } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { useMumtT } from "@/lib/mumt-translations";
+import { Chapter, SourceNote } from "@/components/site/Chapter";
+import { planDims, platformRows, platforms } from "@/content/mumt";
 
-interface SpecRow {
-    label: string;
-    kaan: string;
-    anka: string;
-}
-
-const SPECS: SpecRow[] = [
-    { label: "ROL", kaan: "5. Nesil Muharip", anka: "Stealth İHA" },
-    { label: "KANAT AÇIKLIĞI", kaan: "14 m", anka: "12.5 m" },
-    { label: "MTOW", kaan: "27,000 kg", anka: "6,500 kg" },
-    { label: "MAKSİMUM HIZ", kaan: "Mach 1.8+", anka: "Mach 0.7" },
-    { label: "SERVİS TAVANI", kaan: "55,000 ft", anka: "40,000 ft" },
-    { label: "DAYANIKLILIK", kaan: "—", anka: "10 saat" },
-    { label: "MOTOR", kaan: "2× TEI TF-35000", anka: "1× AI-322" },
-    { label: "FAYDALIYÜK", kaan: "Dahili + Harici", anka: "1,200 kg" },
-];
-
-function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
-    const [count, setCount] = useState(0);
-    const ref = useRef<HTMLSpanElement>(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    let frame = 0;
-                    const totalFrames = 40;
-                    const step = target / totalFrames;
-                    const animate = () => {
-                        frame++;
-                        setCount(Math.min(Math.round(step * frame), target));
-                        if (frame < totalFrames) requestAnimationFrame(animate);
-                    };
-                    requestAnimationFrame(animate);
-                    observer.disconnect();
-                }
-            },
-            { threshold: 0.3 }
-        );
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, [target]);
-
-    return (
-        <span ref={ref}>
-            {count.toLocaleString()}
-            {suffix}
-        </span>
-    );
-}
-
-function PlatformCard({
-    name,
-    subtitle,
-    icon: Icon,
-    color,
-    stats,
-    delay,
-}: {
-    name: string;
-    subtitle: string;
-    icon: typeof Plane;
-    color: string;
-    stats: { label: string; value: number; suffix: string }[];
-    delay: number;
-}) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ delay, duration: 0.5 }}
-            className="rounded-xl border border-cyan-500/10 p-6"
-            style={{
-                background: "rgba(10, 10, 20, 0.6)",
-                backdropFilter: "blur(12px)",
-            }}
-        >
-            <div className="mb-5 flex items-center gap-3">
-                <div
-                    className="flex h-11 w-11 items-center justify-center rounded-lg border"
-                    style={{
-                        borderColor: `${color}25`,
-                        background: `${color}08`,
-                    }}
-                >
-                    <Icon className="h-5 w-5" style={{ color }} />
-                </div>
-                <div>
-                    <h3 className="text-lg font-bold text-white">{name}</h3>
-                    <p className="font-mono text-[9px] tracking-[0.2em]" style={{ color: `${color}99` }}>
-                        {subtitle}
-                    </p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-                {stats.map((s) => (
-                    <div
-                        key={s.label}
-                        className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5"
-                    >
-                        <p className="font-mono text-[8px] tracking-[0.15em] text-slate-500">
-                            {s.label}
-                        </p>
-                        <p className="mt-0.5 text-lg font-bold text-white">
-                            <CountUp target={s.value} suffix={s.suffix} />
-                        </p>
-                    </div>
-                ))}
-            </div>
-        </motion.div>
-    );
-}
-
+/** Chapter 06: KAAN and ANKA-3 compared, with a same-scale plan-view drawing. */
 export function PlatformCompare() {
     const { locale } = useLanguage();
-    const mt = useMumtT(locale);
-    const SPECS: SpecRow[] = mt.specs.map((s: { label: string; kaan: string; anka: string }) => ({
-        label: s.label,
-        kaan: s.kaan,
-        anka: s.anka,
-    }));
-    return (
-        <section className="relative bg-cockpit-dark px-4 py-16 sm:px-6 md:px-12 md:py-24">
-            <div className="mx-auto max-w-6xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.5 }}
-                    className="mb-16 text-center"
-                >
-                    <p className="mb-3 font-mono text-[10px] tracking-[0.3em] text-neon-blue/60">
-                        {mt.platformCompare.tag}
-                    </p>
-                    <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
-                        KAAN <span className="text-neon-blue">vs</span> ANKA-3
-                    </h2>
-                </motion.div>
+    const c = platforms[locale];
 
-                <div className="mb-12 grid gap-6 md:grid-cols-2">
-                    <PlatformCard
-                        name="KAAN"
-                        subtitle="5th GEN MULTIROLE FIGHTER"
-                        icon={Plane}
-                        color="#00d4ff"
-                        delay={0}
-                        stats={[
-                            { label: "MAX SPEED", value: 1.8, suffix: " Mach+" },
-                            { label: "CEILING", value: 55000, suffix: " ft" },
-                            { label: "MTOW", value: 27000, suffix: " kg" },
-                            { label: "WINGSPAN", value: 14, suffix: " m" },
-                        ]}
-                    />
-                    <PlatformCard
-                        name="ANKA-3"
-                        subtitle="STEALTH UCAV"
-                        icon={Target}
-                        color="#00ff88"
-                        delay={0.12}
-                        stats={[
-                            { label: "MAX SPEED", value: 0.7, suffix: " Mach" },
-                            { label: "CEILING", value: 40000, suffix: " ft" },
-                            { label: "MTOW", value: 6500, suffix: " kg" },
-                            { label: "ENDURANCE", value: 10, suffix: " saat" },
-                        ]}
-                    />
+    return (
+        <Chapter id="platforms" index={6} label={c.label} title={c.title} lede={c.lede} solid>
+            <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+                <div className="lg:col-span-7">
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[34rem] border-collapse text-left">
+                            <caption className="sr-only">{c.title}</caption>
+                            <thead>
+                                <tr className="t-label border-b border-line-strong">
+                                    <th scope="col" className="py-3 pr-4 font-normal">{c.colItem}</th>
+                                    <th scope="col" className="py-3 pr-4 font-normal text-signal">KAAN</th>
+                                    <th scope="col" className="py-3 font-normal text-fg">ANKA-3</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {platformRows.map((r) => (
+                                    <tr key={r.key} className="border-b border-line align-baseline">
+                                        <th scope="row" className="py-3 pr-4 font-normal text-muted">{r.label[locale]}</th>
+                                        <td className="t-data py-3 pr-4 text-[0.9375rem] text-fg">{r.kaan[locale]}</td>
+                                        <td className="t-data py-3 text-[0.9375rem] text-fg">{r.anka[locale]}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <SourceNote>{c.source}</SourceNote>
                 </div>
 
-                <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="min-w-[400px] overflow-hidden rounded-xl border border-cyan-500/10"
-                        style={{
-                            background: "rgba(10, 10, 20, 0.5)",
-                            backdropFilter: "blur(8px)",
-                        }}
-                    >
-                        <div className="grid grid-cols-3 border-b border-cyan-500/10 px-3 py-2.5 sm:px-5 sm:py-3">
-                            <span className="font-mono text-[8px] tracking-[0.15em] text-slate-500 sm:text-[9px] sm:tracking-[0.2em]">
-                                SPEC
-                            </span>
-                            <span className="text-center font-mono text-[8px] tracking-[0.15em] text-neon-blue/70 sm:text-[9px] sm:tracking-[0.2em]">
-                                KAAN
-                            </span>
-                            <span className="text-center font-mono text-[8px] tracking-[0.15em] text-hud-green/70 sm:text-[9px] sm:tracking-[0.2em]">
-                                ANKA-3
-                            </span>
-                        </div>
+                <div className="space-y-12 lg:col-span-5">
+                    <figure data-reveal>
+                        <figcaption className="t-label">{c.scaleTitle}</figcaption>
+                        <PlanDrawing />
+                        <SourceNote>{c.scaleNote}</SourceNote>
+                    </figure>
 
-                        {SPECS.map((row, i) => (
-                            <motion.div
-                                key={row.label}
-                                initial={{ opacity: 0, x: -10 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.04, duration: 0.35 }}
-                                className="grid grid-cols-3 border-b border-white/[0.03] px-3 py-2.5 transition-colors hover:bg-cyan-500/[0.03] sm:px-5 sm:py-3"
-                            >
-                                <span className="font-mono text-[9px] tracking-wide text-slate-400 sm:text-[10px]">
-                                    {row.label}
-                                </span>
-                                <span className="text-center text-[11px] font-medium text-white sm:text-[13px]">
-                                    {row.kaan}
-                                </span>
-                                <span className="text-center text-[11px] font-medium text-slate-300 sm:text-[13px]">
-                                    {row.anka}
-                                </span>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                    <div data-reveal>
+                        <p className="t-h3">{c.rolesTitle}</p>
+                        <ul className="mt-4 border-t border-line">
+                            {c.roles.map((r) => (
+                                <li key={r} className="border-b border-line py-3 text-fg-2">
+                                    {r}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </section>
+        </Chapter>
+    );
+}
+
+/** Three length × span frames on one grid: KAAN, ANKA-3 and, for scale, Süper Şimşek. */
+function PlanDrawing() {
+    const s = 13; // px per metre
+    const W = 500;
+    const H = 360;
+    const oy = 30;
+    const items = [
+        { name: "KAAN", d: planDims.kaan, x: 30, signal: true, end: false },
+        { name: "ANKA-3", d: planDims.anka, x: 250, signal: false, end: false },
+        { name: "Süper Şimşek", d: planDims.simsek, x: 450, signal: false, end: true },
+    ];
+
+    return (
+        <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full border border-line bg-ground-2" role="img" aria-label={items.map((i) => `${i.name} ${i.d.length} × ${i.d.span} m`).join(", ")}>
+            <defs>
+                <pattern id="plan-grid" width={s} height={s} patternUnits="userSpaceOnUse">
+                    <path d={`M ${s} 0 L 0 0 0 ${s}`} fill="none" stroke="var(--color-line)" strokeWidth="0.5" />
+                </pattern>
+            </defs>
+            <rect width={W} height={H} fill="url(#plan-grid)" opacity="0.6" />
+            {items.map((it) => {
+                const w = it.d.span * s;
+                const h = it.d.length * s;
+                const stroke = it.signal ? "var(--color-signal)" : "var(--color-fg-2)";
+                return (
+                    <g key={it.name} fontFamily="var(--font-mono)" fontSize="11">
+                        <rect x={it.x} y={oy} width={w} height={h} fill={it.signal ? "var(--color-signal-soft)" : "none"} stroke={stroke} strokeDasharray={it.signal ? undefined : "4 4"} />
+                        <line x1={it.x + w / 2} y1={oy - 10} x2={it.x + w / 2} y2={oy + h + 10} stroke="var(--color-line-strong)" strokeDasharray="10 3 2 3" />
+                        <text x={it.end ? it.x + w : it.x} y={oy + h + 26} textAnchor={it.end ? "end" : "start"} fill={it.signal ? "var(--color-signal)" : "var(--color-fg)"}>
+                            {it.name}
+                        </text>
+                        <text x={it.end ? it.x + w : it.x} y={oy + h + 42} textAnchor={it.end ? "end" : "start"} fill="var(--color-muted)">
+                            {it.d.length} × {it.d.span} m
+                        </text>
+                    </g>
+                );
+            })}
+        </svg>
     );
 }

@@ -1,223 +1,109 @@
 "use client";
 
-import { useRef, useMemo, useState, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { applyMaterialOverride, useModel } from "@/lib/three/useModel";
 
-const CAMERA_PRESETS: Record<string, { rx: number; ry: number; rz: number }> = {
-    front: { rx: 0.1, ry: 0, rz: 0 },
-    side: { rx: 0, ry: Math.PI * 0.5, rz: 0 },
-    top: { rx: -Math.PI / 2, ry: 0, rz: 0 },
-    rear: { rx: 0.05, ry: Math.PI, rz: 0 },
-    cockpit: { rx: -0.35, ry: Math.PI * 0.75 + Math.PI, rz: 0 },
+export type CameraPreset = "front" | "side" | "top" | "rear" | "cockpit";
+
+const PRESETS: Record<CameraPreset, [number, number, number]> = {
+    front: [0.1, 0, 0],
+    side: [0, Math.PI * 0.5, 0],
+    top: [-Math.PI / 2, 0, 0],
+    rear: [0.05, Math.PI, 0],
+    cockpit: [-0.35, Math.PI * 1.75, 0],
 };
 
-const MODEL_PATH = "/models/KAAN.glb";
+export const MODEL_PATH = "/models/KAAN.glb";
 
-interface KaanModelProps {
-    scrollProgress?: number;
-    mouseX?: number;
-    mouseY?: number;
-    xRayMode?: boolean;
-    cameraPreset?: string | null;
-    children?: React.ReactNode;
+/** Mutable input shared between the DOM listeners and the render loop (no React state, no re-renders). */
+export class SceneInput {
+    /** 0..1 progress through the part of the page the scene belongs to. */
+    progress = 0;
+    /** Pointer, -1..1 on each axis. */
+    px = 0;
+    py = 0;
+    setProgress(p: number) {
+        this.progress = p;
+    }
+    setPointer(x: number, y: number) {
+        this.px = x;
+        this.py = y;
+    }
 }
 
-export function KaanModel({
-    scrollProgress = 0,
-    mouseX = 0,
-    mouseY = 0,
-    xRayMode = false,
-    cameraPreset = null,
-    children,
-}: KaanModelProps) {
-    const groupRef = useRef<THREE.Group>(null);
-    const [hovered, setHovered] = useState(false);
-    const prevPresetRef = useRef<string | null>(null);
+interface KaanModelProps {
+    input: SceneInput;
+    xRay: boolean;
+    preset: CameraPreset | null;
+    lite: boolean;
+}
 
-    // Original materials backup for X-ray toggle
-    const originalMaterials = useRef<Map<THREE.Mesh, THREE.Material | THREE.Material[]>>(new Map());
+/** Scroll path: plan view → side profile → three-quarter front. */
+function scrollPose(p: number): [number, number, number] {
+    const top = -Math.PI / 2;
+    const side = 0;
+    const front = Math.PI * 0.1;
+    if (p < 0.33) {
+        const t = p / 0.33;
+        return [top + (side - top) * t, 2 * Math.PI + t * 0.5, 0];
+    }
+    if (p < 0.66) {
+        const t = (p - 0.33) / 0.33;
+        return [side + (front - side) * t, 2 * Math.PI + 0.5 + t * 0.8, t * 0.1];
+    }
+    const t = (p - 0.66) / 0.34;
+    return [front + t * 0.2, 2 * Math.PI + 1.3 + t * 0.5, 0.1 - t * 0.1];
+}
 
-    // GLB loading
-    const { scene } = useGLTF(MODEL_PATH);
+export function KaanModel({ input, xRay, preset, lite }: KaanModelProps) {
+    const group = useRef<THREE.Group>(null);
+    const invalidate = useThree((s) => s.invalidate);
+    const { object } = useModel(MODEL_PATH, { size: 4, lite, envIntensity: 1.4 });
 
-    // X-Ray wireframe material
     const xRayMaterial = useMemo(
-        () =>
-            new THREE.MeshBasicMaterial({
-                color: new THREE.Color("#00d4ff"),
-                wireframe: true,
-                transparent: true,
-                opacity: 0.3,
-            }),
+        () => new THREE.MeshBasicMaterial({ color: "#d7dde2", wireframe: true, transparent: true, opacity: 0.22 }),
         []
     );
+    const originals = useMemo(() => new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>(), []);
 
+    useEffect(() => () => xRayMaterial.dispose(), [xRayMaterial]);
 
-
-    // Clone the scene so we have full control and don't share the singleton
-    const { clonedScene } = useMemo(() => {
-        const clone = scene.clone(true);
-
-        // Deep-clone materials for each mesh so they are independent
-        clone.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                if (Array.isArray(child.material)) {
-                    child.material = child.material.map((m) => m.clone());
-                } else if (child.material) {
-                    child.material = child.material.clone();
-                }
-            }
-        });
-
-        // Compute bounding box and center
-        const box = new THREE.Box3().setFromObject(clone);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const sf = maxDim > 0 ? 4 / maxDim : 1;
-
-        // Re-root: move all children so model center is at (0,0,0)
-        clone.position.set(-center.x, -center.y, -center.z);
-
-        // Wrap in a parent group to apply uniform scale
-        const wrapper = new THREE.Group();
-        wrapper.add(clone);
-        wrapper.scale.setScalar(sf);
-
-        // Flip the model 180° around Y so the nose faces the camera
-        wrapper.rotation.y = Math.PI;
-
-        // Set frustumCulled = false on every object in the hierarchy
-        wrapper.traverse((obj) => {
-            obj.frustumCulled = false;
-        });
-
-        // Bounding sphere radius in scaled space
-        const sphere = new THREE.Sphere();
-        box.getBoundingSphere(sphere);
-
-        return {
-            clonedScene: wrapper,
-        };
-    }, [scene]);
-
-    // Store original materials after clone
     useEffect(() => {
-        clonedScene.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                originalMaterials.current.set(child, child.material);
+        applyMaterialOverride(object, xRay ? xRayMaterial : null, originals);
+        invalidate();
+    }, [xRay, object, xRayMaterial, originals, invalidate]);
 
-                const mat = child.material as THREE.MeshStandardMaterial;
-                if (mat && mat.envMapIntensity !== undefined) {
-                    mat.envMapIntensity = 1.8;
-                }
-            }
-        });
-    }, [clonedScene]);
-
-    // X-Ray toggle — swap materials imperatively on the clone
     useEffect(() => {
-        clonedScene.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                if (xRayMode) {
-                    child.material = xRayMaterial;
-                } else {
-                    const orig = originalMaterials.current.get(child);
-                    if (orig) child.material = orig;
-                }
-            }
-        });
-    }, [xRayMode, clonedScene, xRayMaterial]);
+        invalidate();
+    }, [preset, invalidate]);
 
-    // Camera preset snap
-    useEffect(() => {
-        if (!groupRef.current) return;
-        if (cameraPreset && CAMERA_PRESETS[cameraPreset]) {
-            const p = CAMERA_PRESETS[cameraPreset];
-            groupRef.current.rotation.x = p.rx;
-            groupRef.current.rotation.y = p.ry;
-            groupRef.current.rotation.z = p.rz;
-        }
-        prevPresetRef.current = cameraPreset;
-    }, [cameraPreset]);
+    useFrame(() => {
+        const g = group.current;
+        if (!g) return;
+        const { progress, px, py } = input;
+        const target = preset ? PRESETS[preset] : scrollPose(progress);
+        const k = preset ? 0.05 : 0.15;
+        const speed = preset ? 0.1 : 0.06;
 
-    // Animation loop
-    useFrame((state) => {
-        if (!groupRef.current) return;
+        const tx = target[0] + py * k;
+        const ty = target[1] + px * k;
+        const tz = target[2];
 
-        const time = state.clock.elapsedTime;
-        const idleFloat = Math.sin(time * 0.8) * 0.05;
+        g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, tx, speed);
+        g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, ty, speed);
+        g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, tz, speed);
 
-        let targetRotationX: number;
-        let targetRotationY: number;
-        let targetRotationZ: number;
-
-        if (cameraPreset && CAMERA_PRESETS[cameraPreset]) {
-            const p = CAMERA_PRESETS[cameraPreset];
-            targetRotationX = p.rx;
-            targetRotationY = p.ry;
-            targetRotationZ = p.rz;
-        } else {
-            const topViewX = -Math.PI / 2;
-            const sideViewX = 0;
-            const frontViewX = Math.PI * 0.1;
-
-            if (scrollProgress < 0.33) {
-                const t = scrollProgress / 0.33;
-                targetRotationX = topViewX + (sideViewX - topViewX) * t;
-                targetRotationY = 2 * Math.PI + t * 0.5;
-                targetRotationZ = 0;
-            } else if (scrollProgress < 0.66) {
-                const t = (scrollProgress - 0.33) / 0.33;
-                targetRotationX = sideViewX + (frontViewX - sideViewX) * t;
-                targetRotationY = 2 * Math.PI + 0.5 + t * 0.8;
-                targetRotationZ = t * 0.1;
-            } else {
-                const t = (scrollProgress - 0.66) / 0.34;
-                targetRotationX = frontViewX + t * 0.2;
-                targetRotationY = 2 * Math.PI + 1.3 + t * 0.5;
-                targetRotationZ = 0.1 - t * 0.1;
-            }
-        }
-
-        const mouseFactor = cameraPreset ? 0.05 : 0.15;
-        const mouseInfluenceX = mouseY * mouseFactor;
-        const mouseInfluenceY = mouseX * mouseFactor;
-        const lerpSpeed = cameraPreset ? 0.1 : 0.04;
-
-        groupRef.current.rotation.x = THREE.MathUtils.lerp(
-            groupRef.current.rotation.x,
-            targetRotationX + mouseInfluenceX + idleFloat,
-            lerpSpeed
-        );
-        groupRef.current.rotation.y = THREE.MathUtils.lerp(
-            groupRef.current.rotation.y,
-            targetRotationY + mouseInfluenceY,
-            lerpSpeed
-        );
-        groupRef.current.rotation.z = THREE.MathUtils.lerp(
-            groupRef.current.rotation.z,
-            targetRotationZ,
-            lerpSpeed
-        );
-
-
+        // Keep drawing only while the aircraft is still settling.
+        const err = Math.abs(g.rotation.x - tx) + Math.abs(g.rotation.y - ty) + Math.abs(g.rotation.z - tz);
+        if (err > 0.0005) invalidate();
     });
 
     return (
-        <group ref={groupRef}>
-            {/* GLB Model — cloned, centered, scaled, flipped */}
-            <primitive
-                object={clonedScene}
-                onPointerOver={() => setHovered(true)}
-                onPointerOut={() => setHovered(false)}
-            />
-
-            {children}
+        <group ref={group} rotation={[-Math.PI / 2, 2 * Math.PI, 0]}>
+            <primitive object={object} />
         </group>
     );
 }
