@@ -80,7 +80,7 @@ export function S04() {
         <section ref={section} id="s04" aria-labelledby="s04-title" className="pointer-events-none relative min-h-[150svh]">
             <div ref={layer} className="relative min-h-[100svh] md:sticky md:top-0 md:h-[100svh]">
                 {/* Node buttons, positioned over the scene's anchors each frame */}
-                <div>
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
                     {NODES.map((id) => (
                         <button
                             key={id}
