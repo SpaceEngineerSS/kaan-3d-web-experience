@@ -50,3 +50,6 @@ next-env.d.ts
 /public/workbox-*.js.map
 /public/worker-*.js
 /public/worker-*.js.map
+
+# capture.mjs screenshots (the JSON reports next to them are committed)
+/docs/perf/*/

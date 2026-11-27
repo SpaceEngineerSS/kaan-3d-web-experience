@@ -11,6 +11,9 @@ import { Streamlines } from "./Streamlines";
 import { ShockDiamonds } from "./ShockDiamonds";
 import { MumT } from "./MumT";
 import { Anchors } from "./Anchors";
+import { Stats } from "./Stats";
+
+const STATS = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("stats");
 
 function Kaan({ tier, reduced }: { tier: Tier; reduced: boolean }) {
     const data = useKaanData(tier);
@@ -35,6 +38,7 @@ export function World({ tier, reduced }: { tier: Tier; reduced: boolean }) {
     return (
         <>
             <color attach="background" args={[COLOR.ink]} />
+            {STATS && <Stats />}
             <Suspense fallback={null}>
                 <Kaan tier={tier} reduced={reduced} />
             </Suspense>

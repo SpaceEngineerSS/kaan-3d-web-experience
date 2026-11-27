@@ -48,5 +48,8 @@ These were made for this project and are covered by the repository's MIT licence
 
 ## Typefaces
 
-- **B612** and **B612 Mono** (Airbus / Intactile Design, Polarsys), SIL Open Font License 1.1. Designed for cockpit displays. Self-hosted in `src/app/fonts/`; the upstream files lack Ş ş İ ı Ğ ğ, so those six letters were composed from the font's own glyphs (allowed by the OFL; the licence text is in `src/app/fonts/B612-OFL.txt`).
-- **Rajdhani** (Indian Type Foundry), SIL Open Font License, served through `next/font/google`.
+All three are served through `next/font/google` under the SIL Open Font License 1.1:
+
+- **Chakra Petch** (Cadson Demak): display type
+- **Inter** (Rasmus Andersson): body text
+- **JetBrains Mono** (JetBrains): figures, labels and readouts

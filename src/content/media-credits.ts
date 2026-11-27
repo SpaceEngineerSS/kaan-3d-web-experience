@@ -147,7 +147,7 @@ export const galleryCredits: MediaCredit[] = [
     },
 ];
 
-/** Videos in /public/videos; each has an .mp4, a .webm and a poster in /media/posters. */
+/** Videos in /public/videos; each has an H.264 .mp4 and a poster in /media/posters. */
 export const videoCredits: MediaCredit[] = [
     {
         src: "/videos/kaan.mp4",
@@ -222,7 +222,6 @@ export const allCredits: MediaCredit[] = [...galleryCredits, ...videoCredits, ..
 export function videoSources(name: "kaan" | "anka3" | "super-simsek") {
     return {
         mp4: `/videos/${name}.mp4`,
-        webm: `/videos/${name}.webm`,
         poster: `/media/posters/${name}.jpg`,
     };
 }

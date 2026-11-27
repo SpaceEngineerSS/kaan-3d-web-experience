@@ -13,10 +13,11 @@ const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const STATIC_CACHE = `kaan-static-${VERSION}`;
 const ASSET_CACHE = `kaan-assets-${VERSION}`;
 const PAGE_CACHE = `kaan-pages-${VERSION}`;
-const ASSET_LIMIT = 60;
+const ASSET_LIMIT = 40;
 
-self.addEventListener("install", (event) => {
-    event.waitUntil(caches.open(PAGE_CACHE).then((c) => c.addAll(["/"]).catch(() => undefined)));
+// Nothing is precached: the first navigation is stored by the network-first handler below,
+// so installing never downloads the home page a second time.
+self.addEventListener("install", () => {
     self.skipWaiting();
 });
 

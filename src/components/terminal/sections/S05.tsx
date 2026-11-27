@@ -761,7 +761,6 @@ function Film() {
                     className="aspect-video w-full bg-black object-contain"
                     aria-label={credit.alt[locale]}
                 >
-                    <source src={v.webm} type="video/webm" />
                     <source src={v.mp4} type="video/mp4" />
                     {m.noVideo}
                 </video>

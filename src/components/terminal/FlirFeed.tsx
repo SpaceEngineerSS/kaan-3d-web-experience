@@ -139,6 +139,7 @@ export function FlirFeed({ src, still, stillAlt, label, caption, reducedMotion }
         };
         const start = () => {
             if (!visible || document.hidden) return;
+            if (!vid.getAttribute("src")) vid.src = src;
             vid.play().catch(() => {});
             if (!raf) raf = requestAnimationFrame(frame);
         };
@@ -170,7 +171,7 @@ export function FlirFeed({ src, still, stillAlt, label, caption, reducedMotion }
             gl.deleteShader(fs);
             gl.getExtension("WEBGL_lose_context")?.loseContext();
         };
-    }, [useStill]);
+    }, [useStill, src]);
 
     return (
         <figure className="m-0">
@@ -179,7 +180,7 @@ export function FlirFeed({ src, still, stillAlt, label, caption, reducedMotion }
                     <Image src={still} alt={stillAlt} fill sizes="(min-width: 768px) 32rem, 100vw" className="object-cover contrast-125 grayscale" />
                 ) : (
                     <>
-                        <video ref={video} src={src} muted playsInline loop preload="auto" aria-hidden className="pointer-events-none absolute h-px w-px opacity-0" />
+                        <video ref={video} muted playsInline loop preload="none" aria-hidden className="pointer-events-none absolute h-px w-px opacity-0" />
                         <canvas ref={canvas} role="img" aria-label={label} className="absolute inset-0 h-full w-full" />
                     </>
                 )}

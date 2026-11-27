@@ -28,7 +28,6 @@ export function VideoGallery() {
                                 height={720}
                                 aria-label={v.title}
                             >
-                                <source src={src.webm} type="video/webm" />
                                 <source src={src.mp4} type="video/mp4" />
                             </video>
                             <figcaption className="mt-3">
