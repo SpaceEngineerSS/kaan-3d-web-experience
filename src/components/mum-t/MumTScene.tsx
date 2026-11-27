@@ -3,7 +3,8 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
+import { HangarEnvironment } from "@/components/terminal/scene/HangarIBL";
 import * as THREE from "three";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useDeviceProfile, type DeviceProfile } from "@/hooks/useDeviceProfile";
@@ -185,15 +186,6 @@ function Formation({ mode, lite, reducedMotion, isMobile }: { mode: FormationMod
     );
 }
 
-function StudioEnvironment() {
-    return (
-        <Environment resolution={128} frames={1}>
-            <Lightformer form="rect" intensity={2.2} color="#f4f1ea" position={[0, 5, -2]} scale={[10, 2, 1]} rotation-x={Math.PI / 2} />
-            <Lightformer form="rect" intensity={1.2} color="#dfe6ec" position={[-6, 1, 1]} scale={[3, 6, 1]} rotation-y={Math.PI / 2} />
-            <Lightformer form="ring" intensity={0.6} color="#ffffff" position={[0, -4, 4]} scale={4} />
-        </Environment>
-    );
-}
 
 /** Asks for one frame whenever the loop is switched back on (e.g. scrolled back into view). */
 function Wake({ active }: { active: boolean }) {
@@ -249,15 +241,15 @@ function SceneCanvas({ profile, mode, active }: { profile: DeviceProfile; mode: 
                 gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault());
             }}
         >
-            <color attach="background" args={["#05070a"]} />
+            <color attach="background" args={["#08090b"]} />
             {/* Distance haze: far aircraft fade into the ground colour instead of a hard edge. */}
-            <fog attach="fog" args={["#05070a", 24, 70]} />
+            <fog attach="fog" args={["#08090b", 24, 70]} />
             <directionalLight position={[8, 12, 5]} intensity={lite ? 2.2 : 1.5} color="#f6f3ec" />
-            <directionalLight position={[-6, 2, -4]} intensity={0.6} color="#9fb4c6" />
+            <directionalLight position={[-6, 2, -4]} intensity={0.8} color="#c9b79c" />
             {lite && <ambientLight intensity={0.6} color="#c9d1d8" />}
             <Suspense fallback={null}>
                 <Formation mode={mode} lite={lite} reducedMotion={profile.reducedMotion} isMobile={profile.isMobile} />
-                {!lite && <StudioEnvironment />}
+                {!lite && <HangarEnvironment />}
             </Suspense>
             <Wake active={active} />
         </Canvas>

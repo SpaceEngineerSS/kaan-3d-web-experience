@@ -1,0 +1,26 @@
+{
+  "base": "http://localhost:3210",
+  "date": "2026-11-27T09:32:58.559Z",
+  "consoleErrors": [],
+  "shots": [
+    {
+      "name": "mode-airframe-390",
+      "path": "/",
+      "width": 390,
+      "mode": "airframe",
+      "fps": 144,
+      "stats": {
+        "calls": 10,
+        "triangles": 26936,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 2,
+        "programs": 9
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 0
+    }
+  ]
+}

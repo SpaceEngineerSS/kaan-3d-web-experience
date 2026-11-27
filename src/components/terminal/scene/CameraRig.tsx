@@ -141,13 +141,21 @@ export function CameraRig({ features, reduced }: { features: KaanFeatures; reduc
             modeUniforms.uFrom.value.copy(ONE_HOT[rig.modeFrom]);
             modeUniforms.uTo.value.copy(ONE_HOT[rig.modeTo]);
         }
+        if (rig.intro) {
+            // First reveal: everything starts from "nothing" and the plane draws the aircraft in.
+            rig.intro = false;
+            rig.modeFrom = rig.modeTo;
+            rig.sweep = reduced ? 1 : 0;
+            modeUniforms.uFrom.value.set(0, 0, 0, 0);
+            modeUniforms.uTo.value.copy(ONE_HOT[rig.modeTo]);
+        }
         if (rig.sweep < 1) rig.sweep = Math.min(1, rig.sweep + dt / SWEEP);
         const e = easeSweep(rig.sweep);
         modeUniforms.uSweepZ.value = rig.sweep >= 1 ? zLo - 1 : THREE.MathUtils.lerp(zHi, zLo, e);
         modeUniforms.uSweepOn.value = rig.sweep >= 1 ? 0 : 1;
         modeUniforms.uSweepW.value = f.L * 0.035;
-        if (rig.sweep >= 1) modeUniforms.uFrom.value.copy(ONE_HOT[rig.modeTo]);
-        for (let k = 0; k < 4; k++) rig.m[k] = THREE.MathUtils.lerp(ONE_HOT[rig.modeFrom].getComponent(k), ONE_HOT[rig.modeTo].getComponent(k), e);
+        if (rig.sweep >= 1) modeUniforms.uFrom.value.copy(modeUniforms.uTo.value);
+        for (let k = 0; k < 4; k++) rig.m[k] = THREE.MathUtils.lerp(modeUniforms.uFrom.value.getComponent(k), modeUniforms.uTo.value.getComponent(k), e);
 
         // Clock and the X-RAY scan band.
         if (!reduced) {

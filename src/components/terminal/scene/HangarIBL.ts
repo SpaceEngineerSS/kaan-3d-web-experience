@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from "react";
+/* eslint-disable react-hooks/immutability -- scene.environment is set on the three.js scene by design. */
+import { useEffect, useState } from "react";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { COLOR } from "./shared";
@@ -52,24 +53,102 @@ function buildHangar(): THREE.Scene {
     return scene;
 }
 
-export function useHangarEnvironment(enabled: boolean) {
+/**
+ * Bakes the hangar once the browser is idle (the PMREM pass and its shaders would otherwise land in
+ * the first long task), then hands back the texture. `size` is the cube face resolution.
+ */
+export function useHangarEnvironment(enabled: boolean, size = 256) {
     const gl = useThree((s) => s.gl);
-    const env = useMemo(() => {
-        if (!enabled) return null;
-        const pmrem = new THREE.PMREMGenerator(gl);
-        const scene = buildHangar();
-        const rt = pmrem.fromScene(scene, 0.035);
-        scene.traverse((o) => {
-            const m = o as THREE.Mesh;
-            if (m.isMesh) {
-                m.geometry.dispose();
-                (m.material as THREE.Material).dispose();
-            }
-        });
-        pmrem.dispose();
-        return rt;
-    }, [gl, enabled]);
+    const [env, setEnv] = useState<THREE.WebGLRenderTarget | null>(null);
 
-    useEffect(() => () => env?.dispose(), [env]);
+    useEffect(() => {
+        if (!enabled) return;
+        let rt: THREE.WebGLRenderTarget | null = null;
+        let cancelled = false;
+        const run = () => {
+            if (cancelled) return;
+            const pmrem = new THREE.PMREMGenerator(gl);
+            const scene = buildHangar();
+            rt = pmrem.fromScene(scene, 0.035, 0.1, 100, { size });
+            scene.traverse((o) => {
+                const m = o as THREE.Mesh;
+                if (m.isMesh) {
+                    m.geometry.dispose();
+                    (m.material as THREE.Material).dispose();
+                }
+            });
+            pmrem.dispose();
+            setEnv(rt);
+        };
+        const idle = typeof window.requestIdleCallback === "function";
+        const id = idle ? window.requestIdleCallback(run, { timeout: 1500 }) : window.setTimeout(run, 300);
+        return () => {
+            cancelled = true;
+            if (idle) window.cancelIdleCallback(id);
+            else window.clearTimeout(id);
+            rt?.dispose();
+        };
+    }, [gl, enabled, size]);
+
     return env?.texture ?? null;
+}
+
+/** Sets the procedural hangar as scene.environment, for scenes that light stock PBR materials with it. */
+export function HangarEnvironment() {
+    const scene = useThree((s) => s.scene);
+    const env = useHangarEnvironment(true);
+    useEffect(() => {
+        const prev = scene.environment;
+        scene.environment = env;
+        return () => {
+            scene.environment = prev;
+        };
+    }, [scene, env]);
+    return null;
+}
+
+/**
+ * The same hangar, pre-integrated into a 128 px matcap for phones and mid laptops: a sphere of normals
+ * shaded with the reflected ceiling strips, the left fill and the warm rim. One texture lookup per
+ * pixel instead of a PMREM bake and a full PBR shader.
+ */
+export function hangarMatcap(): THREE.CanvasTexture {
+    const N = 128;
+    const c = document.createElement("canvas");
+    c.width = c.height = N;
+    const g = c.getContext("2d")!;
+    const img = g.createImageData(N, N);
+    const ti = new THREE.Color(COLOR.ti);
+    for (let py = 0; py < N; py++) {
+        for (let px = 0; px < N; px++) {
+            const x = ((px + 0.5) / N) * 2 - 1;
+            const y = 1 - ((py + 0.5) / N) * 2;
+            const d = x * x + y * y;
+            const i = (py * N + px) * 4;
+            if (d > 1) {
+                img.data[i + 3] = 0;
+                continue;
+            }
+            const z = Math.sqrt(1 - d);
+            // reflect the view ray (0,0,1) about the normal
+            const rx = 2 * z * x;
+            const ry = 2 * z * y;
+            const rz = 2 * z * z - 1;
+            const diffuse = 0.1 + 0.22 * Math.max(0, y) + 0.06 * Math.max(0, -x);
+            const strips = ry > 0.35 ? Math.pow(Math.max(0, Math.cos(rx * 9)), 6) * Math.min(1, (ry - 0.35) * 2.2) * 0.55 : 0;
+            const sky = Math.max(0, ry) * 0.12;
+            const fill = Math.max(0, -rx) * Math.max(0, 1 - Math.abs(ry)) * 0.1;
+            const rim = Math.max(0, -rz) * Math.max(0, ry + 0.2) * 0.5;
+            const fres = Math.pow(1 - z, 3) * 0.25;
+            const v = diffuse + strips + sky + fill + fres;
+            img.data[i] = Math.min(255, (v + rim * ti.r) * 255);
+            img.data[i + 1] = Math.min(255, (v + rim * ti.g) * 255);
+            img.data[i + 2] = Math.min(255, (v * 1.04 + rim * ti.b) * 255);
+            img.data[i + 3] = 255;
+        }
+    }
+    g.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
 }

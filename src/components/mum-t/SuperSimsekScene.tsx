@@ -8,6 +8,7 @@ import * as THREE from "three";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useDeviceProfile, type DeviceProfile } from "@/hooks/useDeviceProfile";
 import { useModel } from "@/lib/three/useModel";
+import { HangarEnvironment } from "@/components/terminal/scene/HangarIBL";
 
 const MODEL_PATH = "/models/super-simsek.glb";
 const POSTER = "/media/posters/super-simsek.jpg";
@@ -88,10 +89,11 @@ function SimsekCanvas({ profile, active, label }: { profile: DeviceProfile; acti
                 gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault());
             }}
         >
-            <color attach="background" args={["#000000"]} />
+            <color attach="background" args={["#08090b"]} />
+            {!lite && <HangarEnvironment />}
             <ambientLight intensity={lite ? 0.8 : 0.45} color="#c9d1d8" />
             <directionalLight position={[5, 8, 4]} intensity={1.8} color="#f6f3ec" />
-            <directionalLight position={[-4, 1, -3]} intensity={0.7} color="#bfcad4" />
+            <directionalLight position={[-4, 1, -3]} intensity={0.9} color="#c9b79c" />
             <Suspense fallback={null}>
                 <Model lite={lite} />
             </Suspense>

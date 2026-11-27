@@ -3,10 +3,7 @@ import * as THREE from "three";
 /** Design-system colours (globals.css). */
 export const COLOR = {
     ink: "#08090B",
-    ram: "#1A1D21",
     fg: "#EAEAE6",
-    steel: "#8C9199",
-    faint: "#6B7078",
     ti: "#C9B79C",
     accent: "#E06C2B",
     burn: "#E06C2B",

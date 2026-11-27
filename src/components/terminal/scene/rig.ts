@@ -19,6 +19,8 @@ export const rig = {
     modeFrom: 0,
     modeTo: 0,
     sweep: 1,
+    /** Set when the airframe has compiled: CameraRig sweeps it in from nothing. */
+    intro: false,
     /** Mode weights after the sweep has fully passed: [airframe, xray, aero, eoir], blended over time. */
     m: [1, 0, 0, 0] as [number, number, number, number],
     /** Free-orbit inspection blend 0..1 (1 = camera still at the pose orbit left it in). */
@@ -55,8 +57,9 @@ export function sectionWeight(i: number, p: number) {
  * are already in uTo, the rest still in uFrom. Weights are one-hot vec4s [airframe, xray, aero, eoir].
  */
 export const modeUniforms = {
-    uFrom: { value: new THREE.Vector4(1, 0, 0, 0) },
-    uTo: { value: new THREE.Vector4(1, 0, 0, 0) },
+    // Start from nothing: the airframe is swept in once its shader has compiled.
+    uFrom: { value: new THREE.Vector4(0, 0, 0, 0) },
+    uTo: { value: new THREE.Vector4(0, 0, 0, 0) },
     uSweepZ: { value: -10 },
     uSweepW: { value: 0.06 },
     /** 1 while a sweep is travelling: draws the bright cut line. */

@@ -2,6 +2,42 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [SemVer](https://semver.org/).
 
+## [5.0.0] — 2026-11-27
+
+The terminal becomes a hangar monograph. KAAN is a physical object under hangar light, and the scene turns between four inspection modes.
+
+### Added
+- **Hangar airframe.** A RAM-grey surface lit by a procedural hangar, baked from emissive strips and cards with no image files, plus a gold/ITO thin-film canopy and a contact-shadow floor for the opening.
+  - Desktop-class GPUs use a physical (clearcoat) material.
+  - Phones and mid laptops use the same hangar pre-integrated into a matcap.
+- **Four inspection modes:** AIRFRAME, X-RAY, AERO and EO/IR.
+  - One sweep plane moves every material nose to tail between them, with an amber cut line.
+  - Each section opens in its own mode. A right-edge panel (keys 1–4) overrides it.
+  - EO/IR is a notional long-wave IR, white-hot shading of the surface.
+- **Free orbit inspection** (I / Esc). The pivot glides in, and the camera blends back to the spline on exit.
+- **Monument typography.** The section word sits under the transparent canvas, so the aircraft passes in front of it.
+- **Optional sound.** Hangar air, turbine and mode clicks, synthesised with Web Audio. Off by default, with no audio files.
+- **Section 05 as numbered plates**, including a one-ruler comparison with a parameter switch and a sensor/weapon plate.
+- **`scripts/capture.mjs` measures** every section × width, every mode and the other pages: FPS, draw calls, triangles, overflow, reading blocks and labels. Reports are in `docs/perf/`.
+
+### Changed
+- **Palette:** anthracite, RAM grey, off-white paper, steel labels, one burner-amber accent. Cockpit-display colours appear only inside the simulated displays; the phosphor green is gone from the interface.
+- **One shell for all three pages.** `/mum-t` and `/kaynaklar` share the status bar and footer, and their 3D scenes use the same hangar light.
+- **Camera:** critically damped springs for progress and look-at, plus a wider lens and lifted framing on portrait phones.
+- **Less on screen at once:**
+  - S01 shows a four-line log, with the full log and the footage on request.
+  - The S02 marker list moved to plate 03.
+  - At most three leader labels per section, with an ink halo.
+  - The frame keeps only the clock and the depth ruler.
+- **Performance:**
+  - The hangar bakes in an idle callback, and the airframe shader compiles asynchronously.
+  - There is no post-processing pass.
+  - Lighthouse mobile total blocking time is lower than v4.0.1.
+
+### Removed
+- **Media:** WebM copies of the full videos (36 MB → 15 MB), the duplicate `public/favicon.ico`, and the service worker's install precache. The first load downloads no video.
+- **Code:** the old `Navbar`, the measured-FPS readouts, and the `@react-three/postprocessing` / `postprocessing` dependencies.
+
 ## [4.0.1] — 2026-11-18
 
 ### Fixed

@@ -91,32 +91,29 @@ export function CompareRule() {
                                 {PEERS.map((f) => {
                                     const kaan = f.id === "kaan";
                                     return (
-                                        <li key={f.id} className="grid grid-cols-[4.5rem_1fr] items-center gap-4">
-                                            <span className={`t-tele ${kaan ? "text-fg" : ""}`}>{f.name}</span>
-                                            <span className="relative block h-7">
+                                        <li key={f.id}>
+                                            <p className="flex items-baseline justify-between gap-4">
+                                                <span className={`t-tele ${kaan ? "text-fg" : ""}`}>{f.name}</span>
+                                                <span className={`t-data text-[0.875rem] tabular-nums ${kaan ? "text-fg" : "text-fg-2"}`}>
+                                                    {m.show(f)}
+                                                    {m.est(f) && <span className="ml-1 text-muted">*{cc.estimate}</span>}
+                                                </span>
+                                            </p>
+                                            <span className="relative mt-1.5 block h-3">
                                                 <span
-                                                    className={`absolute inset-y-[11px] left-0 transition-[width] duration-700 ease-[var(--ease-out-quart)] ${kaan ? "bg-accent" : "bg-fg-2/35"} ${m.est(f) ? "opacity-60" : ""}`}
+                                                    className={`absolute inset-y-[4px] left-0 transition-[width] duration-700 ease-[var(--ease-out-quart)] ${kaan ? "bg-accent" : "bg-fg-2/35"} ${m.est(f) ? "opacity-60" : ""}`}
                                                     style={{ width: `${(m.value(f) / end) * 100}%` }}
                                                 />
                                                 <span
                                                     className="absolute top-0 h-full w-px bg-fg transition-[left] duration-700 ease-[var(--ease-out-quart)]"
                                                     style={{ left: `${(m.value(f) / end) * 100}%` }}
                                                 />
-                                                <span
-                                                    className={`t-data absolute -top-0.5 whitespace-nowrap pl-2 text-[0.8125rem] tabular-nums transition-[left] duration-700 ease-[var(--ease-out-quart)] ${kaan ? "text-fg" : "text-fg-2"}`}
-                                                    style={{
-                                                        left: `min(${(m.value(f) / end) * 100}%, calc(100% - 9rem))`,
-                                                    }}
-                                                >
-                                                    {m.show(f)}
-                                                    {m.est(f) && <span className="ml-1 text-muted">*{cc.estimate}</span>}
-                                                </span>
                                             </span>
                                         </li>
                                     );
                                 })}
                             </ul>
-                            <div aria-hidden className="ml-[5.5rem] mt-4 border-t border-edge-2">
+                            <div aria-hidden className="mt-3 border-t border-edge-2">
                                 <div className="relative h-6">
                                     {ticks.map((t) => (
                                         <span key={t} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: `${(t / end) * 100}%` }}>

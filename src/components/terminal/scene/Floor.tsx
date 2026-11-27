@@ -9,7 +9,7 @@ import type { Tier } from "@/hooks/useDeviceProfile";
 import type { KaanFeatures } from "./shared";
 import { rig } from "./rig";
 
-/** Radial falloff baked into a tiny canvas texture: the tier-1 stand-in for a contact shadow. */
+/** Radial falloff baked into a tiny canvas texture: the stand-in for a contact shadow below tier 3. */
 function blobTexture() {
     const c = document.createElement("canvas");
     c.width = c.height = 64;
@@ -58,7 +58,7 @@ export function Floor({ features, tier }: { features: KaanFeatures; tier: Tier }
     const mats = useRef<THREE.Material[]>([]);
     const y = features.box.min.y - 0.012;
     const L = features.L;
-    const blob = useMemo(() => (tier <= 1 ? blobTexture() : null), [tier]);
+    const blob = useMemo(() => (tier <= 2 ? blobTexture() : null), [tier]);
 
     useEffect(() => {
         mats.current = [];
@@ -76,7 +76,7 @@ export function Floor({ features, tier }: { features: KaanFeatures; tier: Tier }
     useFrame(() => {
         const a = (rig.m[0] + rig.m[2]) * rig.w[0];
         if (group.current) group.current.visible = a > 0.01;
-        for (const m of mats.current) m.opacity = a * (tier <= 1 ? 0.7 : 1);
+        for (const m of mats.current) m.opacity = a * (tier <= 2 ? 0.7 : 1);
         floorUniforms.uOpacity.value = a * 0.55;
     });
 

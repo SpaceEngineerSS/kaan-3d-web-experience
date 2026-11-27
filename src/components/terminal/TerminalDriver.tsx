@@ -16,8 +16,6 @@ export function TerminalDriver() {
         let lastY = window.scrollY;
         let lastT = performance.now();
         let raf = 0;
-        let frames = 0;
-        let fpsT = performance.now();
 
         const onPointer = (e: PointerEvent) => {
             terminal.px = (e.clientX / window.innerWidth) * 2 - 1;
@@ -27,13 +25,6 @@ export function TerminalDriver() {
         const tick = (now: number) => {
             raf = requestAnimationFrame(tick);
             if (document.hidden) return;
-
-            frames++;
-            if (now - fpsT >= 500) {
-                terminal.fps = Math.round((frames * 1000) / (now - fpsT));
-                frames = 0;
-                fpsT = now;
-            }
 
             const y = window.scrollY;
             const dt = Math.max(1, now - lastT);

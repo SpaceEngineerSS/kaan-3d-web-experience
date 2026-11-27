@@ -39,8 +39,6 @@ export interface TerminalState {
     inspect: boolean;
     /** Procedural sound on. */
     sound: boolean;
-    /** Measured frames per second of the main loop. */
-    fps: number;
     /** Projected 3D anchors keyed by name, written by the scene each frame. */
     anchors: Record<string, Anchor>;
 }
@@ -55,7 +53,6 @@ export const terminal: TerminalState = {
     mode: "airframe",
     inspect: false,
     sound: false,
-    fps: 60,
     anchors: {},
 };
 

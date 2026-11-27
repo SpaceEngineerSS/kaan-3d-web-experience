@@ -1,13 +1,13 @@
 "use client";
 /* eslint-disable react-hooks/immutability -- three.js uniforms are mutated in the render loop by design. */
 
-import { useEffect, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useState } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type { Tier } from "@/hooks/useDeviceProfile";
 import { COLOR, MODE_GLSL, type KaanFeatures } from "./shared";
 import { modeUniforms, rig } from "./rig";
-import { useHangarEnvironment } from "./HangarIBL";
+import { hangarMatcap, useHangarEnvironment } from "./HangarIBL";
 
 /**
  * KAAN as a physical object: a matte RAM coat lit by the procedural hangar, a gold/ITO film on the
@@ -56,15 +56,19 @@ float kTemp(vec3 p, vec3 wN) {
 `;
 
 export function KaanAirframe({ surface, features, tier }: { surface: THREE.BufferGeometry; features: KaanFeatures; tier: Tier }) {
-    const env = useHangarEnvironment(true);
+    const pbr = tier >= 3;
+    const env = useHangarEnvironment(pbr);
+    const matcap = useMemo(() => (pbr ? null : hangarMatcap()), [pbr]);
+    const { gl, camera, scene } = useThree();
+    const [ready, setReady] = useState(false);
 
     const material = useMemo(() => {
-        const params = {
-            color: new THREE.Color("#3a3f46"),
-            roughness: 0.58,
-            metalness: 0.12,
-        };
-        const m = tier <= 1 ? new THREE.MeshStandardMaterial(params) : new THREE.MeshPhysicalMaterial({ ...params, clearcoat: 0.18, clearcoatRoughness: 0.45 });
+        const params = { color: new THREE.Color("#3a3f46"), roughness: 0.58, metalness: 0.12 };
+        // Full PBR (and its long shader compile) is for desktop-class GPUs; everything else gets the
+        // hangar pre-integrated into a matcap.
+        const m = pbr
+            ? new THREE.MeshPhysicalMaterial({ ...params, clearcoat: 0.18, clearcoatRoughness: 0.45 })
+            : new THREE.MeshMatcapMaterial({ color: new THREE.Color("#a6adb5"), matcap: matcap ?? undefined });
         const f = features;
         const own = {
             uNozL: { value: f.nozzleL.clone() },
@@ -113,21 +117,51 @@ export function KaanAirframe({ surface, features, tier }: { surface: THREE.Buffe
 #include <opaque_fragment>`
                 );
         };
-        m.customProgramCacheKey = () => `kaan-airframe-${tier <= 1 ? "std" : "phys"}`;
+        m.customProgramCacheKey = () => `kaan-airframe-${pbr ? "phys" : "matcap"}`;
         return m;
-    }, [features, tier]);
+    }, [features, pbr, matcap]);
+
+    const mesh = useMemo(() => {
+        const o = new THREE.Mesh(surface, material);
+        o.renderOrder = 0;
+        o.visible = false;
+        return o;
+    }, [surface, material]);
+
+    // Compile off the main thread (KHR_parallel_shader_compile) once the hangar is baked, then
+    // sweep the aircraft in. Until then nothing of it is drawn.
+    useEffect(() => {
+        if (pbr && !env) return;
+        if (material instanceof THREE.MeshStandardMaterial) {
+            material.envMap = env;
+            material.envMapIntensity = 2.1;
+            material.needsUpdate = true;
+        }
+        let live = true;
+        mesh.visible = true;
+        gl.compileAsync(mesh, camera, scene)
+            .catch(() => undefined)
+            .then(() => {
+                if (!live) return;
+                setReady(true);
+                rig.intro = true;
+            });
+        mesh.visible = false;
+        return () => {
+            live = false;
+        };
+    }, [pbr, material, env, mesh, gl, camera, scene]);
 
     useEffect(() => {
-        material.envMap = env;
-        material.envMapIntensity = 2.1;
-        material.needsUpdate = true;
-    }, [material, env]);
+        mesh.visible = ready;
+    }, [mesh, ready]);
 
     useEffect(() => () => material.dispose(), [material]);
+    useEffect(() => () => matcap?.dispose(), [matcap]);
 
     useFrame(() => {
         (material.userData.own as { uSpeed: { value: number } }).uSpeed.value = 0.4 + 0.6 * rig.vAbs;
     });
 
-    return <mesh geometry={surface} material={material} renderOrder={0} />;
+    return <primitive object={mesh} />;
 }
