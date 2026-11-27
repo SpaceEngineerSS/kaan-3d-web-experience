@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { SECTION_IDS, notifyTerminal, terminal } from "@/lib/terminal/state";
+import { MODES, SECTION_IDS, SECTION_MODE, notifyTerminal, setMode, terminal, type Mode } from "@/lib/terminal/state";
 
 /**
  * Feeds the shared terminal store: progress through the pinned 3D track (#track), smoothed scroll
@@ -9,6 +9,10 @@ import { SECTION_IDS, notifyTerminal, terminal } from "@/lib/terminal/state";
  */
 export function TerminalDriver() {
     useEffect(() => {
+        // ?mode=xray pins a mode (used by scripts/capture.mjs); otherwise each section brings its own.
+        const forced = new URLSearchParams(window.location.search).get("mode") as Mode | null;
+        const pinned = forced && (MODES as readonly string[]).includes(forced) ? forced : null;
+        if (pinned) setMode(pinned);
         let lastY = window.scrollY;
         let lastT = performance.now();
         let raf = 0;
@@ -55,6 +59,7 @@ export function TerminalDriver() {
             }
             if (active !== terminal.section) {
                 terminal.section = active;
+                if (!pinned) terminal.mode = SECTION_MODE[active];
                 notifyTerminal();
             }
         };

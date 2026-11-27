@@ -51,8 +51,8 @@ function matrix() {
         shots.push({ name: `kaynaklar-${v.w}`, path: "/kaynaklar", ...v });
     }
     for (const m of MODES) {
-        shots.push({ name: `mode-${m}-1440`, path: "/", scrollTo: "#s02", at: 0.5, mode: m, ...WIDTHS[0] });
-        shots.push({ name: `mode-${m}-390`, path: "/", scrollTo: "#s02", at: 0.5, mode: m, ...WIDTHS[2] });
+        shots.push({ name: `mode-${m}-1440`, path: "/", mode: m, ...WIDTHS[0] });
+        shots.push({ name: `mode-${m}-390`, path: "/", mode: m, ...WIDTHS[2] });
     }
     return shots;
 }

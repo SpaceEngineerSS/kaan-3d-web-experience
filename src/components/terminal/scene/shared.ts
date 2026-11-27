@@ -2,11 +2,14 @@ import * as THREE from "three";
 
 /** Design-system colours (globals.css). */
 export const COLOR = {
-    ink: "#050608",
-    fg: "#ECEFF4",
-    faint: "#646E78",
-    hmd: "#00E575",
-    burn: "#FF3B00",
+    ink: "#08090B",
+    ram: "#1A1D21",
+    fg: "#EAEAE6",
+    steel: "#8C9199",
+    faint: "#6B7078",
+    ti: "#C9B79C",
+    accent: "#E06C2B",
+    burn: "#E06C2B",
 } as const;
 
 export const KAAN_PATH = "/models/KAAN.glb";
@@ -33,6 +36,21 @@ uniform float uScanZ;
 uniform float uScanW;
 float scanBand(float z) {
   return 1.0 - smoothstep(0.0, uScanW, abs(z - uScanZ));
+}
+`;
+
+/** Mode weight at an airframe z: which side of the sweep plane it is on, plus the cut line. */
+export const MODE_GLSL = /* glsl */ `
+uniform vec4 uFrom;
+uniform vec4 uTo;
+uniform float uSweepZ;
+uniform float uSweepW;
+uniform float uSweepOn;
+vec4 modeAt(float z) {
+  return mix(uFrom, uTo, smoothstep(uSweepZ - uSweepW, uSweepZ + uSweepW, z));
+}
+float sweepLine(float z) {
+  return uSweepOn * (1.0 - smoothstep(0.0, uSweepW * 0.35, abs(z - uSweepZ)));
 }
 `;
 
@@ -66,6 +84,7 @@ export function mergeWorldGeometry(root: THREE.Object3D): THREE.BufferGeometry {
     }
     const pos = new Float32Array(count * 3);
     const nor = new Float32Array(count * 3);
+    const glass = new Float32Array(count);
     const v = new THREE.Vector3();
     const n = new THREE.Vector3();
     const nm = new THREE.Matrix3();
@@ -78,6 +97,9 @@ export function mergeWorldGeometry(root: THREE.Object3D): THREE.BufferGeometry {
         const idx = g.index;
         if (!na) missingNormals = true;
         nm.getNormalMatrix(m.matrixWorld);
+        // useModel marks the exported transmissive canopy as a transparent, non-depth-writing surface.
+        const mat = Array.isArray(m.material) ? m.material[0] : m.material;
+        const isGlass = mat.transparent && mat.opacity < 1 ? 1 : 0;
         const c = idx ? idx.count : pa.count;
         for (let i = 0; i < c; i++) {
             const k = idx ? idx.getX(i) : i;
@@ -91,12 +113,14 @@ export function mergeWorldGeometry(root: THREE.Object3D): THREE.BufferGeometry {
                 nor[o * 3 + 1] = n.y;
                 nor[o * 3 + 2] = n.z;
             }
+            glass[o] = isGlass;
             o++;
         }
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     geo.setAttribute("normal", new THREE.BufferAttribute(nor, 3));
+    geo.setAttribute("aGlass", new THREE.BufferAttribute(glass, 1));
     if (missingNormals) geo.computeVertexNormals();
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
@@ -225,6 +249,9 @@ export function makePointGeometry(sampler: { sample: (p: THREE.Vector3, n?: THRE
 const pointsVertex = /* glsl */ `
 ${VERT_PARS}
 ${SCAN_GLSL}
+#ifdef USE_MODE
+${MODE_GLSL}
+#endif
 attribute float aRand;
 uniform float uTime;
 uniform float uSize;
@@ -248,6 +275,9 @@ void main() {
   float near = smoothstep(0.03, 0.16, depth);
   vBand = band;
   vAlpha = (uAlpha * flicker * fade + band * 0.85) * near;
+#ifdef USE_MODE
+  vAlpha *= modeAt(position.z).y;
+#endif
   ${VERT_END}
 }`;
 
@@ -274,9 +304,12 @@ export interface ScanUniforms {
     uScanW: { value: number };
 }
 
-export function createPointsMaterial(shared: ScanUniforms, alpha: number, size: number) {
+/** `mode`: follow the KAAN mode sweep (visible only in X-RAY). The ANKA-3 clouds pass false. */
+export function createPointsMaterial(shared: ScanUniforms, alpha: number, size: number, mode?: Record<string, { value: unknown }>) {
     return new THREE.ShaderMaterial({
+        defines: mode ? { USE_MODE: "" } : {},
         uniforms: {
+            ...(mode ?? {}),
             uTime: shared.uTime,
             uScanZ: shared.uScanZ,
             uScanW: shared.uScanW,
@@ -286,7 +319,7 @@ export function createPointsMaterial(shared: ScanUniforms, alpha: number, size: 
             uAlpha: { value: alpha },
             uOpacity: { value: 1 },
             uFg: { value: new THREE.Color(COLOR.fg) },
-            uHot: { value: new THREE.Color(COLOR.hmd) },
+            uHot: { value: new THREE.Color(COLOR.accent) },
         },
         vertexShader: pointsVertex,
         fragmentShader: pointsFragment,

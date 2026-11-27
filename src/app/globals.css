@@ -104,6 +104,18 @@ canvas {
   touch-action: pan-y;
 }
 
+/* Free orbit: the reading layer steps aside and the canvas takes every gesture. */
+[data-inspect="on"] #track section,
+[data-inspect="on"] [data-overlay] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s;
+}
+
+[data-inspect="on"] #track canvas {
+  touch-action: none;
+}
+
 /* ── Type roles ─────────────────────────────────── */
 /* Monument: the section word that sits behind and around the aircraft. */
 .t-monument {

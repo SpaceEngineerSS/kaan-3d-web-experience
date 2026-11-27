@@ -85,7 +85,7 @@ export function MumT({ features, tier, reduced }: { features: KaanFeatures; tier
         g.setAttribute("aKind", new THREE.BufferAttribute(new Float32Array([0, 0, 0, 0, 1, 1]), 1));
         g.setAttribute("aPhase", new THREE.BufferAttribute(new Float32Array([0, 0, 0.33, 0.33, 0.66, 0.66]), 1));
         const m = new THREE.ShaderMaterial({
-            uniforms: { uTime: { value: 0 }, uOpacity: { value: 0 }, uHot: { value: new THREE.Color(COLOR.hmd) } },
+            uniforms: { uTime: { value: 0 }, uOpacity: { value: 0 }, uHot: { value: new THREE.Color(COLOR.accent) } },
             vertexShader: linkVertex,
             fragmentShader: linkFragment,
             transparent: true,

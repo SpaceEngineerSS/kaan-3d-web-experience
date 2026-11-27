@@ -1,0 +1,159 @@
+{
+  "base": "http://localhost:3210",
+  "date": "2026-11-27T08:49:54.310Z",
+  "consoleErrors": [],
+  "shots": [
+    {
+      "name": "mode-airframe-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "airframe",
+      "fps": 144,
+      "stats": {
+        "calls": 27,
+        "triangles": 26953,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 9,
+        "textures": 21,
+        "programs": 17
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-airframe-390",
+      "path": "/",
+      "width": 390,
+      "mode": "airframe",
+      "fps": 144,
+      "stats": {
+        "calls": 10,
+        "triangles": 26936,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-xray-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "xray",
+      "fps": 143,
+      "stats": {
+        "calls": 25,
+        "triangles": 26949,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 9,
+        "textures": 21,
+        "programs": 17
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-xray-390",
+      "path": "/",
+      "width": 390,
+      "mode": "xray",
+      "fps": 144,
+      "stats": {
+        "calls": 8,
+        "triangles": 26932,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-aero-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "aero",
+      "fps": 144,
+      "stats": {
+        "calls": 27,
+        "triangles": 26953,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 9,
+        "textures": 21,
+        "programs": 17
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-aero-390",
+      "path": "/",
+      "width": 390,
+      "mode": "aero",
+      "fps": 144,
+      "stats": {
+        "calls": 10,
+        "triangles": 26936,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 12
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-eoir-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "eoir",
+      "fps": 144,
+      "stats": {
+        "calls": 25,
+        "triangles": 26949,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 9,
+        "textures": 22,
+        "programs": 17
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "mode-eoir-390",
+      "path": "/",
+      "width": 390,
+      "mode": "eoir",
+      "fps": 144,
+      "stats": {
+        "calls": 8,
+        "triangles": 26932,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 12
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    }
+  ]
+}

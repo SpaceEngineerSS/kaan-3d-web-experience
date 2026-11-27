@@ -32,6 +32,7 @@ export function LeaderLines() {
         const alpha = new Float32Array(SLOTS);
         const shownLabel: string[] = new Array(SLOTS).fill("");
         let raf = 0;
+        const bar = document.querySelector("[data-keepout-bar]");
 
         const tick = () => {
             raf = requestAnimationFrame(tick);
@@ -41,8 +42,11 @@ export function LeaderLines() {
             // Text the labels must never cross: the active section's marked text column.
             const sec = document.getElementById(`s0${terminal.section + 1}`);
             const ko = sec?.querySelector("[data-keepout]")?.getBoundingClientRect();
-            const hit = (x0: number, y0: number, x1: number, y1: number) =>
-                Boolean(ko && ko.width > 0 && x1 > ko.left - 8 && x0 < ko.right + 8 && y1 > ko.top - 8 && y0 < ko.bottom + 8);
+            // ...and the mode bar.
+            const kb = bar?.getBoundingClientRect();
+            const over = (r: DOMRect | undefined, x0: number, y0: number, x1: number, y1: number) =>
+                Boolean(r && r.width > 0 && x1 > r.left - 8 && x0 < r.right + 8 && y1 > r.top - 8 && y0 < r.bottom + 8);
+            const hit = (x0: number, y0: number, x1: number, y1: number) => over(ko, x0, y0, x1, y1) || over(kb, x0, y0, x1, y1);
             const w = rect.width;
             const h = rect.height;
             for (let i = 0; i < SLOTS; i++) {

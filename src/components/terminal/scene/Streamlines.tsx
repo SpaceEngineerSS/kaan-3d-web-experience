@@ -11,8 +11,8 @@ import { rig } from "./rig";
 
 /**
  * Vortex trails shed from the LERX/chine roots, the wing tips and the twin fin tips. Each trail is a
- * helix that grows aft, advected through a precomputed curl-noise field, baked once into line
- * segments; the shader animates flow pulses along it and clips its visible length by scroll speed.
+ * helix that grows aft, advected through a precomputed curl-noise field and baked once into line
+ * segments; all motion (flow pulses, visible length) runs in the shader, nothing is rebuilt per frame.
  */
 
 interface Seed {
@@ -149,7 +149,7 @@ export function Streamlines({ features, tier, reduced }: { features: KaanFeature
                     uAlpha: { value: 0.3 },
                     uFlow: { value: 1 },
                     uFg: { value: new THREE.Color(COLOR.fg) },
-                    uHot: { value: new THREE.Color(COLOR.hmd) },
+                    uHot: { value: new THREE.Color(COLOR.accent) },
                 },
                 vertexShader: vertex,
                 fragmentShader: fragment,
@@ -173,9 +173,10 @@ export function Streamlines({ features, tier, reduced }: { features: KaanFeature
         const still = lite || reduced;
         u.uTime.value = still ? 0 : rig.time;
         u.uFlow.value = still ? 0.35 : 1;
-        u.uLen.value = still ? 0.6 : 0.3 + 0.7 * rig.vAbs;
-        // Strongest in 01 (air superiority), faint from the cockpit and overhead.
-        u.uAlpha.value = (0.16 + 0.34 * rig.vAbs) * (1 - 0.6 * rig.w[2]) * (1 - 0.4 * rig.w[3]) * (1 + 0.4 * rig.w[0]);
+        const aero = rig.m[2];
+        u.uLen.value = still ? 0.6 + 0.4 * aero : Math.min(1, 0.3 + 0.7 * rig.vAbs + 0.7 * aero);
+        // AERO mode owns the trails; in X-RAY they flicker in only while scrolling fast.
+        u.uAlpha.value = (0.5 * aero + 0.22 * rig.vAbs * rig.m[1]) * (1 - 0.6 * rig.w[2]) * (1 - 0.4 * rig.w[3]);
     });
 
     return <lineSegments geometry={geometry} material={material} frustumCulled={false} renderOrder={5} />;

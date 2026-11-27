@@ -12,6 +12,9 @@ import { ShockDiamonds } from "./ShockDiamonds";
 import { MumT } from "./MumT";
 import { Anchors } from "./Anchors";
 import { Stats } from "./Stats";
+import { KaanAirframe } from "./KaanAirframe";
+import { Floor } from "./Floor";
+import { Inspect } from "./Inspect";
 
 const STATS = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("stats");
 
@@ -22,6 +25,8 @@ function Kaan({ tier, reduced }: { tier: Tier; reduced: boolean }) {
         <>
             {/* CameraRig first: its frame callback computes the shared rig state everyone else reads. */}
             <CameraRig features={f} reduced={reduced} />
+            <KaanAirframe surface={data.surface} features={f} tier={tier} />
+            <Floor features={f} tier={tier} />
             <KaanBlueprint data={data} tier={tier} />
             <ShockDiamonds features={f} reduced={reduced} />
             <Streamlines features={f} tier={tier} reduced={reduced} />
@@ -29,6 +34,7 @@ function Kaan({ tier, reduced }: { tier: Tier; reduced: boolean }) {
                 <MumT features={f} tier={tier} reduced={reduced} />
             </Suspense>
             <Anchors features={f} />
+            <Inspect features={f} />
         </>
     );
 }

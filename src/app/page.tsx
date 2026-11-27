@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { StatusBar } from "@/components/shell/StatusBar";
 import { Frame } from "@/components/shell/Frame";
+import { ModeBar } from "@/components/shell/ModeBar";
 import { TerminalDriver } from "@/components/terminal/TerminalDriver";
 import { LeaderLines } from "@/components/terminal/LeaderLines";
 import { S01 } from "@/components/terminal/sections/S01";
@@ -24,6 +25,7 @@ export default function Home() {
         <>
             <StatusBar />
             <Frame />
+            <ModeBar />
             <TerminalDriver />
             <main id="main" className="relative bg-ink">
                 <div id="track" className="relative">

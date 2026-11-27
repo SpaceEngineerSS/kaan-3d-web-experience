@@ -7,9 +7,9 @@ import * as THREE from "three";
 import { MeshSurfaceSampler } from "three-stdlib";
 import { useModel } from "@/lib/three/useModel";
 import type { Tier } from "@/hooks/useDeviceProfile";
-import { analyzeKaan, COLOR, createPointsMaterial, FRAG_END, FRAG_PARS, FRAG_START, KAAN_PATH, KAAN_SIZE, makePointGeometry, mergeWorldGeometry, SCAN_GLSL, VERT_END, VERT_PARS, type KaanFeatures } from "./shared";
+import { analyzeKaan, COLOR, createPointsMaterial, FRAG_END, FRAG_PARS, FRAG_START, KAAN_PATH, KAAN_SIZE, makePointGeometry, mergeWorldGeometry, MODE_GLSL, SCAN_GLSL, VERT_END, VERT_PARS, type KaanFeatures } from "./shared";
 import { buildInternals } from "./internals";
-import { rig, scanUniforms } from "./rig";
+import { modeUniforms, rig, scanUniforms } from "./rig";
 
 export interface KaanData {
     features: KaanFeatures;
@@ -52,13 +52,16 @@ export function useKaanData(tier: Tier): KaanData {
 const edgeVertex = /* glsl */ `
 ${VERT_PARS}
 ${SCAN_GLSL}
+${MODE_GLSL}
 varying float vBand;
 varying float vNear;
+varying float vX;
 void main() {
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * mv;
   vBand = scanBand(position.z);
   vNear = smoothstep(0.03, 0.2, -mv.z);
+  vX = modeAt(position.z).y + sweepLine(position.z);
   ${VERT_END}
 }`;
 
@@ -69,9 +72,10 @@ uniform vec3 uHot;
 uniform float uAlpha;
 varying float vBand;
 varying float vNear;
+varying float vX;
 void main() {
   ${FRAG_START}
-  float a = (uAlpha + vBand * 0.75) * vNear;
+  float a = (uAlpha + vBand * 0.75) * vNear * vX;
   gl_FragColor = vec4(mix(uFg, uHot, vBand), a);
   ${FRAG_END}
 }`;
@@ -81,6 +85,8 @@ void main() {
 const shellVertex = /* glsl */ `
 ${VERT_PARS}
 ${SCAN_GLSL}
+${MODE_GLSL}
+varying float vX;
 varying vec3 vN;
 varying vec3 vV;
 varying float vBand;
@@ -92,6 +98,7 @@ void main() {
   vV = normalize(-mv.xyz);
   vBand = scanBand(position.z);
   vDepth = -mv.z;
+  vX = modeAt(position.z).y;
   ${VERT_END}
 }`;
 
@@ -104,10 +111,11 @@ varying vec3 vN;
 varying vec3 vV;
 varying float vBand;
 varying float vDepth;
+varying float vX;
 void main() {
   ${FRAG_START}
   float rim = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 3.0);
-  float a = rim * uAlpha * (1.0 - vBand) * (1.0 - 0.75 * uReveal) * smoothstep(0.05, 0.35, vDepth);
+  float a = rim * uAlpha * (1.0 - vBand) * (1.0 - 0.75 * uReveal) * smoothstep(0.05, 0.35, vDepth) * vX;
   gl_FragColor = vec4(uFg, a);
   ${FRAG_END}
 }`;
@@ -117,6 +125,8 @@ void main() {
 const internalsVertex = /* glsl */ `
 ${VERT_PARS}
 ${SCAN_GLSL}
+${MODE_GLSL}
+varying float vX;
 attribute float aSpin;
 attribute vec2 aCenter;
 uniform float uTime;
@@ -134,6 +144,7 @@ void main() {
   gl_Position = projectionMatrix * mv;
   vBand = scanBand(position.z);
   vNear = smoothstep(0.03, 0.2, -mv.z);
+  vX = modeAt(position.z).y;
   ${VERT_END}
 }`;
 
@@ -144,10 +155,11 @@ uniform vec3 uFg;
 uniform float uReveal;
 varying float vBand;
 varying float vNear;
+varying float vX;
 void main() {
   ${FRAG_START}
   float v = max(vBand, uReveal * 0.55);
-  float a = v * 0.85 * vNear;
+  float a = v * 0.85 * vNear * vX;
   if (a < 0.003) discard;
   gl_FragColor = vec4(mix(uFg, uHot, 0.35 + 0.65 * vBand), a);
   ${FRAG_END}
@@ -157,7 +169,7 @@ export function KaanBlueprint({ data, tier }: { data: KaanData; tier: Tier }) {
     const n = POINTS_BY_TIER[tier];
     const mats = useMemo(() => {
         const alpha = THREE.MathUtils.clamp(0.1 * Math.sqrt(120_000 / Math.max(n, 1)), 0.1, 0.24);
-        const points = createPointsMaterial(scanUniforms, alpha, 3.0);
+        const points = createPointsMaterial(scanUniforms, alpha, 3.0, modeUniforms);
         const common = {
             transparent: true,
             depthWrite: false,
@@ -166,10 +178,11 @@ export function KaanBlueprint({ data, tier }: { data: KaanData; tier: Tier }) {
         const edges = new THREE.ShaderMaterial({
             ...common,
             uniforms: {
+                ...modeUniforms,
                 uScanZ: scanUniforms.uScanZ,
                 uScanW: scanUniforms.uScanW,
                 uFg: { value: new THREE.Color(COLOR.fg) },
-                uHot: { value: new THREE.Color(COLOR.hmd) },
+                uHot: { value: new THREE.Color(COLOR.accent) },
                 uAlpha: { value: 0.11 },
             },
             vertexShader: edgeVertex,
@@ -179,6 +192,7 @@ export function KaanBlueprint({ data, tier }: { data: KaanData; tier: Tier }) {
             ...common,
             side: THREE.DoubleSide,
             uniforms: {
+                ...modeUniforms,
                 uScanZ: scanUniforms.uScanZ,
                 uScanW: scanUniforms.uScanW,
                 uReveal: scanUniforms.uReveal,
@@ -191,12 +205,13 @@ export function KaanBlueprint({ data, tier }: { data: KaanData; tier: Tier }) {
         const internals = new THREE.ShaderMaterial({
             ...common,
             uniforms: {
+                ...modeUniforms,
                 uTime: scanUniforms.uTime,
                 uScanZ: scanUniforms.uScanZ,
                 uScanW: scanUniforms.uScanW,
                 uReveal: scanUniforms.uReveal,
                 uFg: { value: new THREE.Color(COLOR.fg) },
-                uHot: { value: new THREE.Color(COLOR.hmd) },
+                uHot: { value: new THREE.Color(COLOR.accent) },
             },
             vertexShader: internalsVertex,
             fragmentShader: internalsFragment,

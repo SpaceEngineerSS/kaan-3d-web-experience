@@ -1,26 +1,29 @@
 "use client";
+/* eslint-disable react-hooks/immutability -- the camera and rig state are mutated in the render loop by design. */
 
 import { useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { terminal } from "@/lib/terminal/state";
+import { MODES, terminal } from "@/lib/terminal/state";
 import type { KaanFeatures } from "./shared";
-import { rig, scanUniforms, sectionWeight } from "./rig";
+import { modeUniforms, rig, scanUniforms, sectionWeight } from "./rig";
 
 const V = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 
 /**
- * Camera keyframes and the track progress at which each is reached:
- *  .00 01 hero 3/4 front            .14 01 chine / LERX close-up
- *  .27 02 under the wing            .40 02 under the belly, looking up into the bay
- *  .52 03 settling into the seat    .60 03 first person over the nose   .70 03 (hold)
- *  .80 04 climbing out              .92 04 overhead MUM-T               1.0 04 overhead, drifting
+ * Camera keyframes and the track progress at which each is reached. AIRFRAME (PBR) views stay at
+ * ≥ 1.6 L because the model is low-poly; close-ups happen in X-RAY / EOIR where the point cloud reads.
+ *  .00 01 hero 3/4 front, below eye level   .14 01 slow orbit to the chine, still ~1.7 L
+ *  .27 02 under the wing (X-RAY)            .40 02 under the belly, looking up into the bay
+ *  .52 03 settling into the seat (EOIR)     .60 03 first person over the nose   .70 03 (hold)
+ *  .80 04 climbing out                      .92 04 overhead MUM-T at ~5 L      1.0 04 drifting
  */
 const TIMES = [0, 0.14, 0.27, 0.4, 0.52, 0.6, 0.7, 0.8, 0.92, 1];
 /** Reduced motion: one still frame per section. */
 const STILLS = [0, 0.4, 0.66, 0.92];
+/** Mode sweep duration, seconds. */
+const SWEEP = 0.9;
 
-/** Track progress → uniform curve parameter (keyframe k sits at k / (n − 1)). */
 function toCurveU(p: number) {
     const n = TIMES.length - 1;
     for (let i = 0; i < n; i++) {
@@ -33,20 +36,20 @@ function buildCurves(f: KaanFeatures) {
     const eye = f.eye;
     const ahead = (d: number) => V(0, eye.y - 0.06 * d, eye.z + d);
     const pos = [
-        V(2.35, 0.78, 2.55),
-        V(0.78, 0.2, f.lerx.z + 0.62),
+        V(2.6, 0.42, 2.75),
+        V(2.4, 0.62, 0.9),
         V(1.05, -0.42, -0.25),
         V(0.32, f.bellyY - 0.62, f.bay.z + 0.32),
         V(0, eye.y + 0.035, eye.z - 0.11),
         V(0, eye.y, eye.z),
         V(0, eye.y + 0.004, eye.z + 0.012),
         V(0.5, 2.4, -2.3),
-        V(0.35, 4.5, -1.75),
-        V(-0.35, 5.1, -0.85),
+        V(0.35, 5.6, -2.1),
+        V(-0.35, 6.2, -1.1),
     ];
     const look = [
-        V(0, -0.02, 0.05),
-        V(f.lerx.x * 0.55, f.lerx.y, f.lerx.z + 0.05),
+        V(0, -0.06, 0.1),
+        V(0.1, 0, 0.2),
         V(0.35, -0.05, 0.05),
         V(0, f.bellyY, f.bay.z),
         ahead(3),
@@ -62,27 +65,88 @@ function buildCurves(f: KaanFeatures) {
     };
 }
 
+/**
+ * Critically damped spring step (ζ = 1): no overshoot, settles in ~4/ω seconds.
+ * x'' = ω²(target − x) − 2ω x'. Sub-stepped so a long frame cannot destabilise it.
+ */
+let springV = 0;
+function spring(x: number, v: number, target: number, omega: number, dt: number) {
+    const steps = Math.ceil(dt / (1 / 120));
+    const h = dt / steps;
+    for (let i = 0; i < steps; i++) {
+        v += (omega * omega * (target - x) - 2 * omega * v) * h;
+        x += v * h;
+    }
+    springV = v;
+    return x;
+}
+
+const easeSweep = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+const ONE_HOT = [new THREE.Vector4(1, 0, 0, 0), new THREE.Vector4(0, 1, 0, 0), new THREE.Vector4(0, 0, 1, 0), new THREE.Vector4(0, 0, 0, 1)];
+
 export function CameraRig({ features, reduced }: { features: KaanFeatures; reduced: boolean }) {
     const curves = useMemo(() => buildCurves(features), [features]);
-    const tmp = useMemo(() => ({ pos: new THREE.Vector3(), look: new THREE.Vector3(), off: new THREE.Vector3(), fwd: new THREE.Vector3(), right: new THREE.Vector3(), up: new THREE.Vector3() }), []);
+    const s = useMemo(
+        () => ({
+            pos: new THREE.Vector3(),
+            look: new THREE.Vector3(),
+            lookS: new THREE.Vector3(0, -0.06, 0.1),
+            lookV: new THREE.Vector3(),
+            off: new THREE.Vector3(),
+            fwd: new THREE.Vector3(),
+            right: new THREE.Vector3(),
+            up: new THREE.Vector3(),
+            exitPos: new THREE.Vector3(),
+            exitQuat: new THREE.Quaternion(),
+            q: new THREE.Quaternion(),
+            pv: 0,
+            inspectV: 0,
+            wasInspecting: false,
+        }),
+        []
+    );
 
     useFrame((state, delta) => {
         const dt = Math.min(delta, 0.1);
         const cam = state.camera as THREE.PerspectiveCamera;
         const f = features;
 
-        // Progress, velocity, section weights.
+        // Track progress through a critically damped spring; velocity for roll / FOV.
         const target = THREE.MathUtils.clamp(terminal.track, 0, 1);
-        rig.p = reduced ? STILLS[Math.min(3, Math.floor(target * 4))] : THREE.MathUtils.damp(rig.p, target, 3.2, dt);
+        if (reduced) {
+            rig.p = STILLS[Math.min(3, Math.floor(target * 4))];
+            s.pv = 0;
+        } else {
+            rig.p = spring(rig.p, s.pv, target, 6, dt);
+            s.pv = springV;
+        }
         const vt = THREE.MathUtils.clamp(terminal.velocity / 2500, -1, 1);
         rig.v = reduced ? 0 : THREE.MathUtils.damp(rig.v, vt, 4, dt);
         rig.vAbs = Math.abs(rig.v);
         for (let i = 0; i < 4; i++) rig.w[i] = sectionWeight(i, rig.p);
         const [, w1, w2] = rig.w;
 
-        // Clock and scan sweep (nose → tail). Reduced motion: no clock; the scan follows the track.
-        const zHi = f.box.max.z + 0.08;
-        const zLo = f.box.min.z - 0.08;
+        // Mode sweep: a plane travels nose → tail; reduced motion switches at once.
+        const zHi = f.box.max.z + 0.1;
+        const zLo = f.box.min.z - 0.1;
+        const want = MODES.indexOf(terminal.mode);
+        if (want !== rig.modeTo) {
+            rig.modeFrom = rig.modeTo;
+            rig.modeTo = want;
+            rig.sweep = reduced ? 1 : 0;
+            modeUniforms.uFrom.value.copy(ONE_HOT[rig.modeFrom]);
+            modeUniforms.uTo.value.copy(ONE_HOT[rig.modeTo]);
+        }
+        if (rig.sweep < 1) rig.sweep = Math.min(1, rig.sweep + dt / SWEEP);
+        const e = easeSweep(rig.sweep);
+        modeUniforms.uSweepZ.value = rig.sweep >= 1 ? zLo - 1 : THREE.MathUtils.lerp(zHi, zLo, e);
+        modeUniforms.uSweepOn.value = rig.sweep >= 1 ? 0 : 1;
+        modeUniforms.uSweepW.value = f.L * 0.035;
+        if (rig.sweep >= 1) modeUniforms.uFrom.value.copy(ONE_HOT[rig.modeTo]);
+        for (let k = 0; k < 4; k++) rig.m[k] = THREE.MathUtils.lerp(ONE_HOT[rig.modeFrom].getComponent(k), ONE_HOT[rig.modeTo].getComponent(k), e);
+
+        // Clock and the X-RAY scan band.
         if (!reduced) {
             rig.time += dt;
             rig.scanPhase += dt * (0.17 + 0.12 * rig.vAbs) * (1 - 0.45 * w1);
@@ -94,33 +158,67 @@ export function CameraRig({ features, reduced }: { features: KaanFeatures; reduc
         scanUniforms.uScanW.value = f.L * (0.03 + 0.025 * w1);
         scanUniforms.uReveal.value = w1;
 
-        // Camera along the splines.
+        // Free orbit: OrbitControls owns the camera; on exit blend back to the spline.
+        if (terminal.inspect) {
+            s.wasInspecting = true;
+            rig.inspect = 1;
+            s.inspectV = 0;
+            return;
+        }
+        if (s.wasInspecting) {
+            s.wasInspecting = false;
+            s.exitPos.copy(cam.position);
+            s.exitQuat.copy(cam.quaternion);
+        }
+        if (rig.inspect > 0.0005) {
+            rig.inspect = spring(rig.inspect, s.inspectV, 0, 5, dt);
+            s.inspectV = springV;
+        } else rig.inspect = 0;
+
+        // Camera along the splines; the look target trails on a slower spring.
         const u = toCurveU(rig.p);
-        curves.pos.getPoint(u, tmp.pos);
-        curves.look.getPoint(u, tmp.look);
+        curves.pos.getPoint(u, s.pos);
+        curves.look.getPoint(u, s.look);
+        if (reduced) s.lookS.copy(s.look);
+        else {
+            const w = 9;
+            const k = dt;
+            s.lookV.x += (w * w * (s.look.x - s.lookS.x) - 2 * w * s.lookV.x) * k;
+            s.lookV.y += (w * w * (s.look.y - s.lookS.y) - 2 * w * s.lookV.y) * k;
+            s.lookV.z += (w * w * (s.look.z - s.lookS.z) - 2 * w * s.lookV.z) * k;
+            s.lookS.addScaledVector(s.lookV, k);
+        }
 
         // Portrait screens: pull out (not in the cockpit).
         const aspect = state.size.width / Math.max(state.size.height, 1);
-        const k = 1 + (Math.pow(Math.max(1, 1 / aspect), 0.8) - 1) * (1 - w2);
-        tmp.off.subVectors(tmp.pos, tmp.look).multiplyScalar(k);
-        tmp.pos.copy(tmp.look).add(tmp.off);
+        const kz = 1 + (Math.pow(Math.max(1, 1 / aspect), 0.8) - 1) * (1 - w2);
+        s.off.subVectors(s.pos, s.lookS).multiplyScalar(kz);
+        s.pos.copy(s.lookS).add(s.off);
 
-        // Tiny pointer parallax in camera space.
+        // Damped pointer parallax in camera space.
         if (!reduced) {
-            const dist = tmp.off.length();
-            tmp.fwd.copy(tmp.off).negate().normalize();
-            tmp.right.crossVectors(tmp.fwd, cam.up).normalize();
-            tmp.up.crossVectors(tmp.right, tmp.fwd);
-            const amp = dist * 0.018 * (1 - 0.7 * w2);
-            tmp.pos.addScaledVector(tmp.right, terminal.px * amp).addScaledVector(tmp.up, -terminal.py * amp * 0.7);
+            const dist = s.off.length();
+            s.fwd.copy(s.off).negate().normalize();
+            s.right.crossVectors(s.fwd, cam.up).normalize();
+            s.up.crossVectors(s.right, s.fwd);
+            rig.px = THREE.MathUtils.damp(rig.px, terminal.px, 2.5, dt);
+            rig.py = THREE.MathUtils.damp(rig.py, terminal.py, 2.5, dt);
+            const amp = dist * 0.02 * (1 - 0.7 * w2);
+            s.pos.addScaledVector(s.right, rig.px * amp).addScaledVector(s.up, -rig.py * amp * 0.7);
         }
 
-        cam.position.copy(tmp.pos);
+        cam.position.copy(s.pos);
         cam.up.set(0, 1, 0);
-        cam.lookAt(tmp.look);
+        cam.lookAt(s.lookS);
+        rig.look.copy(s.lookS);
         if (!reduced) cam.rotateZ(THREE.MathUtils.degToRad(6) * rig.v);
+        if (rig.inspect > 0) {
+            s.q.copy(cam.quaternion);
+            cam.position.lerpVectors(s.pos, s.exitPos, rig.inspect);
+            cam.quaternion.slerpQuaternions(s.q, s.exitQuat, rig.inspect);
+        }
 
-        const fov = THREE.MathUtils.lerp(38, 60, w2) + (reduced ? 0 : 4 * rig.v);
+        const fov = THREE.MathUtils.lerp(36, 60, w2) + (reduced ? 0 : 4 * rig.v);
         if (Math.abs(cam.fov - fov) > 0.01) {
             cam.fov = fov;
             cam.updateProjectionMatrix();
