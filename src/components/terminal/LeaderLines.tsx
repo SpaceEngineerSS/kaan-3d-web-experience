@@ -105,7 +105,7 @@ export function LeaderLines() {
                 <g key={i} data-slot={i} style={{ display: "none" }}>
                     <polyline stroke="rgba(236,239,244,0.55)" strokeWidth={1} shapeRendering="crispEdges" />
                     <path stroke="var(--color-fg)" strokeWidth={1} shapeRendering="crispEdges" />
-                    <text className="t-tele" fill="var(--color-fg-2)" />
+                    <text className="t-tele" fill="var(--color-fg)" stroke="var(--color-ink)" strokeWidth={5} strokeLinejoin="round" paintOrder="stroke" />
                 </g>
             ))}
         </svg>

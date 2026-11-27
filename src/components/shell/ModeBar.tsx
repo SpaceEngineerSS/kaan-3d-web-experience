@@ -35,9 +35,21 @@ function lockScroll(on: boolean) {
 /** Inspection modes for the pinned scene (keys 1–4) and free orbit (I). Shown while the 3D track is on screen. */
 export function ModeBar() {
     const { locale } = useLanguage();
-    const mode = useSyncExternalStore(subscribeTerminal, () => terminal.mode, () => "airframe" as Mode);
-    const section = useSyncExternalStore(subscribeTerminal, () => terminal.section, () => 0);
-    const inspect = useSyncExternalStore(subscribeTerminal, () => terminal.inspect, () => false);
+    const mode = useSyncExternalStore(
+        subscribeTerminal,
+        () => terminal.mode,
+        () => "airframe" as Mode,
+    );
+    const section = useSyncExternalStore(
+        subscribeTerminal,
+        () => terminal.section,
+        () => 0,
+    );
+    const inspect = useSyncExternalStore(
+        subscribeTerminal,
+        () => terminal.inspect,
+        () => false,
+    );
     const inTrack = section < 4;
 
     const choose = (m: Mode) => {
@@ -83,11 +95,12 @@ export function ModeBar() {
 
     return (
         <div
-            className={`fixed inset-x-0 bottom-0 z-[45] flex justify-center transition-opacity duration-300 sm:bottom-8 ${inTrack ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            className={`fixed inset-x-0 bottom-0 z-[45] transition-opacity duration-300 lg:inset-x-auto lg:bottom-auto lg:right-12 lg:top-1/2 lg:-translate-y-1/2 ${inTrack ? "opacity-100" : "pointer-events-none opacity-0"}`}
             aria-hidden={!inTrack}
         >
-            <div data-keepout-bar className="flex w-full flex-col items-stretch border-t border-edge-2 bg-ink-2 sm:w-auto sm:border">
-                <div role="group" aria-label={locale === "tr" ? "İnceleme modu" : "Inspection mode"} className="flex overflow-x-auto">
+            <div data-keepout-bar className="border-t border-edge-2 bg-ink-2 lg:w-44 lg:border">
+                <p className="t-tele hidden border-b border-edge px-3 py-2 text-faint lg:block">{locale === "tr" ? "İNCELEME" : "INSPECTION"}</p>
+                <div role="group" aria-label={locale === "tr" ? "İnceleme modu" : "Inspection mode"} className="flex overflow-x-auto lg:flex-col">
                     {MODES.map((m, i) => (
                         <button
                             key={m}
@@ -95,11 +108,11 @@ export function ModeBar() {
                             aria-pressed={mode === m}
                             onClick={() => choose(m)}
                             tabIndex={inTrack ? 0 : -1}
-                            className={`t-tele relative flex min-h-11 flex-1 items-center gap-2 whitespace-nowrap border-r border-edge px-4 transition-colors hover:text-fg sm:flex-none ${mode === m ? "text-fg" : ""}`}
+                            className={`t-tele relative flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap border-r border-edge px-3 transition-colors hover:text-fg lg:justify-start lg:border-b lg:border-r-0 ${mode === m ? "text-fg" : ""}`}
                         >
                             <span className={mode === m ? "text-accent" : "text-faint"}>{i + 1}</span>
-                            {LABEL[m][locale]}
-                            {mode === m && <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-accent" />}
+                            <span>{LABEL[m][locale]}</span>
+                            {mode === m && <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-accent lg:inset-y-0 lg:left-0 lg:right-auto lg:h-auto lg:w-px" />}
                         </button>
                     ))}
                     <button
@@ -107,13 +120,13 @@ export function ModeBar() {
                         aria-pressed={inspect}
                         onClick={toggleInspect}
                         tabIndex={inTrack ? 0 : -1}
-                        className={`t-tele flex min-h-11 items-center gap-2 whitespace-nowrap px-4 transition-colors hover:text-fg ${inspect ? "text-accent" : ""}`}
+                        className={`t-tele flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-3 transition-colors hover:text-fg lg:justify-start ${inspect ? "text-accent" : ""}`}
                     >
                         <span className="text-faint">I</span>
-                        {inspect ? (locale === "tr" ? "ÇIK" : "EXIT") : locale === "tr" ? "İNCELE" : "INSPECT"}
+                        <span>{inspect ? (locale === "tr" ? "ÇIK" : "EXIT") : locale === "tr" ? "İNCELE" : "INSPECT"}</span>
                     </button>
                 </div>
-                <p className="t-tele hidden border-t border-edge px-4 py-1.5 text-faint sm:block" aria-live="polite">
+                <p className="t-tele hidden border-t border-edge px-3 py-2 normal-case leading-snug tracking-[0.02em] text-muted lg:block" aria-live="polite">
                     {inspect ? (locale === "tr" ? "Sürükleyerek döndürün · Esc ile çıkın" : "Drag to orbit · Esc to exit") : HINT[mode][locale]}
                 </p>
             </div>

@@ -13,7 +13,7 @@ function hideAnchors() {
 
 const Stage = dynamic(() => import("./scene/Stage").then((m) => m.Stage), {
     ssr: false,
-    loading: () => <div className="absolute inset-0 bg-ink" aria-hidden />,
+    loading: () => <div className="absolute inset-0" aria-hidden />,
 });
 
 const POSTER_ALT = {
@@ -73,11 +73,11 @@ export function Scene() {
     const profile = useDeviceProfile();
     const active = useActive();
 
-    if (!profile.ready) return <div className="absolute inset-0 bg-ink" aria-hidden />;
+    if (!profile.ready) return <div className="absolute inset-0" aria-hidden />;
     if (profile.tier === 0) return <Poster />;
 
     return (
-        <div className="absolute inset-0 bg-ink">
+        <div className="absolute inset-0">
             <ErrorBoundary fallback={<Poster />}>
                 <Stage profile={profile} active={active} />
             </ErrorBoundary>

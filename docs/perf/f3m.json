@@ -1,0 +1,200 @@
+{
+  "base": "http://localhost:3210",
+  "date": "2026-11-27T09:12:54.979Z",
+  "consoleErrors": [],
+  "shots": [
+    {
+      "name": "s01-390",
+      "path": "/",
+      "width": 390,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 10,
+        "triangles": 26936,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 4,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 3
+    },
+    {
+      "name": "s02-390",
+      "path": "/",
+      "width": 390,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 8,
+        "triangles": 26932,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 4,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 0
+    },
+    {
+      "name": "s03-390",
+      "path": "/",
+      "width": 390,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 8,
+        "triangles": 26932,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 4,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "s04-390",
+      "path": "/",
+      "width": 390,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 11,
+        "triangles": 26932,
+        "points": 90000,
+        "lines": 8183,
+        "geometries": 10,
+        "textures": 4,
+        "programs": 15
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 0
+    },
+    {
+      "name": "s05-390",
+      "path": "/",
+      "width": 390,
+      "mode": null,
+      "fps": 143,
+      "stats": {
+        "calls": 11,
+        "triangles": 26932,
+        "points": 90000,
+        "lines": 8183,
+        "geometries": 10,
+        "textures": 4,
+        "programs": 15
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "mum-t-390",
+      "path": "/mum-t",
+      "width": 390,
+      "mode": null,
+      "fps": 143,
+      "stats": null,
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "kaynaklar-390",
+      "path": "/kaynaklar",
+      "width": 390,
+      "mode": null,
+      "fps": 142,
+      "stats": null,
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "mode-airframe-390",
+      "path": "/",
+      "width": 390,
+      "mode": "airframe",
+      "fps": 144,
+      "stats": {
+        "calls": 10,
+        "triangles": 26936,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 4,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 3
+    },
+    {
+      "name": "mode-xray-390",
+      "path": "/",
+      "width": 390,
+      "mode": "xray",
+      "fps": 144,
+      "stats": {
+        "calls": 8,
+        "triangles": 26932,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 3
+    },
+    {
+      "name": "mode-aero-390",
+      "path": "/",
+      "width": 390,
+      "mode": "aero",
+      "fps": 144,
+      "stats": {
+        "calls": 10,
+        "triangles": 26936,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 3
+    },
+    {
+      "name": "mode-eoir-390",
+      "path": "/",
+      "width": 390,
+      "mode": "eoir",
+      "fps": 144,
+      "stats": {
+        "calls": 8,
+        "triangles": 26932,
+        "points": 60000,
+        "lines": 8180,
+        "geometries": 8,
+        "textures": 5,
+        "programs": 13
+      },
+      "overflow": false,
+      "blocks": 1,
+      "labels": 3
+    }
+  ]
+}

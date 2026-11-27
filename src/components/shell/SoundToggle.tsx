@@ -6,7 +6,11 @@ import { subscribeTerminal, terminal } from "@/lib/terminal/state";
 
 export function SoundToggle({ className = "" }: { className?: string }) {
     const { locale } = useLanguage();
-    const on = useSyncExternalStore(subscribeTerminal, () => terminal.sound, () => false);
+    const on = useSyncExternalStore(
+        subscribeTerminal,
+        () => terminal.sound,
+        () => false,
+    );
 
     const toggle = async () => {
         // The audio graph is only downloaded and built after the first click.

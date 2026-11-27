@@ -1,10 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
 import type { Tier } from "@/hooks/useDeviceProfile";
-import { COLOR } from "./shared";
 import { KaanBlueprint, useKaanData } from "./KaanBlueprint";
 import { CameraRig } from "./CameraRig";
 import { Streamlines } from "./Streamlines";
@@ -43,18 +40,10 @@ function Kaan({ tier, reduced }: { tier: Tier; reduced: boolean }) {
 export function World({ tier, reduced }: { tier: Tier; reduced: boolean }) {
     return (
         <>
-            <color attach="background" args={[COLOR.ink]} />
             {STATS && <Stats />}
             <Suspense fallback={null}>
                 <Kaan tier={tier} reduced={reduced} />
             </Suspense>
-            {tier === 3 && (
-                <EffectComposer multisampling={0}>
-                    <Bloom luminanceThreshold={0.55} luminanceSmoothing={0.2} intensity={0.55} mipmapBlur />
-                    <Noise opacity={reduced ? 0 : 0.035} premultiply blendFunction={BlendFunction.SCREEN} />
-                    <Vignette offset={0.3} darkness={0.65} />
-                </EffectComposer>
-            )}
         </>
     );
 }

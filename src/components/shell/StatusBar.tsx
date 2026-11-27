@@ -33,8 +33,16 @@ export function StatusBar({ items }: { items?: ShellItem[] }) {
     const { locale, setLocale } = useLanguage();
     const path = usePathname();
     const home = path === "/";
-    const section = useSyncExternalStore(subscribeTerminal, () => terminal.section, () => 0);
-    const hud = useSyncExternalStore(subscribeTerminal, () => terminal.telemetry, () => true);
+    const section = useSyncExternalStore(
+        subscribeTerminal,
+        () => terminal.section,
+        () => 0,
+    );
+    const hud = useSyncExternalStore(
+        subscribeTerminal,
+        () => terminal.telemetry,
+        () => true,
+    );
     const [open, setOpen] = useState(false);
 
     const index: ShellItem[] = items ?? (home ? SECTION_IDS.map((id, i) => ({ href: `#${id}`, label: HOME_SECTIONS[i] })) : []);

@@ -131,7 +131,7 @@ const PROBE = (ms) => `(async () => {
   const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
     return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && cs.visibility !== "hidden" && Number(cs.opacity) > 0.05; };
   const blocks = [...document.querySelectorAll("[data-read]")].filter(vis).length;
-  const labels = [...document.querySelectorAll("svg [data-slot]")].filter((el) => el.style.display !== "none" && Number(el.style.opacity || 1) > 0.05).length;
+  const labels = [...document.querySelectorAll("svg [data-slot]")].filter((el) => el.style.display !== "none" && Number(el.style.opacity || 1) > 0.05 && el.getBoundingClientRect().width > 0).length;
   return { fps, stats: window.__kaanStats ? { ...window.__kaanStats } : null,
     overflow: document.documentElement.scrollWidth > innerWidth, blocks, labels };
 })()`;

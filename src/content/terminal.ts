@@ -32,11 +32,9 @@ export const leaderLabels: L<LeaderSpec[][]> = {
             { anchor: "intake", label: "S-KANAL HAVA ALIĞI", dy: -52, side: 1 },
             { anchor: "bay", label: "İÇ SİLAH YUVASI · 8 İST. (BİLDİRİLEN)", dy: 56, side: 1 },
             { anchor: "eots", label: "TOYGUN 100 · EOTS (P1)", dy: 92, side: 1 },
-            { anchor: "lerx", label: "LERX / CHINE", dy: -90, side: 1 },
         ],
         [{ anchor: "canopy", label: "TULGAR · 40°×32°", dy: -60 }],
         [
-            { anchor: "kaanNode", label: "KAAN · GÖREV KOMUTANI", dy: -48 },
             { anchor: "anka1", label: "ANKA-3 · 01", dy: -40 },
             { anchor: "anka2", label: "ANKA-3 · 02", dy: 44 },
             { anchor: "kizilelma", label: "KIZILELMA · KONSEPT", dy: 48 },
@@ -53,11 +51,9 @@ export const leaderLabels: L<LeaderSpec[][]> = {
             { anchor: "intake", label: "S-DUCT INTAKE", dy: -52, side: 1 },
             { anchor: "bay", label: "INTERNAL BAY · 8 STN (REPORTED)", dy: 56, side: 1 },
             { anchor: "eots", label: "TOYGUN 100 · EOTS (P1)", dy: 92, side: 1 },
-            { anchor: "lerx", label: "LERX / CHINE", dy: -90, side: 1 },
         ],
         [{ anchor: "canopy", label: "TULGAR · 40°×32°", dy: -60 }],
         [
-            { anchor: "kaanNode", label: "KAAN · MISSION COMMANDER", dy: -48 },
             { anchor: "anka1", label: "ANKA-3 · 01", dy: -40 },
             { anchor: "anka2", label: "ANKA-3 · 02", dy: 44 },
             { anchor: "kizilelma", label: "KIZILELMA · CONCEPT", dy: 48 },
@@ -76,6 +72,8 @@ export const s01Copy: L<{
     thrust: { k: string; v: string };
     open: string;
     close: string;
+    logMore: string;
+    logLess: string;
     feedLabel: string;
     caption: string;
     stillAlt: string;
@@ -96,8 +94,10 @@ export const s01Copy: L<{
             { k: "ESKORT", v: "F-16D" },
         ],
         thrust: { k: "İTKİ", v: "2 × F110-GE-129 · 13.150 KGF / 29.000 LBF AY" },
-        open: "GÖRÜNTÜ TELEMETRİSİNİ AÇ",
-        close: "GÖRÜNTÜ TELEMETRİSİNİ KAPAT",
+        open: "P0 GÖRÜNTÜSÜ",
+        close: "GÖRÜNTÜYÜ KAPAT",
+        logMore: "TÜM KAYIT",
+        logLess: "KISA KAYIT",
         feedLabel: "TUSAŞ P0 uçuş testi görüntüsü, termal kamera görünümüne benzetilmiş gri tonlu işlemle",
         caption: "TUSAŞ · P0 uçuş testi, 2024",
         stillAlt: "KAAN P0 uçuşta, takip uçağından çekilmiş gri tonlu kare (TUSAŞ, 2024)",
@@ -118,8 +118,10 @@ export const s01Copy: L<{
             { k: "CHASE", v: "F-16D" },
         ],
         thrust: { k: "THRUST", v: "2 × F110-GE-129 · 13,150 KGF / 29,000 LBF AB" },
-        open: "OPEN IMAGE TELEMETRY",
-        close: "CLOSE IMAGE TELEMETRY",
+        open: "P0 FOOTAGE",
+        close: "CLOSE FOOTAGE",
+        logMore: "FULL LOG",
+        logLess: "SHORT LOG",
         feedLabel: "Turkish Aerospace P0 flight-test footage, processed in grayscale to resemble a thermal camera view",
         caption: "Turkish Aerospace · P0 flight test, 2024",
         stillAlt: "KAAN P0 in flight seen from the chase aircraft, grayscale still (Turkish Aerospace, 2024)",
@@ -133,6 +135,7 @@ export const s02Copy: L<{
     title: string;
     paragraphs: string[];
     pinsTitle: string;
+    pinsLink: string;
     pins: { name: string; sub: string; status: string }[];
     note: string;
 }> = {
@@ -145,6 +148,7 @@ export const s02Copy: L<{
             "Silahlar gövde içindeki yuvalarda taşınır. Yuva ölçüleri açıklanmadı; aşağıdaki durumlar basında yer aldığı hâliyle.",
         ],
         pinsTitle: "İŞARETLER // DURUM",
+        pinsLink: "SENSÖR VE SİLAH LEVHASI → 05",
         pins: [
             { name: "GÖKDOĞAN", sub: "TÜBİTAK SAGE · GÖRÜŞ ÖTESİ HAVA-HAVA", status: "PLANLANAN · BASINDA" },
             { name: "BOZDOĞAN", sub: "TÜBİTAK SAGE · GÖRÜŞ İÇİ HAVA-HAVA", status: "PLANLANAN · BASINDA" },
@@ -164,6 +168,7 @@ export const s02Copy: L<{
             "Weapons ride in internal bays. Bay dimensions are unpublished; the status below is as reported.",
         ],
         pinsTitle: "MARKERS // STATUS",
+        pinsLink: "SENSOR AND WEAPON PLATE → 05",
         pins: [
             { name: "GÖKDOĞAN", sub: "TÜBİTAK SAGE · BEYOND-VISUAL-RANGE AAM", status: "PLANNED · REPORTED" },
             { name: "BOZDOĞAN", sub: "TÜBİTAK SAGE · WITHIN-VISUAL-RANGE AAM", status: "PLANNED · REPORTED" },
@@ -338,4 +343,10 @@ export const s04Copy: L<{
         },
         link: "/MUM-T // FULL ANALYSIS",
     },
+};
+
+/** The monument word behind the aircraft in each pinned section. */
+export const monuments: L<string[]> = {
+    tr: ["KAAN", "GÖVDE", "KOKPİT", "MUM-T"],
+    en: ["KAAN", "AIRFRAME", "COCKPIT", "MUM-T"],
 };

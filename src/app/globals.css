@@ -116,6 +116,7 @@ canvas {
   touch-action: none;
 }
 
+@layer components {
 /* ── Type roles ─────────────────────────────────── */
 /* Monument: the section word that sits behind and around the aircraft. */
 .t-monument {
@@ -205,6 +206,7 @@ canvas {
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
+}
 }
 
 .hair {

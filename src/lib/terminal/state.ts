@@ -11,7 +11,7 @@ export const MODES = ["airframe", "xray", "aero", "eoir"] as const;
 export type Mode = (typeof MODES)[number];
 
 /** The inspection mode each section opens in; the mode bar can override it until the section changes. */
-export const SECTION_MODE: Mode[] = ["airframe", "xray", "eoir", "airframe", "airframe"];
+export const SECTION_MODE: Mode[] = ["airframe", "xray", "xray", "airframe", "airframe"];
 
 export interface Anchor {
     /** Screen position in CSS px, relative to the viewport. */

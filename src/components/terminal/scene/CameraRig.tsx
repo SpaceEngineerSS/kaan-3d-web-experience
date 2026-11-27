@@ -102,6 +102,9 @@ export function CameraRig({ features, reduced }: { features: KaanFeatures; reduc
             q: new THREE.Quaternion(),
             pv: 0,
             inspectV: 0,
+            lift: -1,
+            vw: 0,
+            vh: 0,
             wasInspecting: false,
         }),
         []
@@ -218,9 +221,21 @@ export function CameraRig({ features, reduced }: { features: KaanFeatures; reduc
             cam.quaternion.slerpQuaternions(s.q, s.exitQuat, rig.inspect);
         }
 
-        const fov = THREE.MathUtils.lerp(36, 60, w2) + (reduced ? 0 : 4 * rig.v);
-        if (Math.abs(cam.fov - fov) > 0.01) {
+        // Portrait: widen the lens too, so a side-on airframe still fits the narrow width.
+        const portrait = Math.min(1.45, Math.pow(Math.max(1, 1 / aspect), 0.5));
+        const fov = THREE.MathUtils.lerp(36 * portrait, 60, w2) + (reduced ? 0 : 4 * rig.v);
+        // Portrait phones: lift the image so the aircraft sits in the upper part of the screen, clear
+        // of the reading blocks that scroll through the lower half. Not in the cockpit view.
+        const lift = aspect < 0.8 ? 0.18 * (1 - w2) : 0;
+        const W = state.size.width;
+        const H = state.size.height;
+        if (Math.abs(lift - s.lift) > 0.002 || Math.abs(cam.fov - fov) > 0.01 || W !== s.vw || H !== s.vh) {
+            s.lift = lift;
+            s.vw = W;
+            s.vh = H;
             cam.fov = fov;
+            if (lift > 0) cam.setViewOffset(W, H, 0, lift * H, W, H);
+            else cam.clearViewOffset();
             cam.updateProjectionMatrix();
         }
     });
