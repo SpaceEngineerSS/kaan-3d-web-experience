@@ -49,8 +49,8 @@ export function MumtHero() {
             />
 
             <div className="wrap relative z-10 pt-8 lg:pt-0">
-                <p className="t-label mb-5 flex items-center gap-3 text-hmd">
-                    <span className="block h-px w-8 bg-hmd" aria-hidden />
+                <p className="t-label mb-5 flex items-center gap-3 text-accent">
+                    <span className="block h-px w-8 bg-accent" aria-hidden />
                     {h.kicker}
                 </p>
                 <h1 id="mumt-title" className="t-display max-w-[14ch] text-fg">

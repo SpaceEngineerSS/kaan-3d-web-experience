@@ -1,30 +1,31 @@
 @import "tailwindcss";
 
 /*
- * KAAN — tokens.
- * Colours come from the aircraft's own world: a morning sky over Ankara, the grey of the P0 topcoat,
- * the black of a cockpit display, the green of the TULGAR visor, the red of the flag on the fin.
- * Display colours keep their cockpit meaning: green = own/normal, yellow = caution,
- * red = warning/hostile, cyan = information.
+ * Hangar monograph. Anthracite ground, RAM-grey plates, off-white technical paper, one burner-amber
+ * accent. The cockpit-display colours (hmd / info / caution / warn) keep their MIL-STD meaning and
+ * are used only inside the simulated displays.
  */
 @theme inline {
   --font-display: var(--font-chakra), "Arial Narrow", sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  /* Flight-test terminal: carbon black, anodised titanium, hairlines, two tactical accents. */
-  --color-ink: #050608;
-  --color-ink-2: #0b0d12;
-  --color-plate: #0b0d12;
-  --color-edge: rgba(255, 255, 255, 0.07);
-  --color-edge-2: rgba(255, 255, 255, 0.14);
-  --color-fg: #eceff4;
-  --color-fg-2: #b4bcc5;
-  --color-muted: #7c8692;
-  --color-faint: #646e78;
+  --color-ink: #08090b;
+  --color-ink-2: #0d0f12;
+  --color-plate: #0d0f12;
+  --color-ram: #1a1d21;
+  --color-edge: rgba(234, 234, 230, 0.1);
+  --color-edge-2: rgba(234, 234, 230, 0.18);
+  --color-fg: #eaeae6;
+  --color-fg-2: #b9bcc0;
+  --color-muted: #8c9199;
+  --color-faint: #6b7078;
   --color-topcoat: #8a939c;
-  --color-burn: #ff3b00;
-  --color-flag: #ff3b00;
+  --color-ti: #c9b79c;
+  --color-accent: #e06c2b;
+  --color-burn: #e06c2b;
+  --color-flag: #e30a17;
+
   --color-hmd: #00e575;
   --color-info: #8fb8d8;
   --color-caution: #ffcc3d;
@@ -32,6 +33,7 @@
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-sweep: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 :root {
@@ -42,6 +44,7 @@
   --step-3: clamp(1.875rem, 1.5rem + 1.6vw, 3rem);
   --step-4: clamp(2.5rem, 1.8rem + 3.2vw, 5rem);
   --step-5: clamp(3.75rem, 2rem + 8vw, 10rem);
+  --step-mon: clamp(5.5rem, 1rem + 17vw, 22rem);
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 3rem);
   color-scheme: dark;
 }
@@ -81,7 +84,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-hmd);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
@@ -102,6 +105,24 @@ canvas {
 }
 
 /* ── Type roles ─────────────────────────────────── */
+/* Monument: the section word that sits behind and around the aircraft. */
+.t-monument {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-mon);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  color: var(--color-fg);
+  white-space: nowrap;
+  font-kerning: normal;
+}
+
+.t-monument--ghost {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-edge-2);
+}
+
 .t-display {
   font-family: var(--font-display);
   font-weight: 700;
@@ -143,12 +164,11 @@ canvas {
   text-wrap: pretty;
 }
 
-/* Cockpit-style label: B612 Mono, caps, a little tracking. */
 .t-label {
   font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.35;
-  letter-spacing: 0.15em;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
@@ -165,18 +185,16 @@ canvas {
   line-height: 0.9;
 }
 
-/* Telemetry readout: what every number on the terminal uses. */
 .t-tele {
   font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.35;
-  letter-spacing: 0.15em;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
 
-/* 1px engineering rule and 5×5 crosshair marks at grid intersections. */
 .hair {
   border-color: var(--color-edge);
 }
@@ -207,11 +225,11 @@ canvas {
   right: -5px;
 }
 
-/* Bracketed engineering toggle: [ AUDIO // MUTE ] */
+/* Bracketed toggle: [ SES ] */
 .toggle {
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.15em;
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-muted);
   min-height: 32px;
@@ -236,7 +254,13 @@ canvas {
 }
 
 .toggle[data-live="true"] {
-  color: var(--color-hmd);
+  color: var(--color-accent);
+}
+
+/* A reading block: the one text column a scene allows. Opaque, ruled top and bottom, no side frame. */
+.plate {
+  background: var(--color-ink);
+  border-block: 1px solid var(--color-edge-2);
 }
 
 /* ── Layout ─────────────────────────────────────── */
@@ -269,9 +293,6 @@ canvas {
 .chapter + .chapter {
   border-top: 1px solid var(--color-edge);
 }
-
-
-
 
 .link {
   background-image: linear-gradient(currentColor, currentColor);
@@ -374,16 +395,6 @@ canvas {
   }
 }
 
-
-@keyframes spin-slow {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 6s linear infinite;
-}
 
 .overflow-locked {
   overflow: hidden !important;

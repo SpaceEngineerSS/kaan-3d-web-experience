@@ -71,7 +71,7 @@ export function S01() {
                     <div className="col-span-12 border border-edge bg-ink/92 p-3 sm:col-span-8 sm:col-start-5 md:row-start-3 md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
                         <p className="t-tele flex justify-between border-b border-edge-2 pb-1.5 text-fg">
                             <span>{c.logTitle}</span>
-                            <span className="text-hmd">REC</span>
+                            <span className="text-accent">REC</span>
                         </p>
                         <dl className="m-0">
                             {c.log.map((row) => (

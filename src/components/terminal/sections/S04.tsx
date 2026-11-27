@@ -144,7 +144,7 @@ export function S04() {
                             aria-controls="s04-panel"
                             onClick={() => pick(id)}
                             style={{ visibility: "hidden" }}
-                            className={`cross pointer-events-auto absolute left-0 top-0 z-10 h-9 w-9 border ${selected === id ? "border-hmd" : "border-transparent hover:border-edge-2"}`}
+                            className={`cross pointer-events-auto absolute left-0 top-0 z-10 h-9 w-9 border ${selected === id ? "border-accent" : "border-transparent hover:border-edge-2"}`}
                         />
                     ))}
                 </div>

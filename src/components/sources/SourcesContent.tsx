@@ -69,7 +69,7 @@ export function SourcesContent() {
         <div className="wrap pb-28 pt-32 md:pb-40 md:pt-40">
             <header className="grid gap-6 md:grid-cols-12 md:gap-8">
                 <div className="md:col-span-3 lg:col-span-2">
-                    <p className="t-label border-t border-edge pt-3 text-hmd">{c.kicker}</p>
+                    <p className="t-label border-t border-edge pt-3 text-accent">{c.kicker}</p>
                 </div>
                 <div className="md:col-span-9 lg:col-span-8">
                     <h1 className="t-h2 max-w-[18ch]">{c.title}</h1>
@@ -94,7 +94,7 @@ export function SourcesContent() {
                                     {g.items.map((s) => (
                                         <div key={s.url} className="border-b border-edge py-4 last:border-b-0 last:pb-0">
                                             <dt>
-                                                <a href={s.url} target="_blank" rel="noopener noreferrer" className="link inline-flex items-center gap-2 text-fg hover:text-hmd">
+                                                <a href={s.url} target="_blank" rel="noopener noreferrer" className="link inline-flex items-center gap-2 text-fg hover:text-accent">
                                                     {s.name}
                                                     <OutArrow />
                                                 </a>

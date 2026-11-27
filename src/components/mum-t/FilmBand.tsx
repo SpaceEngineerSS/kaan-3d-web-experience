@@ -18,7 +18,7 @@ export function FilmBand() {
                 aria-hidden
             />
             <div className="wrap pb-12 pt-40 md:pb-16">
-                <p className="t-label text-hmd">{c.label}</p>
+                <p className="t-label text-accent">{c.label}</p>
                 <h2 id="mumt-film-title" className="t-h2 mt-4 max-w-[20ch] text-fg" data-reveal>
                     {c.statement}
                 </h2>

@@ -12,12 +12,11 @@ const RADII: Record<LayerId, number> = { long: 175, medium: 120, short: 68, targ
 const ORDER: LayerId[] = ["long", "medium", "short", "target"];
 
 /** A small arrowhead marker pointing right (direction of travel). */
-function Marker({ x, y, size = 9, hmd = false }: { x: number; y: number; size?: number; hmd?: boolean }) {
-    // Own aircraft in HMD green, data-linked wingmen in info cyan.
+function Marker({ x, y, size = 9, own = false }: { x: number; y: number; size?: number; own?: boolean }) {
     return (
         <path
             d={`M ${x + size} ${y} L ${x - size} ${y - size * 0.75} L ${x - size * 0.45} ${y} L ${x - size} ${y + size * 0.75} Z`}
-            fill={hmd ? "var(--color-hmd)" : "var(--color-info)"}
+            fill={own ? "var(--color-accent)" : "var(--color-fg-2)"}
         />
     );
 }
@@ -75,15 +74,15 @@ export function ThreatLandscape() {
 
                         {/* platforms */}
                         <g fontFamily="var(--font-mono)" fontSize="11">
-                            <Marker x={70} y={CY} size={11} hmd />
-                            <text x={52} y={CY + 26} fill="var(--color-hmd)">{c.platforms.kaan}</text>
+                            <Marker x={70} y={CY} size={11} own />
+                            <text x={52} y={CY + 26} fill="var(--color-accent)">{c.platforms.kaan}</text>
 
                             <Marker x={292} y={CY - 58} />
                             <Marker x={300} y={CY + 54} />
-                            <text x={252} y={CY + 82} fill="var(--color-info)">{c.platforms.anka}</text>
+                            <text x={252} y={CY + 82} fill="var(--color-fg-2)">{c.platforms.anka}</text>
 
                             <Marker x={380} y={CY - 18} size={6} />
-                            <text x={322} y={CY - 32} fill="var(--color-info)">{c.platforms.simsek}</text>
+                            <text x={322} y={CY - 32} fill="var(--color-fg-2)">{c.platforms.simsek}</text>
 
                             {/* stand-off arrow from KAAN */}
                             <line x1={90} y1={CY} x2={250} y2={CY} stroke="var(--color-edge-2)" strokeDasharray="3 4" />

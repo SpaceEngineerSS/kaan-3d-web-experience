@@ -27,7 +27,7 @@ export function PlatformCompare() {
                             <thead>
                                 <tr className="t-label border-b border-edge-2">
                                     <th scope="col" className="py-3 pr-4 font-normal">{c.colItem}</th>
-                                    <th scope="col" className="py-3 pr-4 font-normal text-hmd">KAAN</th>
+                                    <th scope="col" className="py-3 pr-4 font-normal text-accent">KAAN</th>
                                     <th scope="col" className="py-3 font-normal text-fg">ANKA-3</th>
                                 </tr>
                             </thead>
@@ -75,9 +75,9 @@ function PlanDrawing() {
     const H = 360;
     const oy = 30;
     const items = [
-        { name: "KAAN", d: planDims.kaan, x: 30, hmd: true, end: false },
-        { name: "ANKA-3", d: planDims.anka, x: 250, hmd: false, end: false },
-        { name: "Süper Şimşek", d: planDims.simsek, x: 450, hmd: false, end: true },
+        { name: "KAAN", d: planDims.kaan, x: 30, own: true, end: false },
+        { name: "ANKA-3", d: planDims.anka, x: 250, own: false, end: false },
+        { name: "Süper Şimşek", d: planDims.simsek, x: 450, own: false, end: true },
     ];
 
     return (
@@ -92,12 +92,12 @@ function PlanDrawing() {
             {items.map((it) => {
                 const w = it.d.span * s;
                 const h = it.d.length * s;
-                const stroke = it.hmd ? "var(--color-hmd)" : "var(--color-info)";
+                const stroke = it.own ? "var(--color-accent)" : "var(--color-fg-2)";
                 return (
                     <g key={it.name} fontFamily="var(--font-mono)" fontSize="11">
-                        <rect x={it.x} y={oy} width={w} height={h} fill={it.hmd ? "var(--color-hmd-soft)" : "none"} stroke={stroke} strokeDasharray={it.hmd ? undefined : "4 4"} />
+                        <rect x={it.x} y={oy} width={w} height={h} fill={it.own ? "rgba(224,108,43,0.08)" : "none"} stroke={stroke} strokeDasharray={it.own ? undefined : "4 4"} />
                         <line x1={it.x + w / 2} y1={oy - 10} x2={it.x + w / 2} y2={oy + h + 10} stroke="var(--color-edge-2)" strokeDasharray="10 3 2 3" />
-                        <text x={it.end ? it.x + w : it.x} y={oy + h + 26} textAnchor={it.end ? "end" : "start"} fill={it.hmd ? "var(--color-hmd)" : "var(--color-fg)"}>
+                        <text x={it.end ? it.x + w : it.x} y={oy + h + 26} textAnchor={it.end ? "end" : "start"} fill={it.own ? "var(--color-accent)" : "var(--color-fg)"}>
                             {it.name}
                         </text>
                         <text x={it.end ? it.x + w : it.x} y={oy + h + 42} textAnchor={it.end ? "end" : "start"} fill="var(--color-muted)">

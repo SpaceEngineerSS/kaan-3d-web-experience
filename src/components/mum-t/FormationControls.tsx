@@ -15,7 +15,7 @@ export function FormationControls({ mode, onChange }: { mode: FormationMode; onC
                 <p id="formation-label" className="t-label">
                     {h.controls}
                 </p>
-                <span className="t-label text-hmd">{h.modes[mode].label}</span>
+                <span className="t-label text-accent">{h.modes[mode].label}</span>
             </div>
             <div className="p-4">
             <div className="seg flex-wrap" role="group" aria-labelledby="formation-label">

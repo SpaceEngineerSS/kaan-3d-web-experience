@@ -72,7 +72,7 @@ export function DataLinkDiagram() {
                                 <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--color-edge)" strokeWidth="0.5" />
                             </pattern>
                             <marker id="dl-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                                <path d="M0 0 L10 5 L0 10 Z" fill="var(--color-info)" />
+                                <path d="M0 0 L10 5 L0 10 Z" fill="var(--color-fg-2)" />
                             </marker>
                         </defs>
                         <rect width="640" height="400" fill="#000" />
@@ -85,7 +85,7 @@ export function DataLinkDiagram() {
 
                         {FLOWS[type].map(([a, b]) => {
                             const s = trimmed(a, b, 38, 6);
-                            return <line key={`${type}-${a}-${b}`} {...s} stroke="var(--color-info)" strokeWidth="1.3" markerEnd="url(#dl-arrow)" />;
+                            return <line key={`${type}-${a}-${b}`} {...s} stroke="var(--color-fg-2)" strokeWidth="1.3" markerEnd="url(#dl-arrow)" />;
                         })}
 
                         <g fontFamily="var(--font-mono)" fontSize="12">
@@ -98,9 +98,9 @@ export function DataLinkDiagram() {
                                         {isGround ? (
                                             <rect x={n.x - 12} y={n.y - 12} width="24" height="24" fill="#000" stroke="var(--color-topcoat)" />
                                         ) : (
-                                            <circle cx={n.x} cy={n.y} r={id === "simsek" ? 9 : 14} fill="#000" stroke={isKaan ? "var(--color-hmd)" : "var(--color-info)"} strokeWidth={isKaan ? 1.6 : 1} />
+                                            <circle cx={n.x} cy={n.y} r={id === "simsek" ? 9 : 14} fill="#000" stroke={isKaan ? "var(--color-accent)" : "var(--color-fg-2)"} strokeWidth={isKaan ? 1.6 : 1} />
                                         )}
-                                        <text x={n.x} y={n.y + (id === "simsek" ? 26 : 32)} textAnchor="middle" fill={isKaan ? "var(--color-hmd)" : "var(--color-fg-2)"}>
+                                        <text x={n.x} y={n.y + (id === "simsek" ? 26 : 32)} textAnchor="middle" fill={isKaan ? "var(--color-accent)" : "var(--color-fg-2)"}>
                                             {labels[id]}
                                         </text>
                                     </g>

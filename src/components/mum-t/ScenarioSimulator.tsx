@@ -12,12 +12,12 @@ const S = 6; // map units → px
 const TARGET: Pos = [86, 30];
 const RINGS = [30, 20, 10];
 
-function Craft({ pos, size, hmd = false, label }: { pos: Pos; size: number; hmd?: boolean; label?: string }) {
+function Craft({ pos, size, own = false, label }: { pos: Pos; size: number; own?: boolean; label?: string }) {
     return (
         <g style={{ transform: `translate(${pos[0] * S}px, ${pos[1] * S}px)`, transition: "transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)" }}>
-            <path d={`M ${size} 0 L ${-size} ${-size * 0.75} L ${-size * 0.45} 0 L ${-size} ${size * 0.75} Z`} fill={hmd ? "var(--color-hmd)" : "var(--color-info)"} />
+            <path d={`M ${size} 0 L ${-size} ${-size * 0.75} L ${-size * 0.45} 0 L ${-size} ${size * 0.75} Z`} fill={own ? "var(--color-accent)" : "var(--color-fg-2)"} />
             {label && (
-                <text x={-size} y={size + 14} fontFamily="var(--font-mono)" fontSize="11" fill={hmd ? "var(--color-hmd)" : "var(--color-info)"}>
+                <text x={-size} y={size + 14} fontFamily="var(--font-mono)" fontSize="11" fill={own ? "var(--color-accent)" : "var(--color-fg-2)"}>
                     {label}
                 </text>
             )}
@@ -74,23 +74,23 @@ export function ScenarioSimulator() {
                         })}
                         <rect x={TARGET[0] * S - 6} y={TARGET[1] * S - 6} width="12" height="12" fill="none" stroke="var(--color-fg)" />
 
-                        <Craft pos={geo.kaan} size={10} hmd label="KAAN" />
+                        <Craft pos={geo.kaan} size={10} own label="KAAN" />
                         <Craft pos={geo.anka1} size={8} label="ANKA-3" />
                         <Craft pos={geo.anka2} size={8} label="ANKA-3" />
                         {geo.simsek && <Craft pos={geo.simsek} size={5} />}
                     </svg>
 
                     <ul className="t-label mt-4 flex flex-wrap gap-x-6 gap-y-2">
-                        <li className="flex items-center gap-2 text-hmd">
+                        <li className="flex items-center gap-2 text-accent">
                             <svg width="12" height="10" viewBox="-6 -5 12 10" aria-hidden><path d="M6 0 L-6 -4.5 L-2.7 0 L-6 4.5 Z" fill="currentColor" /></svg>
                             {c.legend.kaan}
                         </li>
                         <li className="flex items-center gap-2">
-                            <svg width="12" height="10" viewBox="-6 -5 12 10" aria-hidden><path d="M6 0 L-6 -4.5 L-2.7 0 L-6 4.5 Z" fill="var(--color-info)" /></svg>
+                            <svg width="12" height="10" viewBox="-6 -5 12 10" aria-hidden><path d="M6 0 L-6 -4.5 L-2.7 0 L-6 4.5 Z" fill="var(--color-fg-2)" /></svg>
                             {c.legend.anka}
                         </li>
                         <li className="flex items-center gap-2">
-                            <svg width="8" height="8" viewBox="-4 -4 8 8" aria-hidden><path d="M4 0 L-4 -3 L-1.8 0 L-4 3 Z" fill="var(--color-info)" /></svg>
+                            <svg width="8" height="8" viewBox="-4 -4 8 8" aria-hidden><path d="M4 0 L-4 -3 L-1.8 0 L-4 3 Z" fill="var(--color-fg-2)" /></svg>
                             {c.legend.simsek}
                         </li>
                         <li className="flex items-center gap-2">
@@ -117,7 +117,7 @@ export function ScenarioSimulator() {
                                         aria-current={current ? "step" : undefined}
                                         className={`grid min-h-11 w-full grid-cols-[2.5rem_1fr] gap-3 py-3 text-left transition-colors ${current ? "text-fg" : "text-muted hover:text-fg-2"}`}
                                     >
-                                        <span className={`t-data text-sm ${current ? "text-hmd" : ""}`}>{String(i + 1).padStart(2, "0")}</span>
+                                        <span className={`t-data text-sm ${current ? "text-accent" : ""}`}>{String(i + 1).padStart(2, "0")}</span>
                                         <span>
                                             <span className="block font-medium">{s.title}</span>
                                             {current && <span className="mt-1 block text-[0.9375rem] leading-relaxed text-fg-2">{s.body}</span>}

@@ -7,6 +7,12 @@
 export const SECTION_IDS = ["s01", "s02", "s03", "s04", "s05"] as const;
 export type SectionId = (typeof SECTION_IDS)[number];
 
+export const MODES = ["airframe", "xray", "aero", "eoir"] as const;
+export type Mode = (typeof MODES)[number];
+
+/** The inspection mode each section opens in; the mode bar can override it until the section changes. */
+export const SECTION_MODE: Mode[] = ["airframe", "xray", "eoir", "airframe", "airframe"];
+
 export interface Anchor {
     /** Screen position in CSS px, relative to the viewport. */
     x: number;
@@ -25,8 +31,14 @@ export interface TerminalState {
     /** Normalised pointer, −1..1. */
     px: number;
     py: number;
-    /** Overlays visible ([ TELEMETRY: ACTIVE ]). */
+    /** Overlays visible ([ HUD ]). */
     telemetry: boolean;
+    /** Inspection mode the scene sweeps to. */
+    mode: Mode;
+    /** Free orbit inspection: scroll is locked and the camera leaves the spline. */
+    inspect: boolean;
+    /** Procedural sound on. */
+    sound: boolean;
     /** Measured frames per second of the main loop. */
     fps: number;
     /** Projected 3D anchors keyed by name, written by the scene each frame. */
@@ -40,6 +52,9 @@ export const terminal: TerminalState = {
     px: 0,
     py: 0,
     telemetry: true,
+    mode: "airframe",
+    inspect: false,
+    sound: false,
     fps: 60,
     anchors: {},
 };
@@ -62,5 +77,17 @@ export function notifyTerminal() {
 export function setTelemetry(on: boolean) {
     terminal.telemetry = on;
     document.documentElement.dataset.telemetry = on ? "on" : "off";
+    notifyTerminal();
+}
+
+export function setMode(mode: Mode) {
+    if (terminal.mode === mode) return;
+    terminal.mode = mode;
+    notifyTerminal();
+}
+
+export function setInspect(on: boolean) {
+    if (terminal.inspect === on) return;
+    terminal.inspect = on;
     notifyTerminal();
 }

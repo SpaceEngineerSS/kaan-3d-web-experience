@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { StatusBar } from "@/components/shell/StatusBar";
+import { Footer } from "@/components/shell/Footer";
 import { MumtHero } from "@/components/mum-t/MumtHero";
 import { FilmBand } from "@/components/mum-t/FilmBand";
 import { MumTConcept } from "@/components/mum-t/MumTConcept";
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 export default function MumTPage() {
     return (
         <>
-            <Navbar items={MUMT_NAV} homeHref="#top" route={{ href: "/", label: { tr: "KAAN", en: "KAAN" } }} />
+            <StatusBar items={MUMT_NAV} />
             <main id="main" className="relative bg-ink">
                 <MumtHero />
                 <FilmBand />

@@ -31,7 +31,7 @@ export function Chapter({ id, index, label, title, lede, solid, tight, className
                 <header className="grid gap-6 md:grid-cols-12 md:gap-8">
                     <div className="md:col-span-3 lg:col-span-2">
                         <div className="flex items-baseline gap-3 border-t border-edge pt-3 md:block">
-                            <span className="t-data text-sm text-hmd">{String(index).padStart(2, "0")}</span>
+                            <span className="t-data text-sm text-accent">{String(index).padStart(2, "0")}</span>
                             <span className="t-label md:mt-1 md:block">{label}</span>
                         </div>
                     </div>

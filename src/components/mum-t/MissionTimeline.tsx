@@ -8,7 +8,7 @@ const KEYS: PlatformKey[] = ["kaan", "anka", "simsek"];
 
 function RoleMark({ role, platform, label }: { role?: "lead" | "support"; platform: PlatformKey; label: string }) {
     if (!role) return <span className="block h-px w-4 bg-edge-2" aria-hidden />;
-    const colour = platform === "kaan" ? "var(--color-hmd)" : "var(--color-info)";
+    const colour = platform === "kaan" ? "var(--color-accent)" : "var(--color-fg-2)";
     return (
         <span className="inline-flex items-center gap-2">
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
@@ -34,7 +34,7 @@ export function MissionTimeline() {
                             <th scope="col" className="w-12 py-3 pr-4 font-normal">#</th>
                             <th scope="col" className="py-3 pr-6 font-normal">{c.colPhase}</th>
                             {KEYS.map((k) => (
-                                <th key={k} scope="col" className={`w-36 py-3 pr-4 font-normal ${k === "kaan" ? "text-hmd" : ""}`}>
+                                <th key={k} scope="col" className={`w-36 py-3 pr-4 font-normal ${k === "kaan" ? "text-accent" : ""}`}>
                                     {c.platforms[k]}
                                 </th>
                             ))}

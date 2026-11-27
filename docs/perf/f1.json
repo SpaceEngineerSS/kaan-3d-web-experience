@@ -1,0 +1,200 @@
+{
+  "base": "http://localhost:3210",
+  "date": "2026-11-27T08:36:34.892Z",
+  "consoleErrors": [],
+  "shots": [
+    {
+      "name": "s01-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "s02-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 1
+    },
+    {
+      "name": "s03-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "s04-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 27,
+        "triangles": 13539,
+        "points": 180000,
+        "lines": 8843,
+        "geometries": 9,
+        "textures": 17,
+        "programs": 11
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 3
+    },
+    {
+      "name": "s05-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": null,
+      "fps": 144,
+      "stats": {
+        "calls": 27,
+        "triangles": 13539,
+        "points": 180000,
+        "lines": 8843,
+        "geometries": 9,
+        "textures": 17,
+        "programs": 11
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "mum-t-1440",
+      "path": "/mum-t",
+      "width": 1440,
+      "mode": null,
+      "fps": 143,
+      "stats": null,
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "kaynaklar-1440",
+      "path": "/kaynaklar",
+      "width": 1440,
+      "mode": null,
+      "fps": 144,
+      "stats": null,
+      "overflow": false,
+      "blocks": 0,
+      "labels": 0
+    },
+    {
+      "name": "mode-airframe-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "airframe",
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 1
+    },
+    {
+      "name": "mode-xray-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "xray",
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 1
+    },
+    {
+      "name": "mode-aero-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "aero",
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 1
+    },
+    {
+      "name": "mode-eoir-1440",
+      "path": "/",
+      "width": 1440,
+      "mode": "eoir",
+      "fps": 144,
+      "stats": {
+        "calls": 24,
+        "triangles": 13539,
+        "points": 120000,
+        "lines": 8840,
+        "geometries": 7,
+        "textures": 17,
+        "programs": 10
+      },
+      "overflow": false,
+      "blocks": 0,
+      "labels": 1
+    }
+  ]
+}

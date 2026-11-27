@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { StatusBar } from "@/components/terminal/StatusBar";
-import { Frame } from "@/components/terminal/Frame";
+import { StatusBar } from "@/components/shell/StatusBar";
+import { Frame } from "@/components/shell/Frame";
 import { TerminalDriver } from "@/components/terminal/TerminalDriver";
 import { LeaderLines } from "@/components/terminal/LeaderLines";
 import { S01 } from "@/components/terminal/sections/S01";
@@ -8,7 +8,7 @@ import { S02 } from "@/components/terminal/sections/S02";
 import { S03 } from "@/components/terminal/sections/S03";
 import { S04 } from "@/components/terminal/sections/S04";
 import { S05 } from "@/components/terminal/sections/S05";
-import { Footer } from "@/components/Footer";
+import { Footer } from "@/components/shell/Footer";
 import { SceneMount } from "@/components/terminal/SceneMount";
 
 export const metadata: Metadata = {

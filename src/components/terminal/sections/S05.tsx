@@ -251,7 +251,7 @@ function Matrix() {
                                                 <span className={`t-tele ${kaan ? "text-fg" : ""}`}>{f.name}</span>
                                                 <span className="relative block h-2 border border-edge" aria-hidden>
                                                     <span
-                                                        className={`absolute inset-y-0 left-0 ${kaan ? "bg-hmd" : "bg-topcoat/50"} ${m.est(f) ? "opacity-60" : ""}`}
+                                                        className={`absolute inset-y-0 left-0 ${kaan ? "bg-accent" : "bg-topcoat/50"} ${m.est(f) ? "opacity-60" : ""}`}
                                                         style={{ width: `${pct}%` }}
                                                     />
                                                 </span>
@@ -337,8 +337,8 @@ function PlanView() {
                 ))}
                 {PEERS.filter((f) => f.id === "kaan").map((f) => (
                     <g key={f.id}>
-                        <rect x={cx - f.span / 2} y={top} width={f.span} height={f.length} fill="none" stroke="var(--color-hmd)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
-                        <text x={cx - f.span / 2 + 0.2} y={top + f.length - 0.3} fontSize={0.6} fill="var(--color-hmd)" fontFamily="var(--font-mono)">
+                        <rect x={cx - f.span / 2} y={top} width={f.span} height={f.length} fill="none" stroke="var(--color-accent)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+                        <text x={cx - f.span / 2 + 0.2} y={top + f.length - 0.3} fontSize={0.6} fill="var(--color-accent)" fontFamily="var(--font-mono)">
                             {f.name}
                         </text>
                     </g>
@@ -347,7 +347,7 @@ function PlanView() {
             <dl className="mt-4 grid gap-px border border-edge bg-edge">
                 {PEERS.map((f) => (
                     <div key={f.id} className="grid grid-cols-[4rem_1fr] bg-ink px-3 py-1.5">
-                        <dt className={`t-tele ${f.id === "kaan" ? "text-hmd" : ""}`}>{f.name}</dt>
+                        <dt className={`t-tele ${f.id === "kaan" ? "text-accent" : ""}`}>{f.name}</dt>
                         <dd className="t-data text-right text-[0.75rem] text-fg-2">
                             {fmt(f.length, locale)} × {fmt(f.span, locale)} m
                         </dd>
@@ -378,7 +378,7 @@ function Programme() {
                 <ol className="grid gap-px bg-edge">
                     {events.map((e) => (
                         <li key={e.id} className={`grid gap-px bg-edge md:grid-cols-[12rem_1fr_9rem] ${e.done ? "" : "opacity-60"}`}>
-                            <p className={`t-data bg-ink px-4 pt-3 text-[0.75rem] md:py-3 ${e.key ? "text-hmd" : "text-fg-2"}`}>{e.date[locale]}</p>
+                            <p className={`t-data bg-ink px-4 pt-3 text-[0.75rem] md:py-3 ${e.key ? "text-accent" : "text-fg-2"}`}>{e.date[locale]}</p>
                             <div className="bg-ink px-4 py-1 md:py-3">
                                 <p className={`text-[0.9375rem] ${e.done ? "text-fg" : "text-muted"}`}>{e.title[locale]}</p>
                                 <p className="mt-1 max-w-[70ch] text-[0.8125rem] leading-relaxed text-muted">{e.body[locale]}</p>

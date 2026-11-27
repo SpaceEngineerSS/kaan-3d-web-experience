@@ -63,7 +63,7 @@ export function SuperSimsekShowcase() {
                             ))}
                         </tbody>
                     </table>
-                    <p className="mt-4 border-l-2 border-hmd pl-4 text-[0.9375rem] leading-relaxed text-fg-2">{c.uncertain}</p>
+                    <p className="mt-4 border-l-2 border-accent pl-4 text-[0.9375rem] leading-relaxed text-fg-2">{c.uncertain}</p>
 
                     <h3 className="t-h3 mt-12">{c.rolesTitle}</h3>
                     <dl className="mt-4 border-t border-edge">

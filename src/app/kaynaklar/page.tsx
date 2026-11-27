@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { StatusBar } from "@/components/shell/StatusBar";
+import { Footer } from "@/components/shell/Footer";
 import { SourcesContent } from "@/components/sources/SourcesContent";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function SourcesPage() {
     return (
         <>
-            <Navbar items={[]} homeHref="/" route={{ href: "/", label: { tr: "Ana sayfa", en: "Home" } }} />
+            <StatusBar />
             <main id="main" className="relative">
                 <SourcesContent />
             </main>
